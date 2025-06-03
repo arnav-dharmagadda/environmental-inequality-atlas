@@ -5,8 +5,9 @@
 # AUTHOR: Arnav Dharmagadda
 # CREATED: June 3rd, 2025
 ################################################################################
-# INPUTS: 
-# OUTPUTS:
+# INPUTS: gridpoints_with_county_2020.rda, gridded_eif_pop_ageracesex files
+# (1999-2023)
+# OUTPUTS: None.
 ################################################################################
 
 #### Clear Environment ####
@@ -20,8 +21,8 @@ setwd("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environm
 data_path <- "data/"
 
 ageracesex_paths <- setNames(
-    paste0(data_path, "gridded_eif_pop_ageracesex/gridded_eif_pop_ageracesex_", 1999:2023, ".parquet"),
-    paste0("ageracesex_", 1999:2023, "_path")
+  paste0(data_path, "gridded_eif_pop_ageracesex/gridded_eif_pop_ageracesex_", 1999:2023, ".parquet"),
+  paste0("ageracesex_", 1999:2023, "_path")
 )
 list2env(as.list(ageracesex_paths), envir = .GlobalEnv)
 
@@ -41,12 +42,25 @@ load(gridpoints_path)
 gridpoints <- df
 rm(df)
 
-library(arrow)
-
-for (year in 1999:2023) {
+for (year in 2020:2023) {
   path_var <- paste0("ageracesex_", year, "_path")
   path <- get(path_var)
   assign(paste0("ageracesex_", year), read_parquet(path))
 }
 
+#### Filter and Clean Data ####
 
+gridpoints <- gridpoints %>%
+  filter(STATEFP == "51", COUNTYFP %in% c("540", "003")) %>%
+  rename(
+    grid_lon = pm25_grid_x,
+    grid_lat = pm25_grid_y
+  )
+
+for (year in 2020:2023) {
+  ageracesex_name <- paste0("ageracesex_", year)
+  assign(
+    ageracesex_name,
+    left_join(gridpoints, get(ageracesex_name), by = c("grid_lon", "grid_lat"))
+  )
+}
