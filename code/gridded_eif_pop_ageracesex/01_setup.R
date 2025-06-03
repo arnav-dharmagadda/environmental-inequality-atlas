@@ -64,3 +64,15 @@ for (year in 2020:2023) {
     left_join(gridpoints, get(ageracesex_name), by = c("grid_lon", "grid_lat"))
   )
 }
+
+for (year in 2020:2023) {
+  ageracesex_name <- paste0("ageracesex_", year)
+  df <- get(ageracesex_name)
+  df_wide <- df %>%
+    pivot_wider(
+      names_from = c(race_ethnicity),
+      values_from = n_noise,
+      names_sep = "_"
+    )
+  assign(ageracesex_name, df_wide)
+}
