@@ -61,12 +61,13 @@ race_2023 <- ageracesex_2023 %>%
     ) %>%
     group_by(grid_lon, grid_lat) %>%
     summarize(
-      Asian = sum(Asian, na.rm = TRUE),
-      White = sum(White, na.rm = TRUE),
-      `Other/Unknown` = sum(`Other/Unknown`, na.rm = TRUE),
-      Black = sum(Black, na.rm = TRUE),
-      Hispanic = sum(Hispanic, na.rm = TRUE),
-      AIAN = sum(AIAN, na.rm = TRUE),
+      asian = sum(Asian, na.rm = TRUE),
+      white = sum(White, na.rm = TRUE),
+      `other` = sum(`Other/Unknown`, na.rm = TRUE),
+      black = sum(Black, na.rm = TRUE),
+      hispanic = sum(Hispanic, na.rm = TRUE),
+      aian = sum(AIAN, na.rm = TRUE),
+      total = sum(c(Asian, White, Black, Hispanic, AIAN, `Other/Unknown`), na.rm = TRUE),
       STATEFP = first(STATEFP),
       COUNTYFP = first(COUNTYFP),
       COUNTYNS = first(COUNTYNS),
@@ -77,6 +78,12 @@ race_2023 <- ageracesex_2023 %>%
       ALAND = first(ALAND),
       AWATER = first(AWATER),
       .groups = "drop"
+    ) %>%
+    mutate(
+      black_share = black / total,
+      white_share = white / total,
+      hispanic_share = hispanic / total,
+      asian_share = asian / total
     )
 
 sex_2023 <- ageracesex_2023 %>%
@@ -87,8 +94,9 @@ sex_2023 <- ageracesex_2023 %>%
   ) %>%
   group_by(grid_lon, grid_lat) %>%
   summarize(
-    Male = sum(M, na.rm = TRUE),
-    Female = sum(F, na.rm = TRUE),
+    male = sum(M, na.rm = TRUE),
+    female = sum(F, na.rm = TRUE),
+    total = sum(c(M, F), na.rm = TRUE),
     STATEFP = first(STATEFP),
     COUNTYFP = first(COUNTYFP),
     COUNTYNS = first(COUNTYNS),
@@ -99,6 +107,10 @@ sex_2023 <- ageracesex_2023 %>%
     ALAND = first(ALAND),
     AWATER = first(AWATER),
     .groups = "drop"
+  ) %>%
+  mutate(
+    male_share = male / total,
+    female_share = female / total
   )
 
 age_2023 <- ageracesex_2023 %>%
