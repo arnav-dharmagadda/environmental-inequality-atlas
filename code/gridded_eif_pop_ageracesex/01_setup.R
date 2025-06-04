@@ -71,8 +71,57 @@ for (year in 2020:2023) {
   df_wide <- df %>%
     pivot_wider(
       names_from = c(race_ethnicity),
-      values_from = n_noise,
+      values_from = n_noise_postprocessed,
       names_sep = "_"
     )
   assign(ageracesex_name, df_wide)
 }
+
+# Collapse based on race variables
+
+ageracesex_2020 <- ageracesex_2020 %>%
+  group_by(grid_lon, grid_lat) %>%
+  summarize(
+    Asian = sum(Asian, na.rm = TRUE),
+    White = sum(White, na.rm = TRUE),
+    `Other/Unknown` = sum(`Other/Unknown`, na.rm = TRUE),
+    Black = sum(Black, na.rm = TRUE),
+    Hispanic = sum(Hispanic, na.rm = TRUE),
+    AIAN = sum(AIAN, na.rm = TRUE),
+    STATEFP = first(STATEFP),
+    COUNTYFP = first(COUNTYFP),
+    COUNTYNS = first(COUNTYNS),
+    AFFGEOID = first(AFFGEOID),
+    GEOID = first(GEOID),
+    NAME = first(NAME),
+    LSAD = first (LSAD),
+    ALAND = first(ALAND),
+    AWATER = first(AWATER),
+    .groups = "drop"
+  )
+
+# Step 1: Convert to sf POINT object
+ageracesex_2020 <- st_as_sf(ageracesex_2020, coords = c("grid_lon", "grid_lat"), crs = 4326)
+
+# Step 2: Get expanded bounding box to fully contain all grid cells
+bbox <- st_bbox(ageracesex_2020)
+bbox_expanded <- bbox
+bbox_expanded[c("xmin", "ymin")] <- bbox_expanded[c("xmin", "ymin")] - 0.005
+bbox_expanded[c("xmax", "ymax")] <- bbox_expanded[c("xmax", "ymax")] + 0.005
+
+# Step 3: Create grid polygons at 0.01° resolution covering the area
+grid_polygons <- st_make_grid(
+  cellsize = c(0.01, 0.01),
+  offset = c(bbox_expanded["xmin"], bbox_expanded["ymin"]),
+  n = c(ceiling((bbox_expanded["xmax"] - bbox_expanded["xmin"]) / 0.01),
+        ceiling((bbox_expanded["ymax"] - bbox_expanded["ymin"]) / 0.01)),
+  crs = 4326,
+  what = "polygons"
+)
+
+# Step 4: Convert grid to sf and join with your original data (spatial match)
+grid_sf <- st_sf(geometry = grid_polygons)
+
+# Step 5: Spatial join: match points to polygons (assumes 1 point per cell)
+ageracesex_2020 <- st_join(grid_sf, ageracesex_2020, join = st_contains)
+
