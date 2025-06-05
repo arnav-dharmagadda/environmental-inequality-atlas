@@ -8,66 +8,357 @@
 # OUTPUTS: 
 ################################################################################
 
-tm_shape(ageracesex_2020) +
-  tm_polygons(col = "Hispanic", palette = "viridis",
+#### TOTAL POPULATION DISTRIBUTION ####
+
+tm_basemap("CartoDB.Positron") +
+  tm_shape(race_2023) +
+  tm_polygons(col = "total", palette = "-viridis",
+              title = "Total Population", lwd = 0,
+              style = "cont",
+              lengend.hist = TRUE,
+              colorNA = "transparent",
+              alpha = 0.6) +
+  tm_graticules(
+    n.x = 5,
+    n.y = 5,
+    col = "gray70",
+    lwd = 0.3,
+    labels.size = 0.8
+  ) +
+  tm_layout(
+    main.title = "Charlottesville, 2023", 
+    main.title.position = "center",
+    legend.outside = TRUE
+  )
+
+
+#### RACE SHARE MAPS ####
+
+# Hispanic Population Share
+
+tm_basemap("CartoDB.Positron") +
+tm_shape(race_2023) +
+  tm_polygons(col = "hispanic_share", palette = "-viridis",
+              title = "Hispanic Population Share", lwd = 0,
+              style = "cont",
+              lengend.hist = TRUE,
+              colorNA = "transparent",
+              alpha = 0.6) +
+  tm_graticules(
+    n.x = 5,
+    n.y = 5,
+    col = "gray70",
+    lwd = 0.3,
+    labels.size = 0.8
+  ) +
+  tm_layout(
+    main.title = "Charlottesville, 2023", 
+    main.title.position = "center",
+    legend.outside = TRUE
+  )
+
+# White Population Share
+
+tm_basemap("CartoDB.Positron") +
+  tm_shape(race_2023) +
+  tm_polygons(col = "white_share", palette = "-viridis",
+              title = "White Population Share", lwd = 0,
+              style = "cont",
+              lengend.hist = TRUE,
+              colorNA = "transparent",
+              alpha = 0.6) +
+  tm_graticules(
+    n.x = 5,
+    n.y = 5,
+    col = "gray70",
+    lwd = 0.3,
+    labels.size = 0.8
+  ) +
+  tm_layout(
+    main.title = "Charlottesville, 2023", 
+    main.title.position = "center",
+    legend.outside = TRUE
+  )
+
+# Black Population Share
+
+tm_basemap("CartoDB.Positron") +
+  tm_shape(race_2023) +
+  tm_polygons(col = "black_share", palette = "-viridis",
+              title = "Black Population Share", lwd = 0,
+              style = "cont",
+              lengend.hist = TRUE,
+              colorNA = "transparent",
+              alpha = 0.6) +
+  tm_graticules(
+    n.x = 5,
+    n.y = 5,
+    col = "gray70",
+    lwd = 0.3,
+    labels.size = 0.8
+  ) +
+  tm_layout(
+    main.title = "Charlottesville, 2023", 
+    main.title.position = "center",
+    legend.outside = TRUE
+  )
+
+#### RACE MAPS ####
+
+# Hispanic Population
+
+tm_basemap("CartoDB.Positron") +
+  tm_shape(race_2023) +
+  tm_polygons(col = "hispanic", palette = "-viridis",
               title = "Hispanic Population", lwd = 0,
-              style = "cont", breaks = seq(0, 300, 50),
-              lengend.hist = TRUE) +
+              style = "cont",
+              lengend.hist = TRUE,
+              colorNA = "transparent",
+              alpha = 0.6) +
+  tm_graticules(
+    n.x = 5,
+    n.y = 5,
+    col = "gray70",
+    lwd = 0.3,
+    labels.size = 0.8
+  ) +
   tm_layout(
-    main.title = "Gridded EIF Hispanic Population (2020)",  # ← key change
+    main.title = "Charlottesville, 2023", 
     main.title.position = "center",
-    outer.margins = c(0.05, 0, 0, 0),  # top, right, bottom, left
     legend.outside = TRUE
   )
 
-tm_shape(ageracesex_2020) +
-  tm_polygons(col = "Black", palette = "viridis",
+# White Population
+
+tm_basemap("CartoDB.Positron") +
+  tm_shape(race_2023) +
+  tm_polygons(col = "white", palette = "-viridis",
+              title = "White Population", lwd = 0,
+              style = "cont",
+              lengend.hist = TRUE,
+              colorNA = "transparent",
+              alpha = 0.6) +
+  tm_graticules(
+    n.x = 5,
+    n.y = 5,
+    col = "gray70",
+    lwd = 0.3,
+    labels.size = 0.8
+  ) +
+  tm_layout(
+    main.title = "Charlottesville, 2023", 
+    main.title.position = "center",
+    legend.outside = TRUE
+  )
+
+# Black Population
+
+tm_basemap("CartoDB.Positron") +
+  tm_shape(race_2023) +
+  tm_polygons(col = "black", palette = "-viridis",
               title = "Black Population", lwd = 0,
-              style = "cont", breaks = seq(0, 500, 50),
-              lengend.hist = TRUE) +
+              style = "cont",
+              lengend.hist = TRUE,
+              colorNA = "transparent",
+              alpha = 0.6) +
+  tm_graticules(
+    n.x = 5,
+    n.y = 5,
+    col = "gray70",
+    lwd = 0.3,
+    labels.size = 0.8
+  ) +
   tm_layout(
-    main.title = "Gridded EIF Black Population (2020)",  # ← key change
+    main.title = "Charlottesville, 2023", 
     main.title.position = "center",
-    outer.margins = c(0.05, 0, 0, 0),  # top, right, bottom, left
     legend.outside = TRUE
   )
 
-tm_shape(ageracesex_2020) +
-  tm_polygons(col = "White", palette = "viridis",
-              title = "White Population", lwd = 0) +
+#### SEX MAPS ####
+
+# Male
+
+tm_basemap("CartoDB.Positron") +
+  tm_shape(sex_2023) +
+  tm_polygons(col = "male_share", palette = "-viridis",
+              title = "Male Population Share", lwd = 0,
+              style = "cont",
+              lengend.hist = TRUE,
+              colorNA = "transparent",
+              alpha = 0.6) +
+  tm_graticules(
+    n.x = 5,
+    n.y = 5,
+    col = "gray70",
+    lwd = 0.3,
+    labels.size = 0.8
+  ) +
   tm_layout(
-    main.title = "Gridded EIF White Population (2020)",  # ← key change
+    main.title = "Charlottesville, 2023", 
     main.title.position = "center",
-    outer.margins = c(0.05, 0, 0, 0),  # top, right, bottom, left
     legend.outside = TRUE
   )
 
-tm_shape(ageracesex_2020) +
-  tm_polygons(col = "Asian", palette = "viridis",
-              title = "Asian Population", lwd = 0) +
+# Female 
+
+tm_basemap("CartoDB.Positron") +
+  tm_shape(sex_2023) +
+  tm_polygons(col = "female_share", palette = "-viridis",
+              title = "Female Population Share", lwd = 0,
+              style = "cont",
+              lengend.hist = TRUE,
+              colorNA = "transparent",
+              alpha = 0.6) +
+  tm_graticules(
+    n.x = 5,
+    n.y = 5,
+    col = "gray70",
+    lwd = 0.3,
+    labels.size = 0.8
+  ) +
   tm_layout(
-    main.title = "Gridded EIF Asian Population (2020)",  # ← key change
+    main.title = "Charlottesville, 2023", 
     main.title.position = "center",
-    outer.margins = c(0.05, 0, 0, 0),  # top, right, bottom, left
     legend.outside = TRUE
   )
 
-tm_shape(ageracesex_2020) +
-  tm_polygons(col = "AIAN", palette = "viridis",
-              title = "Native American Population", lwd = 0) +
+#### AGE MAPS ####
+
+# Under 18 Population
+
+tm_basemap("CartoDB.Positron") +
+  tm_shape(age_2023) +
+  tm_polygons(col = "under_18", palette = "-viridis",
+              title = "Under 18 Population", lwd = 0,
+              style = "cont",
+              lengend.hist = TRUE,
+              colorNA = "transparent",
+              alpha = 0.6) +
+  tm_graticules(
+    n.x = 5,
+    n.y = 5,
+    col = "gray70",
+    lwd = 0.3,
+    labels.size = 0.8
+  ) +
   tm_layout(
-    main.title = "Gridded EIF Native American Population (2020)",  # ← key change
+    main.title = "Charlottesville, 2023", 
     main.title.position = "center",
-    outer.margins = c(0.05, 0, 0, 0),  # top, right, bottom, left
     legend.outside = TRUE
   )
 
-tm_shape(ageracesex_2020) +
-  tm_polygons(col = "Other/Unknown", palette = "viridis",
-              title = "Other/Unknown Race", lwd = 0) +
+# 19-65 Population
+
+tm_basemap("CartoDB.Positron") +
+  tm_shape(age_2023) +
+  tm_polygons(col = "bet_19_65", palette = "-viridis",
+              title = "19-65 Population", lwd = 0,
+              style = "cont",
+              lengend.hist = TRUE,
+              colorNA = "transparent",
+              alpha = 0.6) +
+  tm_graticules(
+    n.x = 5,
+    n.y = 5,
+    col = "gray70",
+    lwd = 0.3,
+    labels.size = 0.8
+  ) +
   tm_layout(
-    main.title = "Gridded EIF Other/Unknown Race Population (2020)",  # ← key change
+    main.title = "Charlottesville, 2023", 
     main.title.position = "center",
-    outer.margins = c(0.05, 0, 0, 0),  # top, right, bottom, left
+    legend.outside = TRUE
+  )
+
+# Over 65 Population
+
+tm_basemap("CartoDB.Positron") +
+  tm_shape(age_2023) +
+  tm_polygons(col = "over_65", palette = "-viridis",
+              title = "65+ Population", lwd = 0,
+              style = "cont",
+              lengend.hist = TRUE,
+              colorNA = "transparent",
+              alpha = 0.6) +
+  tm_graticules(
+    n.x = 5,
+    n.y = 5,
+    col = "gray70",
+    lwd = 0.3,
+    labels.size = 0.8
+  ) +
+  tm_layout(
+    main.title = "Charlottesville, 2023", 
+    main.title.position = "center",
+    legend.outside = TRUE
+  )
+
+
+# Under 18 Population Share
+
+tm_basemap("CartoDB.Positron") +
+  tm_shape(age_2023) +
+  tm_polygons(col = "under_18_share", palette = "-viridis",
+              title = "Under 18 Population Share", lwd = 0,
+              style = "cont",
+              lengend.hist = TRUE,
+              colorNA = "transparent",
+              alpha = 0.6) +
+  tm_graticules(
+    n.x = 5,
+    n.y = 5,
+    col = "gray70",
+    lwd = 0.3,
+    labels.size = 0.8
+  ) +
+  tm_layout(
+    main.title = "Charlottesville, 2023", 
+    main.title.position = "center",
+    legend.outside = TRUE
+  )
+
+# 19-65 Population Share
+
+tm_basemap("CartoDB.Positron") +
+  tm_shape(age_2023) +
+  tm_polygons(col = "bet_19_65_share", palette = "-viridis",
+              title = "19-65 Population Share", lwd = 0,
+              style = "cont",
+              lengend.hist = TRUE,
+              colorNA = "transparent",
+              alpha = 0.6) +
+  tm_graticules(
+    n.x = 5,
+    n.y = 5,
+    col = "gray70",
+    lwd = 0.3,
+    labels.size = 0.8
+  ) +
+  tm_layout(
+    main.title = "Charlottesville, 2023", 
+    main.title.position = "center",
+    legend.outside = TRUE
+  )
+
+# Over 65 Population Share
+
+tm_basemap("CartoDB.Positron") +
+  tm_shape(age_2023) +
+  tm_polygons(col = "over_65_share", palette = "-viridis",
+              title = "65+ Population Share", lwd = 0,
+              style = "cont",
+              legend.hist = FALSE,
+              colorNA = "transparent",
+              alpha = 0.6) +
+  tm_graticules(
+    n.x = 5,
+    n.y = 5,
+    col = "gray70",
+    lwd = 0.3,
+    labels.size = 0.8
+  ) +
+  tm_layout(
+    main.title = "Charlottesville, 2023", 
+    main.title.position = "center",
     legend.outside = TRUE
   )

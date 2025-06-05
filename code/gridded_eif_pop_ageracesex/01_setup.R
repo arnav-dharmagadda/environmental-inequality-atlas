@@ -24,13 +24,15 @@ ageracesex_2023_path <- paste0(data_path, "gridded_eif_pop_ageracesex/gridded_ei
 
 gridpoints_path <- paste0(data_path, "gridpoints_with_county_2020.rda")
 
+output_path <- paste0(data_path, "processed/gridded_eif_pop_ageracesex/")
+
 #### Load Libraries ####
 
 if (!requireNamespace("pacman", quietly = TRUE)) {
   install.packages("pacman")
 }
 
-pacman::p_load(sf, terra, dplyr, ggplot2, tmap, arrow, dplyr, tidyr)
+pacman::p_load(sf, terra, dplyr, ggplot2, tmap, arrow, dplyr, tidyr, scales, haven)
 
 #### Load Data ####
 
@@ -49,6 +51,23 @@ gridpoints <- gridpoints %>%
     grid_lat = pm25_grid_y
   )
 
+# Loop 1999 through 2023
+
+for (year in 1999:2023) {
+  # Construct path to parquet file
+  parquet_path <- paste0(data_path, "gridded_eif_pop_ageracesex/gridded_eif_pop_ageracesex_", year, ".parquet")
+  
+  # Read the parquet file
+  ageracesex_year <- read_parquet(parquet_path)
+  
+  # Merge with filtered gridpoints
+  merged_year <- left_join(gridpoints, ageracesex_year, by = c("grid_lon", "grid_lat"))
+  
+  # Write to Stata .dta
+  output_file <- paste0(output_path, "ageracesex_", year, ".dta")
+  write_dta(merged_year, output_file)
+}
+
 ageracesex_2023 <- left_join(gridpoints, ageracesex_2023, by = c("grid_lon", "grid_lat"))
 
 # Reshape and collapse the data into separate race, age, and sex files
@@ -61,12 +80,13 @@ race_2023 <- ageracesex_2023 %>%
     ) %>%
     group_by(grid_lon, grid_lat) %>%
     summarize(
-      Asian = sum(Asian, na.rm = TRUE),
-      White = sum(White, na.rm = TRUE),
-      `Other/Unknown` = sum(`Other/Unknown`, na.rm = TRUE),
-      Black = sum(Black, na.rm = TRUE),
-      Hispanic = sum(Hispanic, na.rm = TRUE),
-      AIAN = sum(AIAN, na.rm = TRUE),
+      asian = sum(Asian, na.rm = TRUE),
+      white = sum(White, na.rm = TRUE),
+      `other` = sum(`Other/Unknown`, na.rm = TRUE),
+      black = sum(Black, na.rm = TRUE),
+      hispanic = sum(Hispanic, na.rm = TRUE),
+      aian = sum(AIAN, na.rm = TRUE),
+      total = sum(c(Asian, White, Black, Hispanic, AIAN, `Other/Unknown`), na.rm = TRUE),
       STATEFP = first(STATEFP),
       COUNTYFP = first(COUNTYFP),
       COUNTYNS = first(COUNTYNS),
@@ -77,6 +97,12 @@ race_2023 <- ageracesex_2023 %>%
       ALAND = first(ALAND),
       AWATER = first(AWATER),
       .groups = "drop"
+    ) %>%
+    mutate(
+      black_share = black / total,
+      white_share = white / total,
+      hispanic_share = hispanic / total,
+      asian_share = asian / total
     )
 
 sex_2023 <- ageracesex_2023 %>%
@@ -87,8 +113,9 @@ sex_2023 <- ageracesex_2023 %>%
   ) %>%
   group_by(grid_lon, grid_lat) %>%
   summarize(
-    Male = sum(M, na.rm = TRUE),
-    Female = sum(F, na.rm = TRUE),
+    male = sum(M, na.rm = TRUE),
+    female = sum(F, na.rm = TRUE),
+    total = sum(c(M, F), na.rm = TRUE),
     STATEFP = first(STATEFP),
     COUNTYFP = first(COUNTYFP),
     COUNTYNS = first(COUNTYNS),
@@ -99,6 +126,10 @@ sex_2023 <- ageracesex_2023 %>%
     ALAND = first(ALAND),
     AWATER = first(AWATER),
     .groups = "drop"
+  ) %>%
+  mutate(
+    male_share = male / total,
+    female_share = female / total
   )
 
 age_2023 <- ageracesex_2023 %>%
@@ -112,6 +143,28 @@ age_2023 <- ageracesex_2023 %>%
     under_18 = sum(`Under 18`, na.rm = TRUE),
     over_65 = sum(`Over 65`, na.rm = TRUE),
     bet_19_65 = sum(`19-65`, na.rm = TRUE),
+    total = sum(c(`Under 18`, `Over 65`, `19-65`), na.rm = TRUE),
+    STATEFP = first(STATEFP),
+    COUNTYFP = first(COUNTYFP),
+    COUNTYNS = first(COUNTYNS),
+    AFFGEOID = first(AFFGEOID),
+    GEOID = first(GEOID),
+    NAME = first(NAME),
+    LSAD = first (LSAD),
+    ALAND = first(ALAND),
+    AWATER = first(AWATER),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    under_18_share = under_18 / total,
+    bet_19_65_share = bet_19_65 / total,
+    over_65_share = over_65 / total
+  )
+
+agerace_2023_long <- ageracesex_2023 %>%
+  group_by(grid_lon, grid_lat, race_ethnicity, age_group) %>%
+  summarize(
+    n_noise_postprocessed = sum(n_noise_postprocessed, na.rm = TRUE),
     STATEFP = first(STATEFP),
     COUNTYFP = first(COUNTYFP),
     COUNTYNS = first(COUNTYNS),
