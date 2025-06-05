@@ -24,13 +24,15 @@ ageracesex_2023_path <- paste0(data_path, "gridded_eif_pop_ageracesex/gridded_ei
 
 gridpoints_path <- paste0(data_path, "gridpoints_with_county_2020.rda")
 
+output_path <- paste0(data_path, "processed/gridded_eif_pop_ageracesex/")
+
 #### Load Libraries ####
 
 if (!requireNamespace("pacman", quietly = TRUE)) {
   install.packages("pacman")
 }
 
-pacman::p_load(sf, terra, dplyr, ggplot2, tmap, arrow, dplyr, tidyr)
+pacman::p_load(sf, terra, dplyr, ggplot2, tmap, arrow, dplyr, tidyr, scales, haven)
 
 #### Load Data ####
 
@@ -48,6 +50,23 @@ gridpoints <- gridpoints %>%
     grid_lon = pm25_grid_x,
     grid_lat = pm25_grid_y
   )
+
+# Loop 1999 through 2023
+
+for (year in 1999:2023) {
+  # Construct path to parquet file
+  parquet_path <- paste0(data_path, "gridded_eif_pop_ageracesex/gridded_eif_pop_ageracesex_", year, ".parquet")
+  
+  # Read the parquet file
+  ageracesex_year <- read_parquet(parquet_path)
+  
+  # Merge with filtered gridpoints
+  merged_year <- left_join(gridpoints, ageracesex_year, by = c("grid_lon", "grid_lat"))
+  
+  # Write to Stata .dta
+  output_file <- paste0(output_path, "ageracesex_", year, ".dta")
+  write_dta(merged_year, output_file)
+}
 
 ageracesex_2023 <- left_join(gridpoints, ageracesex_2023, by = c("grid_lon", "grid_lat"))
 
@@ -124,6 +143,28 @@ age_2023 <- ageracesex_2023 %>%
     under_18 = sum(`Under 18`, na.rm = TRUE),
     over_65 = sum(`Over 65`, na.rm = TRUE),
     bet_19_65 = sum(`19-65`, na.rm = TRUE),
+    total = sum(c(`Under 18`, `Over 65`, `19-65`), na.rm = TRUE),
+    STATEFP = first(STATEFP),
+    COUNTYFP = first(COUNTYFP),
+    COUNTYNS = first(COUNTYNS),
+    AFFGEOID = first(AFFGEOID),
+    GEOID = first(GEOID),
+    NAME = first(NAME),
+    LSAD = first (LSAD),
+    ALAND = first(ALAND),
+    AWATER = first(AWATER),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    under_18_share = under_18 / total,
+    bet_19_65_share = bet_19_65 / total,
+    over_65_share = over_65 / total
+  )
+
+agerace_2023_long <- ageracesex_2023 %>%
+  group_by(grid_lon, grid_lat, race_ethnicity, age_group) %>%
+  summarize(
+    n_noise_postprocessed = sum(n_noise_postprocessed, na.rm = TRUE),
     STATEFP = first(STATEFP),
     COUNTYFP = first(COUNTYFP),
     COUNTYNS = first(COUNTYNS),
