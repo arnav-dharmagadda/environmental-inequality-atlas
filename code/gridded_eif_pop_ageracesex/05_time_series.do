@@ -1,5 +1,5 @@
 /*******************************************************************************
-# FILE: 04_time_series.do
+# FILE: 05_time_series.do
 # PURPOSE: This script generates time series figures based on the Gridded EIF 
   age, race, sex files.
 # AUTHOR: Arnav Dharmagadda
