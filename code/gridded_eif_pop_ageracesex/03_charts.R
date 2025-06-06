@@ -23,13 +23,21 @@ agerace_2023_long$race_ethnicity <- factor(
   levels = c("White", "Black", "Hispanic", "Asian", "AIAN", "Other/Unknown")
 )
 
-ggplot(agerace_2023_long, aes(x = race_ethnicity, y = n_noise_postprocessed, fill = age_group)) +
+plot_data <- agerace_2023_long %>%
+  group_by(race_ethnicity, age_group) %>%
+  summarise(population = sum(n_noise_postprocessed, na.rm = TRUE), .groups = "drop")
+
+ggplot(plot_data, aes(x = race_ethnicity, y = population, fill = age_group)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Age Distributions by Race",
        x = "Race",
        y = "Population Count",
        fill = "Age Group") +
   theme_minimal()
+
+agerace_2023_long %>%
+  filter(race_ethnicity == "White" & age_group == "Under 18") %>%
+  summarise(total_sum = sum(n_noise_postprocessed, na.rm = TRUE))
 
 
 # Race Distributions by Age
