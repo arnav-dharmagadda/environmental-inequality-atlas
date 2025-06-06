@@ -24,7 +24,7 @@ ageracesex_2023_path <- paste0(data_path, "gridded_eif_pop_ageracesex/gridded_ei
 
 gridpoints_path <- paste0(data_path, "gridpoints_with_county_2020.rda")
 
-output_path <- paste0(data_path, "processed/gridded_eif_pop_ageracesex/")
+output_path <- paste0(data_path, "processed/gridded_eif_pop_ageracesex_dta/")
 
 #### Load Libraries ####
 
