@@ -35,14 +35,9 @@ ggplot(plot_data, aes(x = race_ethnicity, y = population, fill = age_group)) +
        fill = "Age Group") +
   theme_minimal()
 
-agerace_2023_long %>%
-  filter(race_ethnicity == "White" & age_group == "Under 18") %>%
-  summarise(total_sum = sum(n_noise_postprocessed, na.rm = TRUE))
-
-
 # Race Distributions by Age
 
-ggplot(agerace_2023_long, aes(x = age_group, y = n_noise_postprocessed, fill = race_ethnicity)) +
+ggplot(plot_data, aes(x = age_group, y = population, fill = race_ethnicity)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Race Distributions by Age",
        x = "Age Group",
@@ -53,14 +48,14 @@ ggplot(agerace_2023_long, aes(x = age_group, y = n_noise_postprocessed, fill = r
 # Share Distributions
 
 # Calculate total per race
-race_totals <- agerace_2023_long %>%
+race_totals <- plot_data %>%
   group_by(race_ethnicity) %>%
-  summarise(total = sum(n_noise_postprocessed, na.rm = TRUE))
+  summarise(total = sum(population, na.rm = TRUE))
 
 # Join total back and compute share
-df_shares <- agerace_2023_long %>%
+df_shares <- plot_data %>%
   left_join(race_totals, by = "race_ethnicity") %>%
-  mutate(share = n_noise_postprocessed / total)
+  mutate(share = population / total)
 
 ggplot(df_shares, aes(x = age_group, y = share, fill = race_ethnicity)) +
   geom_bar(stat = "identity", position = "dodge") +
