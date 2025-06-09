@@ -15,11 +15,11 @@ rm(list = ls())
 
 #### Setting working directory and file paths ####
 
-setwd("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/")
+setwd("/Users/jfischman/Library/CloudStorage/OneDrive-BowdoinCollege/Documents/GitHub/environmental-inequality-atlas")
 
-data_path <- "/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/gridded_eif_data/"
+data_path <- "/Users/jfischman/Library/CloudStorage/OneDrive-BowdoinCollege/Documents/General Data/EIF atlas"
 
-gridpoints_path <- paste0(data_path, "gridpoints_with_county_2020.rda")
+gridpoints_path <- paste0(data_path, "/race_income/gridpoints_with_county_2020 (1).rda")
 
 dta_path_ars <- "data/processed/ageracesex_dta/"
 
