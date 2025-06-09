@@ -49,7 +49,7 @@ for (file in rda_files) {
 raceincome_combined <- do.call(rbind, all_raceincome)
 
 save(raceincome_combined, file = paste0(rda_path_ri, "raceincome_long.rda"))
-write_dta(raceincome_combined, paste0(dta_path_ars, "raceincome_long.dta"))
+write_dta(raceincome_combined, paste0(dta_path_ri, "raceincome_long.dta"))
 
 raceincome_combined <- raceincome_combined %>%
   mutate(
@@ -76,7 +76,7 @@ raceincome_combined <- raceincome_combined %>%
   )
 
 raceincome_wide <- raceincome_combined %>%
-  select(year, grid_lon, grid_lat, race_income, n_noise_postprocessed) %>%
+  select(year, grid_lon, grid_lat, STATEFP, COUNTYFP, GEOID, NAME, race_income, n_noise_postprocessed) %>%
   pivot_wider(
     names_from = race_income,
     values_from = n_noise_postprocessed
@@ -108,13 +108,13 @@ raceincome_year_long <- raceincome_wide %>%
   left_join(income_wide, by = c("grid_lon", "grid_lat", "year"))
 
 save(raceincome_year_long, file = paste0(rda_path_ri, "raceincome_long_year.rda"))
-write_dta(raceincome_year_long, paste0(dta_path_ars, "raceincome_long_year.dta"))
+write_dta(raceincome_year_long, paste0(dta_path_ri, "raceincome_long_year.dta"))
 
 # Pivot by Year
 
 raceincome_wide <- raceincome_year_long %>%
   pivot_longer(
-    cols = -c(grid_lon, grid_lat, year),
+    cols = -c(grid_lon, grid_lat, STATEFP, COUNTYFP, GEOID, NAME, year),
     names_to = "var",
     values_to = "value"
   ) %>%
@@ -127,4 +127,4 @@ raceincome_wide <- raceincome_year_long %>%
   )
 
 save(raceincome_wide, file = paste0(rda_path_ri, "raceincome_wide.rda"))
-write_dta(raceincome_wide, paste0(dta_path_ars, "raceincome_wide.dta"))
+write_dta(raceincome_wide, paste0(dta_path_ri, "raceincome_wide.dta"))
