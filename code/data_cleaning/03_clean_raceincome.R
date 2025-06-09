@@ -52,11 +52,28 @@ save(raceincome_combined, file = paste0(rda_path_ri, "raceincome_long.rda"))
 write_dta(raceincome_combined, paste0(dta_path_ars, "raceincome_long.dta"))
 
 raceincome_combined <- raceincome_combined %>%
-  mutate(race_ethnicity = case_when(
-    race_ethnicity == "Other/Unknown" ~ "other_race",
-    TRUE ~ race_ethnicity  # keep all other values unchanged
-  )) %>%
-  mutate(race_income = paste(race_ethnicity, income_decile, sep = "_"))
+  mutate(
+    race_ethnicity = case_when(
+      race_ethnicity == "Other/Unknown" ~ "other_race",
+      TRUE ~ race_ethnicity
+    ),
+    income_decile = as.character(income_decile),  # fix type mismatch
+    income_decile = case_when(
+      income_decile == "0" ~ "inc_0",
+      income_decile == "1" ~ "inc_1",
+      income_decile == "2" ~ "inc_2",
+      income_decile == "3" ~ "inc_3",
+      income_decile == "4" ~ "inc_4",
+      income_decile == "5" ~ "inc_5",
+      income_decile == "6" ~ "inc_6",
+      income_decile == "7" ~ "inc_7",
+      income_decile == "8" ~ "inc_8",
+      income_decile == "9" ~ "inc_9",
+      income_decile == "10" ~ "inc_10",
+      TRUE ~ income_decile
+    ),
+    race_income = paste(race_ethnicity, income_decile, sep = "_")
+  )
 
 raceincome_wide <- raceincome_combined %>%
   select(year, grid_lon, grid_lat, race_income, n_noise_postprocessed) %>%
