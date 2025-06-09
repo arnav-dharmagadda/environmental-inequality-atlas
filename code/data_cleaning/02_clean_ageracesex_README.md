@@ -1,8 +1,8 @@
 # Basic Information
 
-Name: 02_clean_ageracesex.R
-Author: Arnav Dharmagadda
-Created: 6/9/2025
+* Name: 02_clean_ageracesex.R
+* Author: Arnav Dharmagadda
+* Created: 6/9/2025
 
 # Purpose
 
