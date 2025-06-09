@@ -6,7 +6,8 @@
 # CREATED: June 9th, 2025
 ################################################################################
 # INPUTS: gridded_eif_pop_ageracesex files (1999-2023)
-# OUTPUTS: None.
+# OUTPUTS: ageracesex_{YEAR}.dta/.rda, ageracesex_combined.rda/.dta,
+#          ageracesex_year_long.rda/.dta, ageracesex_wide.rda/.dta
 ################################################################################
 
 # Loop 1999 through 2023
@@ -53,6 +54,8 @@ write_dta(ageracesex_combined, paste0(dta_path_ars, "ageracesex_long.dta"))
 
 # Reshape
 
+# Rename values for variable compatibility
+
 ageracesex_combined <- ageracesex_combined %>%
   mutate(age_group = case_when(
     age_group == "Over 65" ~ "over_65",
@@ -74,6 +77,8 @@ ageracesex_combined <- ageracesex_combined %>%
   )) %>%
   mutate(race_age_sex = paste(race_ethnicity, age_group, sex, sep = "_"))
 
+# Reshape for ageracesex variables
+
 ageracesex_wide <- ageracesex_combined %>%
   select(year, grid_lon, grid_lat, STATEFP, COUNTYFP, GEOID, NAME, race_age_sex, n_noise_postprocessed) %>%
   pivot_wider(
@@ -84,6 +89,8 @@ ageracesex_wide <- ageracesex_combined %>%
 agerace_combined <- ageracesex_combined %>%
   mutate(race_age = paste(race_ethnicity, age_group, sep = "_"))
 
+# Reshape for agerace variables
+
 agerace_wide <- agerace_combined %>%
   group_by(year, grid_lon, grid_lat, race_age) %>%
   summarise(total_pop = sum(n_noise_postprocessed, na.rm = TRUE), .groups = "drop") %>%
@@ -92,6 +99,8 @@ agerace_wide <- agerace_combined %>%
     names_from = race_age,
     values_from = total_pop
   )
+
+# Reshape for race variables
 
 race_wide <- ageracesex_combined %>%
   group_by(year, grid_lon, grid_lat, race_ethnicity) %>%
@@ -103,6 +112,8 @@ race_wide <- ageracesex_combined %>%
   ) %>%
   rename(NA_race = `NA`)
 
+# Reshape for age_group variables
+
 age_group_wide <- ageracesex_combined %>%
   group_by(year, grid_lon, grid_lat, age_group) %>%
   summarise(total_age_pop = sum(n_noise_postprocessed, na.rm = TRUE), .groups = "drop") %>%
@@ -113,6 +124,8 @@ age_group_wide <- ageracesex_combined %>%
   ) %>%
   rename(NA_age = `NA`)
 
+# Reshape for sex variables
+
 sex_wide <- ageracesex_combined %>%
   group_by(year, grid_lon, grid_lat, sex) %>%
   summarise(total_sex_pop = sum(n_noise_postprocessed, na.rm = TRUE), .groups = "drop") %>%
@@ -122,6 +135,8 @@ sex_wide <- ageracesex_combined %>%
     values_from = total_sex_pop
   ) %>%
   rename(NA_sex = `NA`)
+
+# Combine all reshaped dataframes into a long format
 
 ageracesex_year_long <- ageracesex_wide %>%
   left_join(agerace_wide,   by = c("grid_lon", "grid_lat", "year")) %>%
