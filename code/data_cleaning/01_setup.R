@@ -21,6 +21,8 @@ data_path <- "/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/gridded_
 
 gridpoints_path <- paste0(data_path, "gridpoints_with_county_2020.rda")
 
+processed_path <- "data/"
+
 dta_path_ars <- "data/processed/ageracesex_dta/"
 
 rda_path_ars <- "data/processed/ageracesex_rda/"
@@ -37,7 +39,7 @@ if (!requireNamespace("pacman", quietly = TRUE)) {
   install.packages("pacman")
 }
 
-pacman::p_load(sf, terra, dplyr, ggplot2, tmap, arrow, dplyr, tidyr, scales, haven)
+pacman::p_load(sf, terra, dplyr, ggplot2, tmap, arrow, dplyr, tidyr, scales, haven, stringr)
 
 #### Load Data ####
 
