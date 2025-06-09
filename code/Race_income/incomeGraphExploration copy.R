@@ -59,8 +59,8 @@ merged2_sf$decile10_bin <- cut(
 
 
 ggplot(merged2_sf) +
-  geom_sf(aes(fill = decile10_bin), color="white", size = 2) +
-  scale_fill_brewer(palette = "YlOrRd", na.value = "grey90") +
+  geom_sf(aes(color = decile10_bin), size = 2) +
+  scale_color_brewer(palette = "YlOrRd", na.value = "grey90") +
   labs(
     title = "Binned decile 10 Resident Counts",
     fill = "Count Bin"
@@ -78,8 +78,8 @@ merged2_sf$decile1_bin <- cut(
 
 
 ggplot(merged2_sf) +
-  geom_sf(aes(fill = decile1_bin), color="white", size = 2) +
-  scale_fill_brewer(palette = "YlOrRd", na.value = "grey90") +
+  geom_sf(aes(color = decile1_bin), size = 2) +
+  scale_color_brewer(palette = "YlOrRd", na.value = "grey90") +
   labs(
     title = "Binned decile 1 Resident Counts",
     fill = "Count Bin"
