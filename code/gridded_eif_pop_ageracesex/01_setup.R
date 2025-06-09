@@ -24,7 +24,9 @@ ageracesex_2023_path <- paste0(data_path, "gridded_eif_pop_ageracesex/gridded_ei
 
 gridpoints_path <- paste0(data_path, "gridpoints_with_county_2020.rda")
 
-output_path <- paste0(data_path, "processed/gridded_eif_pop_ageracesex_dta/")
+dta_path <- paste0(data_path, "processed/gridded_eif_pop_ageracesex_dta/")
+
+map_path <- "output/maps/"
 
 #### Load Libraries ####
 
@@ -64,7 +66,7 @@ for (year in 1999:2023) {
   merged_year <- left_join(gridpoints, ageracesex_year, by = c("grid_lon", "grid_lat"))
   
   # Write to Stata .dta
-  output_file <- paste0(output_path, "ageracesex_", year, ".dta")
+  output_file <- paste0(dta_path, "ageracesex_", year, ".dta")
   write_dta(merged_year, output_file)
 }
 

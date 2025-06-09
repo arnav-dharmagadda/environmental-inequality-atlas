@@ -31,6 +31,8 @@ tm_basemap("CartoDB.Positron") +
     legend.outside = TRUE
   )
 
+ggsave("total_population_distribution_map.pdf", width = 10, height = 8)
+
 
 #### RACE SHARE MAPS ####
 
@@ -56,6 +58,8 @@ tm_shape(race_2023) +
     main.title.position = "center",
     legend.outside = TRUE
   )
+
+ggsave("hispanic_population_share_map.png", width = 10, height = 8)
 
 # White Population Share
 
