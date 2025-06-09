@@ -1,5 +1,5 @@
 /*******************************************************************************
-# FILE: 04_time_series.do
+# FILE: 05_time_series.do
 # PURPOSE: This script generates time series figures based on the Gridded EIF 
   age, race, sex files.
 # AUTHOR: Arnav Dharmagadda
@@ -23,9 +23,14 @@ preserve
 
 collapse (sum) pp_pop_AIAN pp_pop_Asian pp_pop_Black pp_pop_Hispanic pp_pop_NA_race pp_pop_White pp_pop_other_race total, by(year)
 
+gen shade = 1 if year <= 2004
+gen ymin = 0
+gen ymax = 150000 if year <= 2004  // for counts
+
 // Raw Counts
 
 twoway ///
+  (rarea ymin ymax year if shade == 1, color(gs14%80) lwidth(none)) ///
   (line pp_pop_White year, lcolor(blue) lwidth(medthick) lpattern(solid)) ///
   (line pp_pop_Black year, lcolor(red) lwidth(medthick) lpattern(solid)) ///
   (line pp_pop_Hispanic year, lcolor(green) lwidth(medthick) lpattern(solid)) ///
@@ -35,7 +40,7 @@ twoway ///
   subtitle("1999–2023", size(small)) ///
   ytitle("Population Count", size(small)) ///
   xtitle("Year", size(small)) ///
-  legend(order(1 "White" 2 "Black" 3 "Hispanic" 4 "Asian" 5 "Other") ring(10) pos(6) col(3)) ///
+  legend(order(1 "Lower Reliability" 2 "White" 3 "Black" 4 "Hispanic" 5 "Asian" 6 "Other") ring(10) pos(6) col(3)) ///
   graphregion(color(white)) ///
   scheme(538w)
   
@@ -47,7 +52,10 @@ foreach r of local race {
 	gen `r'share = `r' / total
 }
 
+replace ymax = 1
+
 twoway ///
+  (rarea ymin ymax year if shade == 1, color(gs14%80) lwidth(none)) ///
   (line pp_pop_Whiteshare year, lcolor(blue) lwidth(medthick) lpattern(solid)) ///
   (line pp_pop_Blackshare year, lcolor(red) lwidth(medthick) lpattern(solid)) ///
   (line pp_pop_Hispanicshare year, lcolor(green) lwidth(medthick) lpattern(solid)) ///
@@ -57,7 +65,7 @@ twoway ///
   subtitle("1999–2023", size(small)) ///
   ytitle("Population Share", size(small)) ///
   xtitle("Year", size(small)) ///
-  legend(order(1 "White" 2 "Black" 3 "Hispanic" 4 "Asian" 5 "Other") ring(10) pos(6) col(3)) ///
+  legend(order(1 "Lower Reliability" 2 "White" 3 "Black" 4 "Hispanic" 5 "Asian" 6 "Other") ring(10) pos(6) col(3)) ///
   graphregion(color(white)) ///
   scheme(538w)
   
