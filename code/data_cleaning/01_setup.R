@@ -1,12 +1,11 @@
 ################################################################################
 # FILE: 01_setup.R
 # PURPOSE: Set up the environment for cleaning and analyzing the gridded EIF
-# age, race, and sex files. It also includes the race-income files.
+# files.
 # AUTHOR: Arnav Dharmagadda
 # CREATED: June 3rd, 2025
 ################################################################################
-# INPUTS: gridpoints_with_county_2020.rda, gridded_eif_pop_ageracesex files
-# (1999-2023)
+# INPUTS: gridpoints_with_county_2020.rda
 # OUTPUTS: None.
 ################################################################################
 
@@ -16,11 +15,11 @@ rm(list = ls())
 
 #### Setting working directory and file paths ####
 
-setwd("/Users/jfischman/Library/CloudStorage/OneDrive-BowdoinCollege/Documents/GitHub/environmental-inequality-atlas/")
+setwd("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/")
 
-data_path <- "/Users/jfischman/Library/CloudStorage/OneDrive-BowdoinCollege/Documents/General Data/EIF atlas/"
+data_path <- "/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/gridded_eif_data/"
 
-gridpoints_path <- paste0(data_path, "/race_income/gridpoints_with_county_2020 (1).rda")
+gridpoints_path <- paste0(data_path, "gridpoints_with_county_2020.rda")
 
 dta_path_ars <- "data/processed/ageracesex_dta/"
 
@@ -49,96 +48,11 @@ rm(df)
 #### Filter and Clean Data ####
 
 gridpoints <- gridpoints %>%
-  filter(STATEFP == "51", COUNTYFP %in% c("540", "003")) %>%
+  filter(STATEFP == "51" & COUNTYFP == "003" | COUNTYFP == "540") %>%
   rename(
     grid_lon = pm25_grid_x,
     grid_lat = pm25_grid_y
   )
-
-# Loop 1999 through 2023
-
-for (year in 1999:2023) {
-  # Construct path to parquet file
-  parquet_path <- paste0(data_path, "ageracesex/gridded_eif_pop_ageracesex_", year, ".parquet")
-  
-  # Read the parquet file
-  ageracesex_year <- read_parquet(parquet_path)
-  
-  # Merge with filtered gridpoints
-  merged_year <- left_join(gridpoints, ageracesex_year, by = c("grid_lon", "grid_lat"))
-  
-  # Write to Stata .dta
-  output_file <- paste0(dta_path_ars, "ageracesex_", year, ".dta")
-  write_dta(merged_year, output_file)
-  
-  # Write to .rda
-  output_file_rda <- paste0(rda_path_ars, "ageracesex_", year, ".rda")
-  save(merged_year, file = output_file_rda)
-}
-
-for (year in 1999:2023) {
-  # Construct path to parquet file
-  parquet_path <- paste0(data_path, "race_income/gridded_eif_pop_raceincome_", year, ".parquet")
-  
-  # Read the parquet file
-  raceincome_year <- read_parquet(parquet_path)
-  
-  # Merge with filtered gridpoints
-  merged_year <- left_join(gridpoints, raceincome_year, by = c("grid_lon", "grid_lat"))
-  
-  # Write to Stata .dta
-  output_file <- paste0(dta_path_ri, "raceincome_", year, ".dta")
-  write_dta(merged_year, output_file)
-  
-  # Write to .rda
-  output_file_rda <- paste0(rda_path_ri, "raceincome_", year, ".rda")
-  save(merged_year, file = output_file_rda)
-}
-
-#### APPEND AND RESHAPE ####
-
-# Age, Race, Sex
-
-rda_path <- "data/processed/ageracesex_rda/"
-rda_files <- list.files(path = rda_path, pattern = "^ageracesex_\\d{4}\\.rda$", full.names = TRUE)
-all_ageracesex <- list()
-
-for (file in rda_files) {
-  load(file)  # loads object called `merged_year`
-  
-  # Extract year from filename and add as a column
-  year <- as.numeric(gsub(".*_(\\d{4})\\.rda$", "\\1", file))
-  merged_year$year <- year
-  
-  all_ageracesex[[length(all_ageracesex) + 1]] <- merged_year
-}
-
-# Combine all into a single dataframe
-ageracesex_combined <- do.call(rbind, all_ageracesex)
-
-save(ageracesex_combined, file = paste0(rda_path, "ageracesex_long.rda"))
-
-# Race, Income 
-
-rda_path <- "data/processed/raceincome_rda/"
-rda_files <- list.files(path = rda_path, pattern = "^raceincome_\\d{4}\\.rda$", full.names = TRUE)
-all_raceincome <- list()
-
-for (file in rda_files) {
-  load(file)  # loads object called `merged_year`
-  
-  # Extract year from filename and add as a column
-  year <- as.numeric(gsub(".*_(\\d{4})\\.rda$", "\\1", file))
-  merged_year$year <- year
-  
-  all_raceincome[[length(all_raceincome) + 1]] <- merged_year
-}
-
-# Combine all into a single dataframe
-raceincome_combined <- do.call(rbind, all_raceincome)
-
-save(raceincome_combined, file = paste0(rda_path, "raceincome_long.rda"))
-
 
 ageracesex_2023 <- left_join(gridpoints, ageracesex_2023, by = c("grid_lon", "grid_lat"))
 
