@@ -1,9 +1,9 @@
 # Basic Information
 
-Name: data_cleaning/
-Author: Arnav Dharmagadda
-Created: 6/3/2025
-Time to Run: ~5 minutes
+* Name: data_cleaning/
+* Author: Arnav Dharmagadda
+* Created: 6/3/2025
+* Time to Run: ~5 minutes
 
 # Purpose
 
