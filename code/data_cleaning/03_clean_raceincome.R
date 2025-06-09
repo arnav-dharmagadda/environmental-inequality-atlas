@@ -112,7 +112,7 @@ write_dta(raceincome_year_long, paste0(dta_path_ars, "raceincome_long_year.dta")
 
 # Pivot by Year
 
-raceincome_wide <- raceincome_wide %>%
+raceincome_wide <- raceincome_year_long %>%
   pivot_longer(
     cols = -c(grid_lon, grid_lat, year),
     names_to = "var",
