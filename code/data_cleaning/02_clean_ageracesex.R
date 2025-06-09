@@ -75,7 +75,7 @@ ageracesex_combined <- ageracesex_combined %>%
   mutate(race_age_sex = paste(race_ethnicity, age_group, sex, sep = "_"))
 
 ageracesex_wide <- ageracesex_combined %>%
-  select(year, grid_lon, grid_lat, race_age_sex, n_noise_postprocessed) %>%
+  select(year, grid_lon, grid_lat, STATEFP, COUNTYFP, GEOID, NAME, race_age_sex, n_noise_postprocessed) %>%
   pivot_wider(
     names_from = race_age_sex,
     values_from = n_noise_postprocessed
@@ -129,14 +129,14 @@ ageracesex_year_long <- ageracesex_wide %>%
   left_join(age_group_wide, by = c("grid_lon", "grid_lat", "year")) %>%
   left_join(sex_wide, by = c("grid_lon", "grid_lat", "year"))
 
-save(ageracesex_year_long, file = paste0(rda_path_ri, "ageracesex_year_long.rda"))
+save(ageracesex_year_long, file = paste0(rda_path_ars, "ageracesex_year_long.rda"))
 write_dta(ageracesex_year_long, paste0(dta_path_ars, "ageracesex_year_long.dta"))
 
 #### PIVOT BY YEAR ####
 
 ageracesex_wide <- ageracesex_year_long %>%
   pivot_longer(
-    cols = -c(grid_lon, grid_lat, year),
+    cols = -c(grid_lon, grid_lat, STATEFP, COUNTYFP, GEOID, NAME, year),
     names_to = "var",
     values_to = "value"
   ) %>%
@@ -148,6 +148,6 @@ ageracesex_wide <- ageracesex_year_long %>%
     values_fill = 0
   )
 
-save(ageracesex_wide, file = paste0(rda_path_ri, "ageracesex_wide.rda"))
-write_dta(raceincome_wide, paste0(dta_path_ars, "ageracesex_wide.dta"))
+save(ageracesex_wide, file = paste0(rda_path_ars, "ageracesex_wide.rda"))
+write_dta(ageracesex_wide, paste0(dta_path_ars, "ageracesex_wide.dta"))
 
