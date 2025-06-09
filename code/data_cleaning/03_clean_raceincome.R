@@ -6,7 +6,8 @@
 # CREATED: June 9th, 2025
 ################################################################################
 # INPUTS: gridded_eif_pop_raceincome files (1999-2023)
-# OUTPUTS: None.
+# OUTPUTS: raceincome_{YEAR}.dta/.rda, raceincome_combined.rda/.dta,
+#          raceincome_year_long.rda/.dta, raceincome_wide.rda/.dta
 ################################################################################
 
 # Loop through 1999-2023

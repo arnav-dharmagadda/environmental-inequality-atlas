@@ -5,8 +5,8 @@
 # AUTHOR: Arnav Dharmagadda
 # CREATED: June 9th, 2025
 ################################################################################
-# INPUTS: gridded_eif_pop_raceincome files (1999-2023)
-# OUTPUTS: None.
+# INPUTS: None.
+# OUTPUTS: ageracesex_income_year.rda/.dta, ageracesex_income.rda/.dta
 ################################################################################
 
 #### YEAR LONG FILE ####

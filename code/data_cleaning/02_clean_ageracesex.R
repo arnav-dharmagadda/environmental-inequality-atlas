@@ -6,7 +6,8 @@
 # CREATED: June 9th, 2025
 ################################################################################
 # INPUTS: gridded_eif_pop_ageracesex files (1999-2023)
-# OUTPUTS: None.
+# OUTPUTS: ageracesex_{YEAR}.dta/.rda, ageracesex_combined.rda/.dta,
+#          ageracesex_year_long.rda/.dta, ageracesex_wide.rda/.dta
 ################################################################################
 
 # Loop 1999 through 2023
