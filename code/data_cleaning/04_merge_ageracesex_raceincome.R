@@ -1,5 +1,5 @@
 ################################################################################
-# FILE: 03_clean_raceincome.R
+# FILE: 04_merge_ageracesex_raceincome.R
 # PURPOSE: Merge race-income and age-race-sex files to create a combined data
 # set.
 # AUTHOR: Arnav Dharmagadda
