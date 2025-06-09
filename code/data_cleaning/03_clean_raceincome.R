@@ -110,3 +110,21 @@ raceincome_year_long <- raceincome_wide %>%
 save(raceincome_year_long, file = paste0(rda_path_ri, "raceincome_long_year.rda"))
 write_dta(raceincome_year_long, paste0(dta_path_ars, "raceincome_long_year.dta"))
 
+# Pivot by Year
+
+raceincome_wide <- raceincome_wide %>%
+  pivot_longer(
+    cols = -c(grid_lon, grid_lat, year),
+    names_to = "var",
+    values_to = "value"
+  ) %>%
+  mutate(var_year = paste0(var, "_", year)) %>%
+  select(-year, -var) %>%
+  pivot_wider(
+    names_from = var_year,
+    values_from = value,
+    values_fill = 0
+  )
+
+save(raceincome_wide, file = paste0(rda_path_ri, "raceincome_wide.rda"))
+write_dta(raceincome_wide, paste0(dta_path_ars, "raceincome_wide.dta"))
