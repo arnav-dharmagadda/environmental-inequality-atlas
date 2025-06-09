@@ -56,21 +56,41 @@ write_dta(ageracesex_combined, paste0(dta_path_ars, "ageracesex_long.dta"))
 ageracesex_combined <- ageracesex_combined %>%
   mutate(age_group = case_when(
     age_group == "Over 65" ~ "over_65",
-    age_group == "19-65" ~ "19_65",
+    age_group == "19-65" ~ "bet_19_65",
     age_group == "Under 18" ~ "under_18",
     TRUE ~ age_group  # keep all other values unchanged
   )) %>%
   mutate(race_ethnicity = case_when(
-    race_ethnicity == "NA" ~ "NA_race",
+    race_ethnicity == "Other/Unknown" ~ "other_race",
     TRUE ~ race_ethnicity  # keep all other values unchanged
+  )) %>%
+  mutate(age_group = case_when(
+    age_group == "Missing Age" ~ "na_age",
+    TRUE ~ age_group  # keep all other values unchanged
+  )) %>%
+  mutate(sex = case_when(
+    sex == "Missing Gender" ~ "na_sex",
+    TRUE ~ sex  # keep all other values unchanged
   )) %>%
   mutate(race_age_sex = paste(race_ethnicity, age_group, sex, sep = "_"))
 
 ageracesex_wide <- ageracesex_combined %>%
-  select(year, grid_lon, grid_lat, race_age_sex, n_noise_postprocessed) %>%
+  select(year, grid_lon, grid_lat, STATEFP, COUNTYFP, GEOID, NAME, race_age_sex, n_noise_postprocessed) %>%
   pivot_wider(
     names_from = race_age_sex,
     values_from = n_noise_postprocessed
+  )
+
+agerace_combined <- ageracesex_combined %>%
+  mutate(race_age = paste(race_ethnicity, age_group, sep = "_"))
+
+agerace_wide <- agerace_combined %>%
+  group_by(year, grid_lon, grid_lat, race_age) %>%
+  summarise(total_pop = sum(n_noise_postprocessed, na.rm = TRUE), .groups = "drop") %>%
+  select(year, grid_lon, grid_lat, race_age, total_pop) %>%
+  pivot_wider(
+    names_from = race_age,
+    values_from = total_pop
   )
 
 race_wide <- ageracesex_combined %>%
@@ -103,4 +123,31 @@ sex_wide <- ageracesex_combined %>%
   ) %>%
   rename(NA_sex = `NA`)
 
+ageracesex_year_long <- ageracesex_wide %>%
+  left_join(agerace_wide,   by = c("grid_lon", "grid_lat", "year")) %>%
+  left_join(race_wide, by = c("grid_lon", "grid_lat", "year")) %>%
+  left_join(age_group_wide, by = c("grid_lon", "grid_lat", "year")) %>%
+  left_join(sex_wide, by = c("grid_lon", "grid_lat", "year"))
+
+save(ageracesex_year_long, file = paste0(rda_path_ars, "ageracesex_year_long.rda"))
+write_dta(ageracesex_year_long, paste0(dta_path_ars, "ageracesex_year_long.dta"))
+
+#### PIVOT BY YEAR ####
+
+ageracesex_wide <- ageracesex_year_long %>%
+  pivot_longer(
+    cols = -c(grid_lon, grid_lat, STATEFP, COUNTYFP, GEOID, NAME, year),
+    names_to = "var",
+    values_to = "value"
+  ) %>%
+  mutate(var_year = paste0(var, "_", year)) %>%
+  select(-year, -var) %>%
+  pivot_wider(
+    names_from = var_year,
+    values_from = value,
+    values_fill = 0
+  )
+
+save(ageracesex_wide, file = paste0(rda_path_ars, "ageracesex_wide.rda"))
+write_dta(ageracesex_wide, paste0(dta_path_ars, "ageracesex_wide.dta"))
 
