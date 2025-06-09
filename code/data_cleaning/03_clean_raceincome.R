@@ -52,6 +52,8 @@ raceincome_combined <- do.call(rbind, all_raceincome)
 save(raceincome_combined, file = paste0(rda_path_ri, "raceincome_long.rda"))
 write_dta(raceincome_combined, paste0(dta_path_ri, "raceincome_long.dta"))
 
+# Change observation values for compatibility
+
 raceincome_combined <- raceincome_combined %>%
   mutate(
     race_ethnicity = case_when(
@@ -76,12 +78,16 @@ raceincome_combined <- raceincome_combined %>%
     race_income = paste(race_ethnicity, income_decile, sep = "_")
   )
 
+# Reshape for raceincome variables
+
 raceincome_wide <- raceincome_combined %>%
   select(year, grid_lon, grid_lat, STATEFP, COUNTYFP, GEOID, NAME, race_income, n_noise_postprocessed) %>%
   pivot_wider(
     names_from = race_income,
     values_from = n_noise_postprocessed
   )
+
+# Reshape for race variables
 
 race_wide <- raceincome_combined %>%
   group_by(year, grid_lon, grid_lat, race_ethnicity) %>%
@@ -93,6 +99,8 @@ race_wide <- raceincome_combined %>%
   ) %>%
   rename(NA_race = `NA`)
 
+# Reshape for income variables
+
 income_wide <- raceincome_combined %>%
   group_by(year, grid_lon, grid_lat, income_decile) %>%
   summarise(total_inc_pop = sum(n_noise_postprocessed, na.rm = TRUE), .groups = "drop") %>%
@@ -103,6 +111,7 @@ income_wide <- raceincome_combined %>%
   ) %>%
   rename(NA_inc = `NA`)
 
+# Combine all into a single dataframe with year
 
 raceincome_year_long <- raceincome_wide %>%
   left_join(race_wide,   by = c("grid_lon", "grid_lat", "year")) %>%

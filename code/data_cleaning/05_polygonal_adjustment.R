@@ -53,6 +53,8 @@ process_rda_file <- function(file_path, lon_col = "grid_lon", lat_col = "grid_la
   save(list = df_name, file = file_path, envir = env)
 }
 
+# Run the function on all .rda files in the specified directory
+
 file_paths <- list.files("data/processed/", pattern = "\\.rda$", full.names = TRUE, recursive = TRUE)
 walk(file_paths, process_rda_file)
 
