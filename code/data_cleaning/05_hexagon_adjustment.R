@@ -47,8 +47,6 @@ process_rda_to_hex <- function(file_path, lon_col = "grid_lon", lat_col = "grid_
 
 #### Apply Functions to Data Files ####
 
-# === Load and process all .rda files from multiple folders === #
-
 # List of folders to search for input .rda files
 folders <- c(processed_path, rda_path_ars, rda_path_ri)
 
