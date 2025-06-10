@@ -17,7 +17,7 @@ raceincome2023 <- get(raceincome_2023)
 #Calculating average income for each race seperately for Cville and AC
 
 avg_income_by_race_county <- raceincome2023 %>%
-  filter(!is.na(race_ethnicity)) %>%
+  filter(!is.na(race_ethnicity), race_ethnicity != "Other/Unknown") %>%
   group_by(COUNTYFP, race_ethnicity) %>%
   summarise(
     avg_income_decile = weighted.mean(income_decile, w = n_noise_postprocessed, na.rm = TRUE),
