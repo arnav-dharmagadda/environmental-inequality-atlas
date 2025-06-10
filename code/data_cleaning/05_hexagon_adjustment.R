@@ -11,38 +11,67 @@
 
 #### Define Functions ####
 
-# Function to create a hexagon centered at a point
-create_hexagon <- function(point, radius = 0.005) {
-  st_buffer(point, dist = radius, nQuadSegs = 6)
-}
-
-# Function to process a single .rda file into hexagon polygons
-process_rda_to_hex <- function(file_path, lon_col = "grid_lon", lat_col = "grid_lat", radius = 0.005) {
-  # Step 1: Load the original .rda file into a temporary environment
+process_rda_to_hex_grid <- function(file_path, lon_col = "grid_lon", lat_col = "grid_lat", hex_cellsize = 0.02) {
+  
+  # Step 1: Load the .rda file
   env <- new.env()
   load(file_path, envir = env)
-  
-  # Step 2: Extract the data frame inside
   df_name <- ls(env)[1]
   df <- env[[df_name]]
   
-  # Step 3: Convert to sf POINT object
-  df_sf <- st_as_sf(df, coords = c(lon_col, lat_col), crs = 4326)
+  # Step 2: Convert the original data frame to an sf POINT object
+  points_sf <- st_as_sf(df, coords = c(lon_col, lat_col), crs = 4326, remove = FALSE)
   
-  # Step 4: Create hexagons centered on each point
-  hex_geom <- st_geometry(df_sf) %>%
-    lapply(create_hexagon, radius = radius) %>%
-    st_sfc(crs = 4326)
+  # Step 3: Create a single, seamless hexagonal grid that covers all points.
+  hex_grid <- st_make_grid(points_sf, cellsize = hex_cellsize, square = FALSE)
   
-  # Step 5: Create a new sf object with hexagonal geometries
-  df_hex <- st_sf(df, geometry = hex_geom)
+  # Convert the grid to a full sf object so it can hold data
+  hex_grid_sf <- st_sf(geometry = hex_grid) %>%
+    mutate(hex_id = row_number()) # Add a unique ID to each hexagon
   
-  # Step 6: Save to new .rda file with _hex suffix
-  hex_file_path <- sub("\\.rda$", "_hex.rda", file_path)
-  assign(df_name, df_hex, envir = env)
+  # Step 4: Spatially join your original points to the new hexagonal grid.
+  points_in_hex <- st_join(points_sf, hex_grid_sf, join = st_intersects)
+  
+  grouping_vars <- c("hex_id")
+  
+  if ("year" %in% colnames(points_in_hex)) {
+    grouping_vars <- c(grouping_vars, "year")
+    message("Found 'year' column. Grouping by year.")
+  } else {
+    message("No 'year' column found. Proceeding without grouping by year.")
+  }
+  
+  # Step 5: Aggregate the data for each hexagon by summing the population.
+  hex_summary <- points_in_hex %>%
+    st_drop_geometry() %>% # Drop geometry for faster, non-spatial grouping
+    group_by(across(all_of(grouping_vars))) %>%
+    summarise(
+      across(
+        where(is.numeric) & !any_of(c("grid_lon", "grid_lat", "COUNTYFP", "STATEFP", "NAME", "GEOID")), 
+        ~if (all(is.na(.))) NA_real_ else sum(., na.rm = TRUE),
+        .names = "{.col}" # This keeps the original column names
+      ),
+      grid_lon = first(grid_lon),
+      grid_lat = first(grid_lat),
+      COUNTYFP = first(COUNTYFP),
+      STATEFP = first(STATEFP),
+      name = first(NAME),
+      GEOID = first(GEOID),
+      n_points = n() 
+    )
+  
+  # Step 6: Join the summarized data back to the hexagonal grid object.
+  df_hex_grid <- hex_grid_sf %>%
+    right_join(hex_summary, by = "hex_id") %>%
+    filter(!is.na(hex_id)) # Keep only hexagons with population > 0
+  
+  # Step 7: Save to new .rda file with "_hex.rda" suffix
+  hex_file_path <- sub("(_hex)?\\.rda$", "_hex.rda", file_path)
+  
+  assign(df_name, df_hex_grid, envir = env)
   save(list = df_name, file = hex_file_path, envir = env)
   
-  message("Saved hex version to: ", hex_file_path)
+  message("Saved hex grid version to: ", hex_file_path)
 }
 
 #### Apply Functions to Data Files ####
@@ -51,9 +80,11 @@ process_rda_to_hex <- function(file_path, lon_col = "grid_lon", lat_col = "grid_
 folders <- c(processed_path, rda_path_ars, rda_path_ri)
 
 # Get all .rda file paths from those folders
-file_paths <- unlist(lapply(folders, function(dir) {
+all_rda_files <- unlist(lapply(folders, function(dir) {
   list.files(dir, pattern = "\\.rda$", full.names = TRUE)
 }))
 
+file_paths <- all_rda_files[!grepl("_hex\\.rda$", all_rda_files)]
+
 # Run the processing function on each file
-walk(file_paths, process_rda_to_hex)
+walk(file_paths, process_rda_to_hex_grid)
