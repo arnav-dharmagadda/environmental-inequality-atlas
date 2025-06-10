@@ -1,7 +1,8 @@
 ###################################################################
 # Purpose: initial visualizations of race-income gridded eif data
 # Author: Josie Fischman
-# Date: 6/3/2025
+# Date created: 6/3/2025
+###################################################################
 # Inputs: raceincome_wide
 # Outputs: Binned Decile 10 Resident Counts.png, Binned Decile 1 Resident Counts.png, Binned Resident Counts in Deciles 0-3.png, Binned Resident Counts in Deciles 8-10.png, Percent of Residents in 0-3 Deciles.png, Percent of Residents in 0-3 Deciles2.png  
 ###################################################################

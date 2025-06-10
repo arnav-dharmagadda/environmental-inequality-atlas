@@ -1,7 +1,8 @@
 ###################################################################
 # Purpose: initial visualizations of race and income gridded eif data
 # Author: Josie Fischman
-# Date: 6/4/2025
+# Date created: 6/4/2025
+###################################################################
 # Inputs: raceincome_wide
 # Outputs: Income Decile Distribution by Race.png, Income Distribution by Race Facet.png, Income Decile Composition by Race.png, Income Distribution by Race in Charlottesville.png, Income Distribution by Race (proportional) in Charlottesville.png, Share of Race Group in 2nd, 5th, and 10th Income Deciles.png 
 ###################################################################

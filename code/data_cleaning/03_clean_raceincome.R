@@ -109,7 +109,7 @@ raceincome_year_long <- raceincome_wide %>%
 
 save(raceincome_year_long, file = paste0(rda_path_ri, "raceincome_long_year.rda"))
 write_dta(raceincome_year_long, paste0(dta_path_ars, "raceincome_long_year.dta"))
-
+View(raceincome_year_long)
 # Pivot by Year
 
 raceincome_wide <- raceincome_wide %>%
@@ -129,4 +129,4 @@ raceincome_wide <- raceincome_wide %>%
 save(raceincome_wide, file = paste0(rda_path_ri, "raceincome_wide.rda"))
 write_dta(raceincome_wide, paste0(dta_path_ars, "raceincome_wide.dta"))
 
-
+View(raceincome_wide)

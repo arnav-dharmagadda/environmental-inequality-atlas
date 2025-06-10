@@ -1,9 +1,10 @@
 ###################################################################
 # Purpose: initial visualizations of race-income gridded eif data
 # Author: Josie Fischman
-# Date: 6/3/2025
-# Inputs:
-# Outputs: 
+# Date created: 6/3/2025
+####################################################################
+# Inputs:raceincome_wide
+# Outputs: Black Residents in Charlottesville.png, Percentage of Black Population in Charlottesville.png
 ###################################################################
 
 #change into spatial data

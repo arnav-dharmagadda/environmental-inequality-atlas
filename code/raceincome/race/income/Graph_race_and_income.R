@@ -1,9 +1,10 @@
 ###################################################################
 # Purpose: initial visualizations of race and income gridded eif data
 # Author: Josie Fischman
-# Date: 6/4/2025
-# Inputs:
-# Outputs: 
+# Date created: 6/4/2025
+##################################################################
+# Inputs: raceincome_wide
+# Outputs: Income Decile Distribution by Race.png, Income Distribution by Race Facet.png, Income Decile Composition by Race.png, Income Distribution by Race in Charlottesville.png, Income Distribution by Race (proportional) in Charlottesville.png, Share of Race Group in 2nd, 5th, and 10th Income Deciles.png 
 ###################################################################
 library(ggplot2)
 library(RColorBrewer)
@@ -68,7 +69,7 @@ race_summary <- raceincome_long %>%
 
 #plot income deciles by race
 
-ggplot(race_summary, aes(x = factor(decile), y = total_count, fill = race)) +
+p <- ggplot(race_summary, aes(x = factor(decile), y = total_count, fill = race)) +
   geom_col(position = "dodge") +
   scale_fill_brewer(palette = "Set2") +
   labs(
@@ -78,8 +79,10 @@ ggplot(race_summary, aes(x = factor(decile), y = total_count, fill = race)) +
   ) +
   theme_minimal()
 
+ggsave("output/raceincome/Income Decile Distribution by Race.png", plot = p, width = 6, height = 4)
+
 #facet
-ggplot(race_summary, aes(x = factor(decile), y = total_count)) +
+q <- ggplot(race_summary, aes(x = factor(decile), y = total_count)) +
   geom_col(fill = "#1f78b4") +
   facet_wrap(~ race, scales = "free_y") +
   labs(
@@ -88,11 +91,12 @@ ggplot(race_summary, aes(x = factor(decile), y = total_count)) +
     y = "Number of People"
   ) +
   theme_minimal()
+ggsave("output/raceincome/Income Distribution by Race Facet.png", plot = q, width = 6, height = 4)
 
 
 
 #race distribution by income decile ungrouped
-ggplot(race_summary, aes(x = race, y = total_count, fill = factor(decile))) +
+r <- ggplot(race_summary, aes(x = race, y = total_count, fill = factor(decile))) +
   geom_col(position = "stack") +
   scale_fill_brewer(palette = "YlGnBu", name = "Income Decile") +
   labs(
@@ -101,6 +105,7 @@ ggplot(race_summary, aes(x = race, y = total_count, fill = factor(decile))) +
     y = "Number of People"
   ) +
   theme_minimal()
+ggsave("output/raceincome/Income Decile Composition by Race.png", plot = r, width = 6, height = 4)
 
 #race distribution by income decile grouped
 
@@ -120,7 +125,7 @@ race_summary_grouped$decile_group <- factor(
   levels = c("Low (0–3)", "Mid (4–7)", "High (8–9)")
 )
 
-ggplot(race_summary_grouped, aes(x = race, y = total_count, fill = decile_group)) +
+s <- ggplot(race_summary_grouped, aes(x = race, y = total_count, fill = decile_group)) +
   geom_col(position = "dodge") +
   scale_fill_brewer(palette = "Set2", name = "Income Group") +
   labs(
@@ -129,6 +134,7 @@ ggplot(race_summary_grouped, aes(x = race, y = total_count, fill = decile_group)
     y = "Number of People"
   ) +
   theme_minimal()
+ggsave("output/raceincome/Income Distribution by Race in Charlottesville.png", plot = s, width = 6, height = 4)
 
 
 #Income dist by Race (share of each race)
@@ -142,7 +148,7 @@ race_summary_grouped_share$decile_group <- factor(
   levels = c("Low (0–3)", "Mid (4–7)", "High (8–9)")
 )
 
-ggplot(race_summary_grouped_share, aes(x = race, y = share, fill = decile_group)) +
+t <- ggplot(race_summary_grouped_share, aes(x = race, y = share, fill = decile_group)) +
   geom_col(position = "dodge") +
   scale_fill_brewer(palette = "Set2", name = "Income Group") +
   scale_y_continuous(labels = scales::percent) +
@@ -152,6 +158,8 @@ ggplot(race_summary_grouped_share, aes(x = race, y = share, fill = decile_group)
     y = "Share of Group"
   ) +
   theme_minimal()
+
+ggsave("output/raceincome/Income Distribution by Race (proportional) in Charlottesville.png", plot = t, width = 6, height = 4)
 
 #income dist in 1st, 5, and 10th decile
 selected_deciles <- c(1, 4, 9)
@@ -173,7 +181,7 @@ race_summary_selected_share$decile <- factor(
   labels = c("1st Decile", "5th Decile", "10th Decile")
 )
 #plot
-ggplot(race_summary_selected_share, aes(x = race, y = share, fill = decile)) +
+u <- ggplot(race_summary_selected_share, aes(x = race, y = share, fill = decile)) +
   geom_col(position = "dodge") +
   scale_fill_brewer(palette = "Set2", name = "Household Income Decile") +
   scale_y_continuous(labels = scales::percent) +
@@ -183,6 +191,8 @@ ggplot(race_summary_selected_share, aes(x = race, y = share, fill = decile)) +
     y = "Share of Group"
   ) +
   theme_minimal()
+ggsave("output/raceincome/Share of Race Group in 2nd, 5th, and 10th Income Deciles.png", plot = u, width = 6, height = 4)
+
 #map?
 
 #merged3_sf <- merged3_sf %>%
