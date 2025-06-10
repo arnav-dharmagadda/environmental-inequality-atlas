@@ -10,6 +10,7 @@ This script will run the five scripts that are used in this module to clean the 
 
 # Instructions
 
-1. Set the working directory
-2. TEMPORARY: While the data is stored offline, adjust the data path to be wherever your data is located.
-3. Run.
+1. Set the working directory and git_path in 01_setup.R
+2. Run these two lines
+3. TEMPORARY: While the data is stored offline, adjust the data path to be wherever your data is located.
+4. Run.

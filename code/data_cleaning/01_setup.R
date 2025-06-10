@@ -15,23 +15,25 @@
 
 #### Setting working directory and file paths ####
 
-#setwd("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/")
+setwd("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/")
 
-#data_path <- "/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/gridded_eif_data/"
+data_path <- "gridded_eif_data/"
+
+git_path <- "GitHub/environmental-inequality-atlas/"
 
 gridpoints_path <- paste0(data_path, "gridpoints_with_county_2020.rda")
 
-processed_path <- "data/processed/"
+processed_path <- paste0(git_path, "data/processed/")
 
-dta_path_ars <- "data/processed/ageracesex_dta/"
+dta_path_ars <- paste0(git_path, "data/processed/ageracesex_dta/")
 
-rda_path_ars <- "data/processed/ageracesex_rda/"
+rda_path_ars <- paste0(git_path, "data/processed/ageracesex_rda/")
 
-dta_path_ri <- "data/processed/raceincome_dta/"
+dta_path_ri <- paste0(git_path, "data/processed/raceincome_dta/")
 
-rda_path_ri <- "data/processed/raceincome_rda/"
+rda_path_ri <- paste0(git_path, "data/processed/raceincome_rda/")
 
-map_path <- "output/maps/"
+map_path <- paste0(git_path, "output/maps/")
 
 #### Load Libraries ####
 

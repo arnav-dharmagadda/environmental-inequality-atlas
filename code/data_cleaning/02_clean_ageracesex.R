@@ -7,7 +7,7 @@
 ################################################################################
 # INPUTS: gridded_eif_pop_ageracesex files (1999-2023)
 # OUTPUTS: ageracesex_{YEAR}.dta/.rda, ageracesex_combined.rda/.dta,
-#          ageracesex_year_long.rda/.dta, ageracesex_wide.rda/.dta
+#          ageracesex_year_long.rda/.dta
 ################################################################################
 
 # Loop 1999 through 2023
@@ -146,23 +146,4 @@ ageracesex_year_long <- ageracesex_wide %>%
 
 save(ageracesex_year_long, file = paste0(rda_path_ars, "ageracesex_year_long.rda"))
 write_dta(ageracesex_year_long, paste0(dta_path_ars, "ageracesex_year_long.dta"))
-
-#### PIVOT BY YEAR ####
-
-ageracesex_wide <- ageracesex_year_long %>%
-  pivot_longer(
-    cols = -c(grid_lon, grid_lat, STATEFP, COUNTYFP, GEOID, NAME, year),
-    names_to = "var",
-    values_to = "value"
-  ) %>%
-  mutate(var_year = paste0(var, "_", year)) %>%
-  select(-year, -var) %>%
-  pivot_wider(
-    names_from = var_year,
-    values_from = value,
-    values_fill = 0
-  )
-
-save(ageracesex_wide, file = paste0(rda_path_ars, "ageracesex_wide.rda"))
-write_dta(ageracesex_wide, paste0(dta_path_ars, "ageracesex_wide.dta"))
 

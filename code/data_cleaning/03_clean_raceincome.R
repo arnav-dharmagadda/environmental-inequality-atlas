@@ -7,7 +7,7 @@
 ################################################################################
 # INPUTS: gridded_eif_pop_raceincome files (1999-2023)
 # OUTPUTS: raceincome_{YEAR}.dta/.rda, raceincome_combined.rda/.dta,
-#          raceincome_year_long.rda/.dta, raceincome_wide.rda/.dta
+#          raceincome_year_long.rda/.dta
 ################################################################################
 
 # Loop through 1999-2023
@@ -87,18 +87,6 @@ raceincome_wide <- raceincome_combined %>%
     values_from = n_noise_postprocessed
   )
 
-# Reshape for race variables
-
-race_wide <- raceincome_combined %>%
-  group_by(year, grid_lon, grid_lat, race_ethnicity) %>%
-  summarise(total_race_pop = sum(n_noise_postprocessed, na.rm = TRUE), .groups = "drop") %>%
-  select(year, grid_lon, grid_lat, race_ethnicity, total_race_pop) %>%
-  pivot_wider(
-    names_from = race_ethnicity,
-    values_from = total_race_pop
-  ) %>%
-  rename(NA_race = `NA`)
-
 # Reshape for income variables
 
 income_wide <- raceincome_combined %>%
@@ -114,27 +102,7 @@ income_wide <- raceincome_combined %>%
 # Combine all into a single dataframe with year
 
 raceincome_year_long <- raceincome_wide %>%
-  left_join(race_wide,   by = c("grid_lon", "grid_lat", "year")) %>%
   left_join(income_wide, by = c("grid_lon", "grid_lat", "year"))
 
 save(raceincome_year_long, file = paste0(rda_path_ri, "raceincome_long_year.rda"))
 write_dta(raceincome_year_long, paste0(dta_path_ri, "raceincome_long_year.dta"))
-
-# Pivot by Year
-
-raceincome_wide <- raceincome_year_long %>%
-  pivot_longer(
-    cols = -c(grid_lon, grid_lat, STATEFP, COUNTYFP, GEOID, NAME, year),
-    names_to = "var",
-    values_to = "value"
-  ) %>%
-  mutate(var_year = paste0(var, "_", year)) %>%
-  select(-year, -var) %>%
-  pivot_wider(
-    names_from = var_year,
-    values_from = value,
-    values_fill = 0
-  )
-
-save(raceincome_wide, file = paste0(rda_path_ri, "raceincome_wide.rda"))
-write_dta(raceincome_wide, paste0(dta_path_ri, "raceincome_wide.dta"))
