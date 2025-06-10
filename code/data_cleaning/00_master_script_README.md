@@ -6,7 +6,7 @@ Created: 6/9/2025
 
 # Purpose
 
-This script will run the five scripts that are used in this module to clean the Gridded EIF age-race-sex and race-income data. 
+This script will run the six scripts that are used in this module to clean the Gridded EIF age-race-sex and race-income data. 
 
 # Instructions
 
