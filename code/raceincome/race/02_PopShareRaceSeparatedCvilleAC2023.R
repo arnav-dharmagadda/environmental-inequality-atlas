@@ -52,6 +52,7 @@ race_shares_by_county <- raceincome_2023_wide %>%
   mutate(
     race = gsub("n_noise_postprocessed_", "", race)
   ) %>%
+  filter(race != "Other/Unknown") %>%  # remove the group here
   group_by(county_name) %>%
   mutate(
     share = total_population / sum(total_population)
