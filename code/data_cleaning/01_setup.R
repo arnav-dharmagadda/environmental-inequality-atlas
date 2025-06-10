@@ -11,13 +11,13 @@
 
 #### Clear Environment ####
 
-rm(list = ls())
+#rm(list = ls())
 
 #### Setting working directory and file paths ####
 
-setwd("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/")
+#setwd("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/")
 
-data_path <- "/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/gridded_eif_data/"
+#data_path <- "/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/gridded_eif_data/"
 
 gridpoints_path <- paste0(data_path, "gridpoints_with_county_2020.rda")
 

@@ -4,8 +4,9 @@
 # AUTHOR: Arnav Dharmagadda
 # CREATED: June 9th, 2025
 ################################################################################
-# INPUTS: gridded_eif_pop_raceincome files (1999-2023)
-# OUTPUTS: None.
+# INPUTS: Processed .rda files in data/processed/ageracesex_rda/,
+# data/processed/raceincome_rda/, and data/processed/
+# OUTPUTS: Overwritten .rda files with grid polygons
 ################################################################################
 
 #### DEFINE A FUNCTION ####
@@ -52,18 +53,8 @@ process_rda_file <- function(file_path, lon_col = "grid_lon", lat_col = "grid_la
   save(list = df_name, file = file_path, envir = env)
 }
 
-# Age, Race, Sex
+# Run the function on all .rda files in the specified directory
 
-file_paths <- list.files("data/processed/ageracesex_rda/", pattern = "\\.rda$", full.names = TRUE)
-walk(file_paths, process_rda_file)
-
-# Race, Income
-
-file_paths <- list.files("data/processed/raceincome_rda/", pattern = "\\.rda$", full.names = TRUE)
-walk(file_paths, process_rda_file)
-
-# Combined
-
-file_paths <- list.files("data/processed/", pattern = "\\.rda$", full.names = TRUE)
+file_paths <- list.files("data/processed/", pattern = "\\.rda$", full.names = TRUE, recursive = TRUE)
 walk(file_paths, process_rda_file)
 
