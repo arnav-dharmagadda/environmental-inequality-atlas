@@ -15,11 +15,12 @@
 
 #### Setting working directory and file paths ####
 
-#setwd("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/")
 
-#data_path <- "/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/gridded_eif_data/"
+setwd("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/")
 
-gridpoints_path <- paste0(data_path, "gridpoints_with_county_2020.rda")
+data_path <- "/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/gridded_eif_data/"
+
+gridpoints_path <- paste0(data_path, "/race_income/gridpoints_with_county_2020 (1).rda")
 
 processed_path <- "data/processed/"
 
