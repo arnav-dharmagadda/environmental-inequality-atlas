@@ -17,13 +17,12 @@ raceincome1999 <- get(raceincome_1999)
 #Calculating average income for each race in Cville/AC
 
 avg_income_by_race <- raceincome1999 %>%
-  filter(!is.na(race_ethnicity)) %>%
+  filter(!is.na(race_ethnicity), race_ethnicity != "Other/Unknown") %>%
   group_by(race_ethnicity) %>%
   summarise(
     avg_income_decile = weighted.mean(income_decile, w = n_noise_postprocessed, na.rm = TRUE),
     .groups = "drop"
   )
-View(avg_income_by_race)
 
 # Save bar chart of average income by race in Cville/AC in 1999
 ggsave(

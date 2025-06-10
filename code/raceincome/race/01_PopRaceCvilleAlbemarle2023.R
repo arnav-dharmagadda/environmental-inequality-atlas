@@ -41,10 +41,9 @@ race_totals <- raceincome_2023_wide %>%
     names_to = "race",
     values_to = "total_population"
   ) %>%
-  mutate(
-    race = gsub("n_noise_postprocessed_", "", race),
-    share = total_population / sum(total_population)  # calculate share
-  )
+  mutate(race = gsub("n_noise_postprocessed_", "", race)) %>%
+  filter(race != "Other/Unknown") %>% #exclude before computing share
+  mutate(share = total_population / sum(total_population))
 
 # Plot as a histogram (bar chart)
 #ggplot(race_totals, aes(x = reorder(race, -total_population), y = total_population)) +

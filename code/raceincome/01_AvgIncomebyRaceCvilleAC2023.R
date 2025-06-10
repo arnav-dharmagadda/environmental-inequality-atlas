@@ -17,17 +17,16 @@ raceincome2023 <- get(raceincome_2023)
 #Calculating average income for each race in Cville/AC
 
 avg_income_by_race <- raceincome2023 %>%
-  filter(!is.na(race_ethnicity)) %>%
+  filter(!is.na(race_ethnicity), race_ethnicity != "Other/Unknown") %>%
   group_by(race_ethnicity) %>%
   summarise(
     avg_income_decile = weighted.mean(income_decile, w = n_noise_postprocessed, na.rm = TRUE),
     .groups = "drop"
   )
-View(avg_income_by_race)
 
 # Save bar chart of average income by race in Cville/AC in 2023
 ggsave(
-  "output/raceincome/income/avg_income_by_race_2023.png",
+  "output/raceincome/avg_income_by_race_2023.png",
   plot = ggplot(avg_income_by_race, aes(x = reorder(race_ethnicity, -avg_income_decile), y = avg_income_decile)) +
     geom_bar(stat = "identity", fill = "steelblue") +
     labs(
