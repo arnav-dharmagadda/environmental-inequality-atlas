@@ -53,4 +53,19 @@ show(incomedecile_totals)
 
 
 
+race_summary <- raceincome_long %>%
+  group_by(race) %>%
+  summarise(
+    count = sum(count, na.rm = TRUE)
+  ) %>%
+  mutate(percent_of_total = 100 * count / total_pop)
+
+income_summary <- raceincome_long %>%
+  group_by(decile) %>%
+  summarise(
+    count = sum(count, na.rm = TRUE)
+  ) %>%
+  mutate(percent_of_total = 100 * count / total_pop)
+
+
 
