@@ -14,6 +14,12 @@
 raceincome_1999 <- load("data/processed/raceincome_rda/raceincome_1999.rda")
 raceincome1999 <- get(raceincome_1999)
 
+#Filter for Cville/AC
+raceincome2023 <- raceincome2023 %>%
+  filter(
+    STATEFP == "51" & COUNTYFP %in% c("540", "003")
+  )
+
 #Calculating average income for each race in Cville/AC
 
 avg_income_by_race <- raceincome1999 %>%
