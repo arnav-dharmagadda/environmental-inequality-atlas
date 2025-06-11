@@ -51,7 +51,6 @@ rm(df)
 #### Filter Gridpoints to Focus Area ####
 
 gridpoints <- gridpoints %>%
-  filter(STATEFP == "51" & COUNTYFP == "003" | COUNTYFP == "540") %>%
   rename(
     grid_lon = pm25_grid_x,
     grid_lat = pm25_grid_y

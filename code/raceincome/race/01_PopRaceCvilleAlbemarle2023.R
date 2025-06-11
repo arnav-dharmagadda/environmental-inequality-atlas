@@ -14,6 +14,12 @@
 raceincome_2023 <- load("data/processed/raceincome_rda/raceincome_2023.rda")
 raceincome2023 <- get(raceincome_2023)
 
+#Filter for Cville/AC
+raceincome2023 <- raceincome2023 %>%
+  filter(
+    STATEFP == "51" & COUNTYFP %in% c("540", "003")
+  )
+
 # sum population in each grid by race
 
 racesumbygrid <- raceincome2023 %>%
