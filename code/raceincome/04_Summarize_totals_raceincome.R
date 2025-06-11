@@ -51,7 +51,7 @@ incomedecile_totals <- raceincome_long %>%
 show(incomedecile_totals)
 
 
-#find percentages
+
 
 race_summary <- raceincome_long %>%
   group_by(race) %>%
@@ -66,5 +66,6 @@ income_summary <- raceincome_long %>%
     count = sum(count, na.rm = TRUE)
   ) %>%
   mutate(percent_of_total = 100 * count / total_pop)
+
 
 
