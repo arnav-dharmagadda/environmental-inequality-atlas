@@ -30,7 +30,9 @@ raceincome_long <- raceincome_sf %>%
     decile = as.integer(str_extract(variable, "(?<=_inc_)\\d+")),
     year = as.integer(str_extract(variable, "\\d{4}$"))
   ) %>%
+
   filter(year == 2023, race != "other", !is.na(decile))
+
 #make it a grid
 # Step 1: Convert to sf POINT object
 raceincome_2023 <- st_as_sf(raceincome_2023, coords = c("grid_lon", "grid_lat"), crs = 4326)
