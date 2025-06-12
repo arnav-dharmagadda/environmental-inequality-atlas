@@ -20,6 +20,8 @@ raceincome2023 <- raceincome2023 %>%
     STATEFP == "51" & COUNTYFP %in% c("540", "003")
   )
 
+
+
 #Calculating average income for each race in Cville/AC
 
 avg_income_by_race <- raceincome1999 %>%

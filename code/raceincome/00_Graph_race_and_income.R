@@ -11,59 +11,23 @@ library(RColorBrewer)
 library(prettymapr)
 library(sf)
 library(stringr)
-#change into spatial data
-raceincome_sf <- st_as_sf(
-  raceincome_wide,
-  coords = c("grid_lon", "grid_lat"),
-  crs = 4326  # WGS 84 (standard GPS lat/lon)
-)
-#filter year 2023 and convert to long
-raceincome_long <- raceincome_sf %>%
-  pivot_longer(
-    cols = where(is.numeric),
-    names_to = "variable",
-    values_to = "count"
-  ) %>%
-  filter(!is.na(count)) %>%
-  mutate(
-    race = gsub("_.*", "", variable),
-    decile = as.integer(str_extract(variable, "(?<=_inc_)\\d+")),
-    year = as.integer(str_extract(variable, "\\d{4}$"))
-  ) %>%
-  filter(year == 2023, race != "other", !is.na(decile))
-#make it a grid
-# Step 1: Convert to sf POINT object
-raceincome_2023 <- st_as_sf(raceincome_2023, coords = c("grid_lon", "grid_lat"), crs = 4326)
-# Step 2: Get expanded bounding box to fully contain all grid cells
-bbox <- st_bbox(raceincome_2023)
-bbox_expanded <- bbox
-bbox_expanded[c("xmin", "ymin")] <- bbox_expanded[c("xmin", "ymin")] - 0.005
-bbox_expanded[c("xmax", "ymax")] <- bbox_expanded[c("xmax", "ymax")] + 0.005
-# Step 3: Create grid polygons at 0.01° resolution covering the area
-grid_polygons <- st_make_grid(
-  cellsize = c(0.01, 0.01),
-  offset = c(bbox_expanded["xmin"], bbox_expanded["ymin"]),
-  n = c(ceiling((bbox_expanded["xmax"] - bbox_expanded["xmin"]) / 0.01),
-        ceiling((bbox_expanded["ymax"] - bbox_expanded["ymin"]) / 0.01)),
-  crs = 4326,
-  what = "polygons"
-)
-# Step 4: Convert grid to sf and join with your original data (spatial match)
-grid_sf <- st_sf(geometry = grid_polygons)
-# Step 5: Spatial join: match points to polygons (assumes 1 point per cell)
-raceincome_2023 <- st_join(grid_sf, raceincome_2023, join = st_contains)
+load("data/processed/raceincome_rda/raceincome_2023.rda")  # loads the object into environment
+# Let's say the object it loads is also named `raceincome_2023`, then just use it:
+raceincome2023 <- raceincome_2023
 
-#filter for decile and race
-# Separate into race and decile
-raceincome_long <- raceincome_long %>%
-  mutate(
-    race = gsub("_.*", "", variable),
-    decile = gsub(".*_(\\d+)_.*", "\\1", variable),
-    decile = as.integer(decile)
+#Filter for Cville/AC
+raceincome2023 <- raceincome2023 %>%
+  filter(
+    STATEFP == "51" & COUNTYFP %in% c("540", "003") 
   ) %>%
-  filter(race != "other" & race != "Other" & !is.na(decile))
+  filter(!tolower(race) %in% "Other/Unknown")
+View(raceincome2023)
+#filter for decile and race
+
+# Separate into race and decile
+
 #summarize by counts
-race_summary <- raceincome_long %>%
+race_summary <- raceincome2023 %>%
   group_by(race, decile) %>%
   summarise(total_count = sum(count, na.rm = TRUE), .groups = "drop")
 
@@ -82,7 +46,8 @@ p <- ggplot(race_summary, aes(x = factor(decile), y = total_count, fill = race))
 ggsave("output/raceincome/Income Decile Distribution by Race.png", plot = p, width = 6, height = 4)
 
 #facet
-q <- ggplot(race_summary, aes(x = factor(decile), y = total_count)) +
+
+q <- ggplot(race_summary_filtered, aes(x = factor(decile), y = total_count)) +
   geom_col(fill = "#1f78b4") +
   facet_wrap(~ race, scales = "free_y") +
   labs(
