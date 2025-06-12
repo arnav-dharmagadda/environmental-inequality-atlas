@@ -1,7 +1,7 @@
 ################################################################################
 # FILE: 05SummaryStatsRacePopulationSharesinIncomeDecilesCvilleAC2023.R
 # PURPOSE: Use 2023 race/income data from the gridded EIF to generate summary 
-# statistics for race population shares at every income decile in the United 
+# statistics for race population shares at low, mid, and high income deciles in the United 
 # States, Virginia, and Charlottesville and Albemarle County.
 # AUTHOR: Elizabeth Shiker
 # CREATED: June 11th, 2025
@@ -21,7 +21,7 @@ raceincome2023 <- get(raceincome_2023)
 USincomegroup_2023 <- raceincome2023 %>%
   mutate(
     income_group = case_when(
-      income_decile %in% 1:3 ~ "Low",
+      income_decile %in% 0:3 ~ "Low",
       income_decile %in% 4:7 ~ "Mid",
       income_decile %in% 8:10 ~ "High",
       TRUE ~ NA_character_
@@ -59,7 +59,7 @@ Va2023 <- raceincome2023 %>%
 Va2023 <- Va2023 %>%
   mutate(
     income_group = case_when(
-      income_decile %in% 1:3 ~ "Low",
+      income_decile %in% 0:3 ~ "Low",
       income_decile %in% 4:7 ~ "Mid",
       income_decile %in% 8:10 ~ "High",
       TRUE ~ NA_character_
@@ -98,7 +98,7 @@ CvilleAC2023 <- raceincome2023 %>%
 CvilleAC2023 <- CvilleAC2023 %>%
   mutate(
     income_group = case_when(
-      income_decile %in% 1:3 ~ "Low",
+      income_decile %in% 0:3 ~ "Low",
       income_decile %in% 4:7 ~ "Mid",
       income_decile %in% 8:10 ~ "High",
       TRUE ~ NA_character_
