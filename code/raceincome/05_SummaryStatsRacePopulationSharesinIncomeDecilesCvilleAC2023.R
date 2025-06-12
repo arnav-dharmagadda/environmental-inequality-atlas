@@ -28,25 +28,43 @@ USincomegroup_2023 <- raceincome2023 %>%
     )
   )
 
-# Calculate racial shares per income group
-US_raceShares_byIncomeDecile <- USincomegroup_2023 %>%
+# 2. Aggregate postprocessed population by race and income group
+race_income_group_US2023 <- USincomegroup_2023 %>%
   filter(
-    !is.na(income_group),
     !is.na(race_ethnicity),
-    race_ethnicity != "Other/Unknown"
+    !is.na(income_group)
   ) %>%
-  group_by(income_group, race_ethnicity) %>%
-  summarise(pop = sum(n_noise_postprocessed, na.rm = TRUE), .groups = "drop") %>%
-  group_by(income_group) %>%
-  mutate(
-    total_pop = sum(pop),
-    race_share = pop / total_pop
-  ) %>%
-  select(income_group, race_ethnicity, race_share) %>%
-  pivot_wider(names_from = race_ethnicity, values_from = race_share) %>%
-  arrange(income_group)
+  group_by(race_ethnicity, income_group) %>%
+  summarise(
+    pop = sum(n_noise_postprocessed, na.rm = TRUE),
+    .groups = "drop"
+  )
 
-View(US_raceShares_byIncomeDecile)
+# 3. Get total population by race (denominator)
+race_totals_US2023 <- race_income_group_US2023 %>%
+  group_by(race_ethnicity) %>%
+  summarise(
+    total_pop = sum(pop),
+    .groups = "drop"
+  )
+
+# 4. Compute share of each race's population in each income group
+race_shares_long_US2023 <- race_income_group_US2023 %>%
+  left_join(race_totals_US2023, by = "race_ethnicity") %>%
+  mutate(
+    share_within_race = pop / total_pop
+  ) %>%
+  select(income_group, race_ethnicity, share_within_race)
+
+# 5. Pivot: income groups as rows, races as columns
+race_shares_wide_US2023 <- race_shares_long_US2023 %>%
+  pivot_wider(
+    names_from = race_ethnicity,
+    values_from = share_within_race
+  ) %>%
+  arrange(factor(income_group, levels = c("Low", "Mid", "High")))
+
+View(race_shares_wide_US2023)
 
 ####VIRGINIA####
 
@@ -66,25 +84,43 @@ Va2023 <- Va2023 %>%
     )
   )
 
-# Calculate racial shares per income group
-Va_raceShares_byIncomeDecile <- Va2023 %>%
+# 2. Aggregate postprocessed population by race and income group
+race_income_group_Va2023 <- Va2023 %>%
   filter(
-    !is.na(income_group),
     !is.na(race_ethnicity),
-    race_ethnicity != "Other/Unknown"
+    !is.na(income_group),
   ) %>%
-  group_by(income_group, race_ethnicity) %>%
-  summarise(pop = sum(n_noise_postprocessed, na.rm = TRUE), .groups = "drop") %>%
-  group_by(income_group) %>%
-  mutate(
-    total_pop = sum(pop),
-    race_share = pop / total_pop
-  ) %>%
-  select(income_group, race_ethnicity, race_share) %>%
-  pivot_wider(names_from = race_ethnicity, values_from = race_share) %>%
-  arrange(income_group)
+  group_by(race_ethnicity, income_group) %>%
+  summarise(
+    pop = sum(n_noise_postprocessed, na.rm = TRUE),
+    .groups = "drop"
+  )
 
-View(Va_raceShares_byIncomeDecile)
+# 3. Get total population by race (denominator)
+race_totals_Va2023 <- race_income_group_Va2023 %>%
+  group_by(race_ethnicity) %>%
+  summarise(
+    total_pop = sum(pop),
+    .groups = "drop"
+  )
+
+# 4. Compute share of each race's population in each income group
+race_shares_long_Va2023 <- race_income_group_Va2023 %>%
+  left_join(race_totals_Va2023, by = "race_ethnicity") %>%
+  mutate(
+    share_within_race = pop / total_pop
+  ) %>%
+  select(income_group, race_ethnicity, share_within_race)
+
+# 5. Pivot: income groups as rows, races as columns
+race_shares_wide_Va2023 <- race_shares_long_Va2023 %>%
+  pivot_wider(
+    names_from = race_ethnicity,
+    values_from = share_within_race
+  ) %>%
+  arrange(factor(income_group, levels = c("Low", "Mid", "High")))
+
+View(race_shares_wide_Va2023)
 
 ####CVILLE + AC####
 
@@ -105,22 +141,40 @@ CvilleAC2023 <- CvilleAC2023 %>%
     )
   )
 
-# Calculate racial shares per income group
-CvilleAC_raceShares_byIncomeDecile <- CvilleAC2023 %>%
+# 2. Aggregate postprocessed population by race and income group
+race_income_group_CvilleAC2023 <- CvilleAC2023 %>%
   filter(
-    !is.na(income_group),
     !is.na(race_ethnicity),
-    race_ethnicity != "Other/Unknown"
+    !is.na(income_group),
   ) %>%
-  group_by(income_group, race_ethnicity) %>%
-  summarise(pop = sum(n_noise_postprocessed, na.rm = TRUE), .groups = "drop") %>%
-  group_by(income_group) %>%
-  mutate(
-    total_pop = sum(pop),
-    race_share = pop / total_pop
-  ) %>%
-  select(income_group, race_ethnicity, race_share) %>%
-  pivot_wider(names_from = race_ethnicity, values_from = race_share) %>%
-  arrange(income_group)
+  group_by(race_ethnicity, income_group) %>%
+  summarise(
+    pop = sum(n_noise_postprocessed, na.rm = TRUE),
+    .groups = "drop"
+  )
 
-View(CvilleAC_raceShares_byIncomeDecile)
+# 3. Get total population by race (denominator)
+race_totals_CvilleAC2023 <- race_income_group_CvilleAC2023 %>%
+  group_by(race_ethnicity) %>%
+  summarise(
+    total_pop = sum(pop),
+    .groups = "drop"
+  )
+
+# 4. Compute share of each race's population in each income group
+race_shares_long_CvilleAC2023 <- race_income_group_CvilleAC2023 %>%
+  left_join(race_totals_CvilleAC2023, by = "race_ethnicity") %>%
+  mutate(
+    share_within_race = pop / total_pop
+  ) %>%
+  select(income_group, race_ethnicity, share_within_race)
+
+# 5. Pivot: income groups as rows, races as columns
+race_shares_wide_CvilleAC2023 <- race_shares_long_CvilleAC2023 %>%
+  pivot_wider(
+    names_from = race_ethnicity,
+    values_from = share_within_race
+  ) %>%
+  arrange(factor(income_group, levels = c("Low", "Mid", "High")))
+
+View(race_shares_wide_CvilleAC2023)
