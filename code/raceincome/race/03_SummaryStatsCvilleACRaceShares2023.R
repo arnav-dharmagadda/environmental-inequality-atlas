@@ -44,7 +44,6 @@ US_totals <- US_2023_wide %>%
     values_to = "total_population"
   ) %>%
   mutate(race = gsub("n_noise_postprocessed_", "", race)) %>%
-  filter(race != "Other/Unknown") %>% #exclude before computing share
   mutate(share = total_population / sum(total_population))
 
 View(US_totals)
@@ -84,7 +83,6 @@ Va_totals <- Va_2023_wide %>%
     values_to = "total_population"
   ) %>%
   mutate(race = gsub("n_noise_postprocessed_", "", race)) %>%
-  filter(race != "Other/Unknown") %>% #exclude before computing share
   mutate(share = total_population / sum(total_population))
 
 View(Va_totals)
@@ -126,7 +124,6 @@ CvilleAC_totals <- CvilleAC_2023_wide %>%
     values_to = "total_population"
   ) %>%
   mutate(race = gsub("n_noise_postprocessed_", "", race)) %>%
-  filter(race != "Other/Unknown") %>% #exclude before computing share
   mutate(share = total_population / sum(total_population))
 
 View(CvilleAC_totals)
