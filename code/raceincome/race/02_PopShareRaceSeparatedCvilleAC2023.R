@@ -1,5 +1,5 @@
 ################################################################################
-# FILE: PopShareRaceSeparatedCvilleAC2023.R
+# FILE: 02_PopShareRaceSeparatedCvilleAC2023.R
 # PURPOSE: Use gridded EIF data to create a bar chart on population share by
 # race/ethnicity in 2023, separated by Charlottesville and Albemarle County.
 # AUTHOR: Elizabeth Shiker

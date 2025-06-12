@@ -1,5 +1,5 @@
 ################################################################################
-# FILE: AvgIncomebyRaceCvilleAC1999.R
+# FILE: 03_AvgIncomebyRaceCvilleAC1999.R
 # PURPOSE: Use gridded EIF data to create a bar chart on average income decile by
 # race/ethnicity in Charlottesville and Albemarle County in 1999.
 # AUTHOR: Elizabeth Shiker

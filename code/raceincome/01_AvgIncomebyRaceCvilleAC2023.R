@@ -1,5 +1,5 @@
 ################################################################################
-# FILE: AvgIncomebyRaceCvilleAC2023.R
+# FILE: 01_AvgIncomebyRaceCvilleAC2023.R
 # PURPOSE: Use gridded EIF data to create a bar chart on average income decile by
 # race/ethnicity in Charlottesville and Albemarle County in 2023.
 # AUTHOR: Elizabeth Shiker
