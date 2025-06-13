@@ -20,6 +20,15 @@ raceincome2023 <- raceincome2023 %>%
     STATEFP == "51" & COUNTYFP %in% c("540", "003")
   )
 
+#Calculating average income decile for Cville/AC
+
+avg_income_decile_cville_ac <- raceincome2023 %>%
+  filter(!is.na(income_decile), !is.na(n_noise_postprocessed)) %>%
+  summarise(
+    weighted_avg_income_decile = weighted.mean(income_decile, w = n_noise_postprocessed)
+  )
+
+
 #Calculating average income for each race in Cville/AC
 
 avg_income_by_race <- raceincome2023 %>%
