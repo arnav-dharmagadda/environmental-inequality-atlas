@@ -58,7 +58,6 @@ race_shares_by_county <- raceincome_2023_wide %>%
   mutate(
     race = gsub("n_noise_postprocessed_", "", race)
   ) %>%
-  filter(race != "Other/Unknown") %>%  # remove the group here
   group_by(county_name) %>%
   mutate(
     share = total_population / sum(total_population)
@@ -70,7 +69,8 @@ library(scales)
 
 ggsave(
   "output/raceincome/race/population_share_by_race_county_2023.png",
-  plot = ggplot(race_shares_by_county, aes(x = reorder(race, -share), y = share, fill = county_name)) +
+  plot = ggplot(race_shares_by_county %>% filter(race != "Other/Unknown"), 
+                aes(x = reorder(race, -share), y = share, fill = county_name)) +
     geom_bar(stat = "identity", position = "dodge") +
     scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
     labs(
