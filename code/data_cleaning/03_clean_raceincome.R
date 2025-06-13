@@ -31,6 +31,25 @@ for (year in 1999:2023) {
   save(merged_year, file = output_file_rda)
 }
 
+for (year in 2023) {
+  # Construct path to parquet file
+  parquet_path <- paste0(data_path, "raceincome/gridded_eif_pop_raceincome_", year, ".parquet")
+  
+  # Read the parquet file
+  raceincome_year <- read_parquet(parquet_path)
+  
+  # Merge with filtered gridpoints
+  merged_year <- left_join(gridpoints_nat, raceincome_year, by = c("grid_lon", "grid_lat"))
+  
+  # Write to Stata .dta
+  output_file <- paste0(dta_path_ri, "nat_raceincome_", year, ".dta")
+  write_dta(merged_year, output_file)
+  
+  # Write to .rda
+  output_file_rda <- paste0(rda_path_ri, "nat_raceincome_", year, ".rda")
+  save(merged_year, file = output_file_rda)
+}
+
 # Append
 
 rda_files <- list.files(path = rda_path_ri, pattern = "^raceincome_\\d{4}\\.rda$", full.names = TRUE)

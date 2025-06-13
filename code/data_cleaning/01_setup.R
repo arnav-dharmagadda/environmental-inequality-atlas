@@ -47,6 +47,7 @@ pacman::p_load(sf, terra, dplyr, ggplot2, tmap, arrow, dplyr, tidyr, scales, hav
 
 load(gridpoints_path)
 gridpoints <- df
+gridpoints_nat <- gridpoints
 rm(df)
 
 #### Filter Gridpoints to Focus Area ####
@@ -57,3 +58,10 @@ gridpoints <- gridpoints %>%
     grid_lon = pm25_grid_x,
     grid_lat = pm25_grid_y
   )
+
+gridpoints_nat <- gridpoints_nat %>%
+  rename(
+    grid_lon = pm25_grid_x,
+    grid_lat = pm25_grid_y
+  )
+
