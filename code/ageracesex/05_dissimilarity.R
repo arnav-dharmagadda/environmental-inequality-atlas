@@ -1,5 +1,5 @@
 ################################################################################
-# FILE: 06_dissimilarity.R
+# FILE: 05_dissimilarity.R
 # PURPOSE: This script generates a dissimilarity index and map.
 # AUTHOR: Arnav Dharmagadda
 # CREATED: June 12th, 2025
@@ -90,14 +90,14 @@ ggplot(dissimilarity_long %>% filter(NAME == "Total"),
     subtitle = "Dissimilarity Index between White and Other Groups, U.S. Total",
     x = "Year",
     y = "Dissimilarity Index",
-    color = "Group Pair"
+    color = ""
   ) +
   theme_minimal(base_size = 14) +
   theme(
     plot.title = element_text(face = "bold", size = 16),
     plot.subtitle = element_text(size = 13, margin = margin(b = 10)),
     axis.title = element_text(size = 14),
-    legend.position = "right",
+    legend.position = "bottom",
     legend.title = element_text(size = 13),
     legend.text = element_text(size = 12),
     panel.grid.minor = element_blank()
