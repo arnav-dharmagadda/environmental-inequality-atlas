@@ -17,6 +17,7 @@ setwd("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environm
 # File Paths
 
 processed <- "data/processed/"
+maps_output <- "output/ageracesex/02_maps/"
 
 #### Load Libraries ####
 
@@ -24,22 +25,31 @@ if (!requireNamespace("pacman", quietly = TRUE)) {
   install.packages("pacman")
 }
 
-pacman::p_load(sf, terra, dplyr, ggplot2, tmap, arrow, dplyr, tidyr, scales, haven)
+pacman::p_load(sf, terra, dplyr, ggplot2, tmap, arrow, dplyr, tidyr, scales, haven, tigris)
 
 #### Load Data ####
 
-file_path <- paste0(processed, "ageracesex_income_year.rda")
+file_path <- paste0(processed, "ageracesex_rda/ageracesex_year_long.rda")
 load(file_path)
-data_2023 <- ageracesex_income_year
+data_all <- ageracesex_year_long
+data_2023 <- ageracesex_year_long
 
-file_path <- paste0(processed, "ageracesex_income_year_hex.rda")
+file_path <- paste0(processed, "ageracesex_rda/ageracesex_year_long_hex.rda")
 load(file_path)
-data_2023_hex <- ageracesex_income_year
+data_2023_hex <- ageracesex_year_long
 
 #### Filter and Clean Data ####
 
+file_path <- paste0(processed, "ageracesex_rda/ageracesex_2023.rda")
+load(file_path)
+data_2023_hex <- merged_year
+
+data_2023_hex %>% 
+  summarize(total_sum = sum(n_noise, na.rm = TRUE))
+
 data_2023 <- data_2023 %>%
   filter(year == 2023) %>%
+  filter(STATEFP == "51" & COUNTYFP == "003" | COUNTYFP == "540") %>%
   rowwise() %>%
   mutate(total = sum(c(M, F, NA_sex, na_sex), na.rm = TRUE)) %>%
   ungroup() %>%
@@ -57,6 +67,7 @@ data_2023 <- data_2023 %>%
 
 data_2023_hex <- data_2023_hex %>%
   filter(year == 2023) %>%
+  filter(STATEFP == "51" & COUNTYFP == "003" | COUNTYFP == "540") %>%
   rowwise() %>%
   mutate(total = sum(c(M, F, NA_sex, na_sex), na.rm = TRUE)) %>%
   ungroup() %>%
