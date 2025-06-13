@@ -128,3 +128,9 @@ CvilleAC_totals <- CvilleAC_2023_wide %>%
 
 View(CvilleAC_totals)
 
+#total population
+total_population_CvilleAC <- CvilleAC2023 %>%
+  summarise(total_pop = sum(n_noise_postprocessed, na.rm = TRUE)) %>%
+  pull(total_pop)
+
+print(total_population_CvilleAC)
