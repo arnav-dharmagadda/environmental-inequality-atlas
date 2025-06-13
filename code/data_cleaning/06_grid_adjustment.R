@@ -20,7 +20,7 @@ process_rda_file <- function(file_path, lon_col = "grid_lon", lat_col = "grid_la
   df <- env[[df_name]]
   
   # Step 1: Convert to sf POINT object
-  df_sf <- st_as_sf(df, coords = c(lon_col, lat_col), crs = 4326)
+  df_sf <- st_as_sf(df, coords = c(lon_col, lat_col), crs = 4326, remove = FALSE)
   
   # Step 2: Expand bounding box
   bbox <- st_bbox(df_sf)
@@ -58,7 +58,7 @@ process_rda_file <- function(file_path, lon_col = "grid_lon", lat_col = "grid_la
 all_rda_files <- list.files(processed_path, pattern = "\\.rda$", full.names = TRUE, recursive = TRUE)
 
 # Filter to exclude files ending in "_hex.rda"
-file_paths <- all_rda_files[!grepl("_hex\\.rda$", all_rda_files)]
+file_paths <- all_rda_files[!grepl("_hex\\.rda$", all_rda_files) & !grepl("^nat_", basename(all_rda_files))]
 
 walk(file_paths, process_rda_file)
 

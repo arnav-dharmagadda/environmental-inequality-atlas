@@ -32,6 +32,11 @@ process_rda_to_hex_grid <- function(file_path, lon_col = "grid_lon", lat_col = "
   # Step 4: Spatially join your original points to the new hexagonal grid.
   points_in_hex <- st_join(points_sf, hex_grid_sf, join = st_intersects)
   
+  df_with_hex_id <- st_drop_geometry(points_in_hex)  # remove sf geometry
+  assign(df_name, df_with_hex_id, envir = env)
+  save(list = df_name, file = file_path, envir = env)
+  message("Saved updated point data (with hex_id) to original file: ", file_path)
+  
   grouping_vars <- c("hex_id")
   
   if ("year" %in% colnames(points_in_hex)) {
@@ -84,7 +89,7 @@ all_rda_files <- unlist(lapply(folders, function(dir) {
   list.files(dir, pattern = "\\.rda$", full.names = TRUE)
 }))
 
-file_paths <- all_rda_files[!grepl("_hex\\.rda$", all_rda_files)]
+file_paths <- all_rda_files[!grepl("_hex\\.rda$", all_rda_files) & !grepl("^nat_", basename(all_rda_files))]
 
 # Run the processing function on each file
 walk(file_paths, process_rda_to_hex_grid)
