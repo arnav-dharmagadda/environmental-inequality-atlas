@@ -16,9 +16,9 @@
 #### Setting working directory and file paths ####
 
 
-setwd("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/")
+setwd("/Users/jfischman/Library/CloudStorage/OneDrive-BowdoinCollege/Documents/GitHub/environmental-inequality-atlas/")
 
-data_path <- "/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/gridded_eif_data/"
+data_path <- "/Users/jfischman/Library/CloudStorage/OneDrive-BowdoinCollege/Documents/General Data/EIF atlas/"
 
 gridpoints_path <- paste0(data_path, "/race_income/gridpoints_with_county_2020 (1).rda")
 
@@ -51,6 +51,7 @@ rm(df)
 #### Filter Gridpoints to Focus Area ####
 
 gridpoints <- gridpoints %>%
+  filter(STATEFP == "51" & COUNTYFP == "003" | COUNTYFP == "540") %>%
   rename(
     grid_lon = pm25_grid_x,
     grid_lat = pm25_grid_y
