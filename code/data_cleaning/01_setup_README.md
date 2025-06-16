@@ -10,7 +10,7 @@ This script sets up the R environment for cleaning the Gridded EIF age-race-sex 
 
 It will clear the R environment, set file paths for use throughout the module, and it will load the necessary libraries.
 
-It will load the gridpoints shapefile and allow a user to filter to the oberservations pertinent to analysis. When created, this file isolate observations to Albemarle and Charlottesville in Virginia. This can be edited to include the entire nation when needed.
+It will load the gridpoints file and allow a user to filter to the oberservations pertinent to analysis. When created, this file isolate observations to Albemarle and Charlottesville in Virginia. This can be edited to include the entire nation when needed.
 
 # Instructions
 

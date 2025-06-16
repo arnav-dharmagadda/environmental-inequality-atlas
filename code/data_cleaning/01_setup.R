@@ -15,24 +15,27 @@
 
 #### Setting working directory and file paths ####
 
+setwd("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/")
 
-setwd("/Users/jfischman/Library/CloudStorage/OneDrive-BowdoinCollege/Documents/GitHub/environmental-inequality-atlas/")
+data_path <- "gridded_eif_data/"
+
+git_path <- "GitHub/environmental-inequality-atlas/"
 
 data_path <- "/Users/jfischman/Library/CloudStorage/OneDrive-BowdoinCollege/Documents/General Data/EIF atlas/"
 
 gridpoints_path <- paste0(data_path, "/race_income/gridpoints_with_county_2020 (1).rda")
 
-processed_path <- "data/processed/"
+processed_path <- paste0(git_path, "data/processed/")
 
-dta_path_ars <- "data/processed/ageracesex_dta/"
+dta_path_ars <- paste0(git_path, "data/processed/ageracesex_dta/")
 
-rda_path_ars <- "data/processed/ageracesex_rda/"
+rda_path_ars <- paste0(git_path, "data/processed/ageracesex_rda/")
 
-dta_path_ri <- "data/processed/raceincome_dta/"
+dta_path_ri <- paste0(git_path, "data/processed/raceincome_dta/")
 
-rda_path_ri <- "data/processed/raceincome_rda/"
+rda_path_ri <- paste0(git_path, "data/processed/raceincome_rda/")
 
-map_path <- "output/maps/"
+map_path <- paste0(git_path, "output/maps/")
 
 #### Load Libraries ####
 
@@ -46,6 +49,7 @@ pacman::p_load(sf, terra, dplyr, ggplot2, tmap, arrow, dplyr, tidyr, scales, hav
 
 load(gridpoints_path)
 gridpoints <- df
+gridpoints_nat <- gridpoints
 rm(df)
 
 #### Filter Gridpoints to Focus Area ####
@@ -56,3 +60,10 @@ gridpoints <- gridpoints %>%
     grid_lon = pm25_grid_x,
     grid_lat = pm25_grid_y
   )
+
+gridpoints_nat <- gridpoints_nat %>%
+  rename(
+    grid_lon = pm25_grid_x,
+    grid_lat = pm25_grid_y
+  )
+

@@ -7,7 +7,7 @@
 ################################################################################
 # INPUTS: gridded_eif_pop_ageracesex files (1999-2023)
 # OUTPUTS: ageracesex_{YEAR}.dta/.rda, ageracesex_combined.rda/.dta,
-#          ageracesex_year_long.rda/.dta, ageracesex_wide.rda/.dta
+#          ageracesex_year_long.rda/.dta
 ################################################################################
 
 # Loop 1999 through 2023
@@ -31,6 +31,25 @@ for (year in 1999:2023) {
   save(merged_year, file = output_file_rda)
 }
 
+for (year in 2023) {
+  # Construct path to parquet file
+  parquet_path <- paste0(data_path, "ageracesex/gridded_eif_pop_ageracesex_", year, ".parquet")
+  
+  # Read the parquet file
+  ageracesex_year <- read_parquet(parquet_path)
+  
+  # Merge with filtered gridpoints
+  merged_year <- left_join(gridpoints_nat, ageracesex_year, by = c("grid_lon", "grid_lat"))
+  
+  # Write to Stata .dta
+  output_file <- paste0(dta_path_ars, "nat_ageracesex_", year, ".dta")
+  write_dta(merged_year, output_file)
+  
+  # Write to .rda
+  output_file_rda <- paste0(rda_path_ars, "nat_ageracesex_", year, ".rda")
+  save(merged_year, file = output_file_rda)
+}
+
 # Append
 
 rda_files <- list.files(path = rda_path_ars, pattern = "^ageracesex_\\d{4}\\.rda$", full.names = TRUE)
@@ -44,6 +63,7 @@ for (file in rda_files) {
   merged_year$year <- year
   
   all_ageracesex[[length(all_ageracesex) + 1]] <- merged_year
+
 }
 
 # Combine all into a single dataframe
@@ -146,23 +166,4 @@ ageracesex_year_long <- ageracesex_wide %>%
 
 save(ageracesex_year_long, file = paste0(rda_path_ars, "ageracesex_year_long.rda"))
 write_dta(ageracesex_year_long, paste0(dta_path_ars, "ageracesex_year_long.dta"))
-
-#### PIVOT BY YEAR ####
-
-ageracesex_wide <- ageracesex_year_long %>%
-  pivot_longer(
-    cols = -c(grid_lon, grid_lat, STATEFP, COUNTYFP, GEOID, NAME, year),
-    names_to = "var",
-    values_to = "value"
-  ) %>%
-  mutate(var_year = paste0(var, "_", year)) %>%
-  select(-year, -var) %>%
-  pivot_wider(
-    names_from = var_year,
-    values_from = value,
-    values_fill = 0
-  )
-
-save(ageracesex_wide, file = paste0(rda_path_ars, "ageracesex_wide.rda"))
-write_dta(ageracesex_wide, paste0(dta_path_ars, "ageracesex_wide.dta"))
 

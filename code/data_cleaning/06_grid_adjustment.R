@@ -1,5 +1,5 @@
 ################################################################################
-# FILE: 05_polygonal_adjustment.R
+# FILE: 06_grid_adjustment.R
 # PURPOSE: Make grid polygons instead of points
 # AUTHOR: Arnav Dharmagadda
 # CREATED: June 9th, 2025
@@ -20,7 +20,7 @@ process_rda_file <- function(file_path, lon_col = "grid_lon", lat_col = "grid_la
   df <- env[[df_name]]
   
   # Step 1: Convert to sf POINT object
-  df_sf <- st_as_sf(df, coords = c(lon_col, lat_col), crs = 4326)
+  df_sf <- st_as_sf(df, coords = c(lon_col, lat_col), crs = 4326, remove = FALSE)
   
   # Step 2: Expand bounding box
   bbox <- st_bbox(df_sf)
@@ -55,7 +55,10 @@ process_rda_file <- function(file_path, lon_col = "grid_lon", lat_col = "grid_la
 
 # Run the function on all .rda files in the specified directory
 
-file_paths <- list.files("data/processed/", pattern = "\\.rda$", full.names = TRUE, recursive = TRUE)
-file_paths <- "data/processed/raceincome_rda/raceincome_2023.rda"
+all_rda_files <- list.files(processed_path, pattern = "\\.rda$", full.names = TRUE, recursive = TRUE)
+
+# Filter to exclude files ending in "_hex.rda"
+file_paths <- all_rda_files[!grepl("_hex\\.rda$", all_rda_files) & !grepl("^nat_", basename(all_rda_files))]
+
 walk(file_paths, process_rda_file)
 
