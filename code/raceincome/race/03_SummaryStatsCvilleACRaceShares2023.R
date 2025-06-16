@@ -1,8 +1,10 @@
 ################################################################################
 # FILE: 03_SummaryStatsCvilleACRaceShares2023.R
 # PURPOSE: Use gridded EIF data for race/income in 2023 to generate summary 
-# statistics on population race shares for U.S., Virginia, and Cville/AC. Create
-# table with raw population numbers and shares.
+# statistics on population race shares for U.S., Virginia, and Cville/AC. 
+# Create table with raw population numbers and shares.
+# Calculate percentage difference in white shares between 
+# Charlottesville/Albemarle County and Virginia and the United States. 
 # AUTHOR: Elizabeth Shiker
 # CREATED: June 11th, 2025
 ################################################################################
@@ -209,6 +211,25 @@ addStyle(
 )
 # Save
 saveWorkbook(wb, "output/raceincome/race/race_summary_table.xlsx", overwrite = TRUE)
+
+##### How much more white is Cville/AC than VA or the US? #####
+
+# Extract White share values
+white_shares <- combined_totals %>%
+  filter(race == "White") %>%
+  summarise(
+    CvilleAC_share = CvilleAC_share,
+    VA_share = VA_share,
+    US_share = US_share
+  )
+
+# Calculate percent difference
+percent_more_white_va <- ((white_shares$CvilleAC_share - white_shares$VA_share) / white_shares$VA_share) * 100
+percent_more_white_us <- ((white_shares$CvilleAC_share - white_shares$US_share) / white_shares$US_share) * 100
+
+# Print the results with rounding
+cat("Charlottesville and Albemarle County are", round(percent_more_white_va, 1), "% more white than Virginia. \n")
+cat("Charlottesville and Albemarle County are", round(percent_more_white_us, 1), "% more white than the United States. \n")
   
 
 
