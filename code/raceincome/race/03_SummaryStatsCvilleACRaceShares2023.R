@@ -1,12 +1,13 @@
 ################################################################################
 # FILE: 03_SummaryStatsCvilleACRaceShares2023.R
 # PURPOSE: Use gridded EIF data for race/income in 2023 to generate summary 
-# statistics on population race shares for U.S., Virginia, and Cville/AC
+# statistics on population race shares for U.S., Virginia, and Cville/AC. Create
+# table with raw population numbers and shares.
 # AUTHOR: Elizabeth Shiker
 # CREATED: June 11th, 2025
 ################################################################################
 # INPUTS: raceincome_2023.rda
-# OUTPUTS: None. 
+# OUTPUTS: race_summary_table.xlsx
 ################################################################################
 
 # Load in race and income data from 2023
@@ -46,8 +47,6 @@ US_totals <- US_2023_wide %>%
   mutate(race = gsub("n_noise_postprocessed_", "", race)) %>%
   mutate(share = total_population / sum(total_population))
 
-View(US_totals)
-
 #### Virginia ####
 
 #Filter for Virginia
@@ -84,8 +83,6 @@ Va_totals <- Va_2023_wide %>%
   ) %>%
   mutate(race = gsub("n_noise_postprocessed_", "", race)) %>%
   mutate(share = total_population / sum(total_population))
-
-View(Va_totals)
 
 #### CVILLE/AC ####
 
@@ -126,11 +123,92 @@ CvilleAC_totals <- CvilleAC_2023_wide %>%
   mutate(race = gsub("n_noise_postprocessed_", "", race)) %>%
   mutate(share = total_population / sum(total_population))
 
-View(CvilleAC_totals)
+#####Combined Table US, VA, and Cville/AC#####
 
-#total population
-total_population_CvilleAC <- CvilleAC2023 %>%
-  summarise(total_pop = sum(n_noise_postprocessed, na.rm = TRUE)) %>%
-  pull(total_pop)
+# Rename columns before joining
 
-print(total_population_CvilleAC)
+US_clean <- US_totals %>%
+  rename(US_raw = total_population, US_share = share)
+
+Va_clean <- Va_totals %>%
+  rename(VA_raw = total_population, VA_share = share)
+
+CvilleAC_clean <- CvilleAC_totals %>%
+  rename(CvilleAC_raw = total_population, CvilleAC_share = share)
+
+#Join all three tables by 'race'
+
+combined_totals <- US_clean %>%
+  full_join(Va_clean, by = "race") %>%
+  full_join(CvilleAC_clean, by = "race")
+
+#Take out Other/Unknown group from table  
+
+combined_totals_display <- combined_totals %>%
+  filter(race != "Other/Unknown") %>%
+  arrange(desc(US_raw))
+
+#Create a total row and bind to bottom of table
+
+totals_row <- combined_totals %>%
+  summarise(
+    race = "Total", 
+    US_raw = sum(US_raw, na.rm = TRUE),
+    US_share = sum(US_share, na.rm = TRUE),
+    VA_raw = sum(VA_raw, na.rm = TRUE),
+    VA_share = sum(VA_share, na.rm = TRUE),
+    CvilleAC_raw = sum(CvilleAC_raw, na.rm = TRUE),
+    CvilleAC_share = sum(CvilleAC_share, na.rm = TRUE)
+  )
+
+combined_totals_display_with_total <- bind_rows(combined_totals_display, totals_row)
+
+View(combined_totals_display_with_total)
+
+#Install packages for saving
+
+install.packages("openxlsx")
+library(openxlsx)
+
+# ✅ Create the full nested folder path first
+dir.create("output/raceincome/race", showWarnings = FALSE, recursive = TRUE)
+
+# Create workbook and add worksheet
+
+wb <- createWorkbook()
+addWorksheet(wb, "Race Summary")
+
+# Write data
+
+writeData(wb, "Race Summary", combined_totals_display_with_total)
+
+# Formatting 
+
+bold_text <- createStyle(textDecoration = "bold")
+
+# Bold the word "Total"
+
+total_row_index <- which(combined_totals_display_with_total$race == "Total") + 1  # +1 for header
+addStyle(
+  wb,
+  sheet = "Race Summary",
+  style = bold_text,
+  rows = total_row_index,
+  cols = 1,  # Only race column
+  gridExpand = FALSE
+)
+
+# Bold the header row
+addStyle(
+  wb,
+  sheet = "Race Summary",
+  style = bold_text,
+  rows = 1,
+  cols = 1:ncol(combined_totals_display_with_total),
+  gridExpand = TRUE
+)
+# Save
+saveWorkbook(wb, "output/raceincome/race/race_summary_table.xlsx", overwrite = TRUE)
+  
+
+
