@@ -1,8 +1,8 @@
 # Basic Information
 
-Name: 00_master_script.R
-Author: Arnav Dharmagadda
-Created: 6/9/2025
+* Name: 00_master_script.R
+* Author: Arnav Dharmagadda
+* Created: 6/9/2025
 
 # Purpose
 

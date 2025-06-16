@@ -1,8 +1,8 @@
 # Basic Information
 
-Name: 04_merge_ageracesex_raceincome.R
-Author: Arnav Dharmagadda
-Created: 6/9/2025
+* Name: 04_merge_ageracesex_raceincome.R
+* Author: Arnav Dharmagadda
+* Created: 6/9/2025
 
 # Purpose
 

@@ -21,7 +21,9 @@ data_path <- "gridded_eif_data/"
 
 git_path <- "GitHub/environmental-inequality-atlas/"
 
-gridpoints_path <- paste0(data_path, "gridpoints_with_county_2020.rda")
+data_path <- "/Users/jfischman/Library/CloudStorage/OneDrive-BowdoinCollege/Documents/General Data/EIF atlas/"
+
+gridpoints_path <- paste0(data_path, "/race_income/gridpoints_with_county_2020 (1).rda")
 
 processed_path <- paste0(git_path, "data/processed/")
 

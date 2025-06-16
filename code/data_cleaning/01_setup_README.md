@@ -1,8 +1,8 @@
 # Basic Information
 
-Name: 01_setup.R
-Author: Arnav Dharmagadda
-Created: 6/3/2025
+* Name: 01_setup.R
+* Author: Arnav Dharmagadda
+* Created: 6/3/2025
 
 # Purpose
 

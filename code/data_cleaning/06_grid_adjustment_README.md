@@ -1,8 +1,8 @@
 # Basic Information
 
-Name: 05_polygonal_adjustment.R
-Author: Arnav Dharmagadda
-Created: 6/9/2025
+* Name: 05_polygonal_adjustment.R
+* Author: Arnav Dharmagadda
+* Created: 6/9/2025
 
 # Purpose
 
