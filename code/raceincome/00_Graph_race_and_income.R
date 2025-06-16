@@ -11,26 +11,36 @@ library(RColorBrewer)
 library(prettymapr)
 library(sf)
 library(stringr)
-load("data/processed/raceincome_rda/raceincome_2023.rda")  # loads the object into environment
-# Let's say the object it loads is also named `raceincome_2023`, then just use it:
-raceincome2023 <- raceincome_2023
 
-#Filter for Cville/AC
-raceincome2023 <- raceincome2023 %>%
-  filter(
-    STATEFP == "51" & COUNTYFP %in% c("540", "003") 
+raceincome_sf <- st_as_sf(
+  raceincome_wide,
+  coords = c("grid_lon", "grid_lat"),
+  crs = 4326  # WGS 84 (standard GPS lat/lon)
+)
+
+# Convert to long format, extract components, and filter to 2023
+raceincome_2023 <- raceincome_sf %>%
+  pivot_longer(
+    cols = where(is.numeric),
+    names_to = "variable",
+    values_to = "count"
   ) %>%
-  filter(!tolower(race) %in% "Other/Unknown")
-View(raceincome2023)
-#filter for decile and race
+  filter(!is.na(count)) %>%
+  mutate(
+    race = gsub("_.*", "", variable),
+    decile = as.integer(str_extract(variable, "(?<=_inc_)\\d+")),
+    year = as.integer(str_extract(variable, "\\d{4}$"))
+  ) %>%
+  filter(year == 2023, race != "other", !is.na(decile))
+
 
 # Separate into race and decile
 
 #summarize by counts
-race_summary <- raceincome2023 %>%
+race_summary <- raceincome_2023 %>%
+  filter(!is.na(race)) %>%
   group_by(race, decile) %>%
   summarise(total_count = sum(count, na.rm = TRUE), .groups = "drop")
-
 #plot income deciles by race
 
 p <- ggplot(race_summary, aes(x = factor(decile), y = total_count, fill = race)) +
@@ -46,10 +56,12 @@ p <- ggplot(race_summary, aes(x = factor(decile), y = total_count, fill = race))
 ggsave("output/raceincome/Income Decile Distribution by Race.png", plot = p, width = 6, height = 4)
 
 #facet
+race_summary_filtered <- race_summary_filtered %>%
+  filter(!race %in% c(NA, "NA", "Unknown", "Other/Unknown"))
 
 q <- ggplot(race_summary_filtered, aes(x = factor(decile), y = total_count)) +
   geom_col(fill = "#1f78b4") +
-  facet_wrap(~ race, scales = "free_y") +
+  facet_wrap(~ race, scales = "free_y", ncol = 3) +
   labs(
     title = paste("Income Distribution by Race in", year),
     x = "Income Decile",
@@ -58,10 +70,31 @@ q <- ggplot(race_summary_filtered, aes(x = factor(decile), y = total_count)) +
   theme_minimal()
 ggsave("output/raceincome/Income Distribution by Race Facet.png", plot = q, width = 6, height = 4)
 
+#facet share
+race_income_share <- race_summary_filtered %>%
+  group_by(race) %>%
+  mutate(
+    race_total = sum(total_count, na.rm = TRUE),
+    share = total_count / race_total
+  ) %>%
+  ungroup()
+q_share <- ggplot(race_income_share, aes(x = factor(decile), y = share)) +
+  geom_col(fill = "#1f78b4") +
+  facet_wrap(~ race, scales = "free_y", ncol = 3) +
+  #scale_fill_brewer(palette = "Set3") +
+  labs(
+    title = paste("Income Decile Distribution Within Each Race (", year, ")", sep = ""),
+    x = "Income Decile (0 = lowest, 9 = highest)",
+    y = "Share of Race Population"
+  ) +
+  theme_minimal()
+
+# Save to file
+ggsave("output/raceincome/Race Share Within Income Deciles.png", plot = q_share, width = 6, height = 4)
 
 
 #race distribution by income decile ungrouped
-r <- ggplot(race_summary, aes(x = race, y = total_count, fill = factor(decile))) +
+r <- ggplot(race_summary_filtered, aes(x = race, y = total_count, fill = factor(decile))) +
   geom_col(position = "stack") +
   scale_fill_brewer(palette = "YlGnBu", name = "Income Decile") +
   labs(
@@ -74,7 +107,7 @@ ggsave("output/raceincome/Income Decile Composition by Race.png", plot = r, widt
 
 #race distribution by income decile grouped
 
-race_summary_grouped <- race_summary %>%
+race_summary_grouped <- race_summary_filtered %>%
   mutate(
     decile_group = case_when(
       decile %in% 0:3 ~ "Low (0–3)",
@@ -129,7 +162,7 @@ ggsave("output/raceincome/Income Distribution by Race (proportional) in Charlott
 #income dist in 1st, 5, and 10th decile
 selected_deciles <- c(1, 4, 9)
 
-race_summary_selected <- race_summary %>%
+race_summary_selected <- race_summary_filtered %>%
   filter(decile %in% selected_deciles)
 
 #calculate share by race
