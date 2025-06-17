@@ -100,4 +100,55 @@ tj <- ggplot() +
   )
 ggsave("output/raceincome/Income Decile Share by Race: U.S. vs. CharlottesvilleAlbemarle.png", plot = tj, width = 6, height = 4)
 
+#average income by race
+
+avg_decile_by_race <- combined_summary %>%
+  group_by(region, race) %>%
+  summarise(
+    avg_decile = weighted.mean(decile, total_count, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+ty <- ggplot(avg_decile_by_race, aes(x = race, y = avg_decile, fill = region)) +
+  geom_col(position = position_dodge(width = 0.7), width = 0.6) +
+  scale_fill_manual(values = c("United States" = "#1f78b4", "Charlottesville/Albemarle" = "#FFA500")) +
+  labs(
+    title = "Average Income Decile by Race: U.S. vs. Charlottesville/Albemarle (2023)",
+    x = "Race",
+    y = "Average Income Decile",
+    fill = "Region"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA),
+    axis.text.x = element_text(angle = 30, hjust = 1)
+  )
+ggsave("output/raceincome/Average Income Decile by Race: U.S. vs. CharlottesvilleAlbemarle.png", plot = ty, width = 6, height = 4)
+
+#average decile
+avg_decile <- combined_summary %>%
+  group_by(region) %>%
+  summarise(
+    avg_decile = weighted.mean(decile, total_count, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+tw <- ggplot(avg_decile, aes(x = region, y = avg_decile, fill = region)) +
+  geom_col(position = position_dodge(width = 0.7), width = 0.6) +
+  scale_fill_manual(values = c("United States" = "#1f78b4", "Charlottesville/Albemarle" = "#FFA500")) +
+  labs(
+    title = "Average Income Decile: U.S. vs. Charlottesville/Albemarle (2023)",
+    x = "Region",
+    y = "Average Income Decile",
+    fill = "Region"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA),
+    axis.text.x = element_text(angle = 30, hjust = 1)
+  )
+ggsave("output/raceincome/Average Income Decile: U.S. vs. CharlottesvilleAlbemarle.png", plot = tw, width = 6, height = 4)
+
 
