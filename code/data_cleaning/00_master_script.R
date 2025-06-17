@@ -18,6 +18,8 @@ source(paste0(git_path, "code/data_cleaning/03_clean_raceincome.R"))
 
 source(paste0(git_path, "code/data_cleaning/04_merge_ageracesex_raceincome.R"))
 
-source(paste0(git_path, "code/data_cleaning/05_hexagon_adjustment.R"))
+source(paste0(git_path, "code/data_cleaning/05_point_adjustment.R"))
 
-source(paste0(git_path, "code/data_cleaning/06_grid_adjustment.R"))
+source(paste0(git_path, "code/data_cleaning/06_hexagon_adjustment.R"))
+
+source(paste0(git_path, "code/data_cleaning/07_grid_adjustment.R"))
