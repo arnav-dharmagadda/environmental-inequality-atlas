@@ -14,7 +14,7 @@
 
 for (year in 1999:2023) {
   # Construct path to parquet file
-  parquet_path <- paste0(data_path, "/race_income/gridded_eif_pop_raceincome_", year, ".parquet")
+  parquet_path <- paste0(data_path, "raceincome/gridded_eif_pop_raceincome_", year, ".parquet")
   
   # Read the parquet file
   raceincome_year <- read_parquet(parquet_path)
