@@ -220,7 +220,7 @@ jk <- ggplot(race_income_share, aes(x = as.numeric(decile), weight = total_count
     color = "Race",
     fill = "Race"
   ) + 
-  theme_classic(base_size = 14) +
+  theme_minimal() +
   theme(
     plot.background = element_rect(fill = "white", color = NA),
     panel.background = element_rect(fill = "white", color = NA)
