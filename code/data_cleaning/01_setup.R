@@ -17,13 +17,11 @@
 
 setwd("/Users/jfischman/Library/CloudStorage/OneDrive-BowdoinCollege/Documents/GitHub/environmental-inequality-atlas/")
 
-data_path <- "gridded_eif_data/"
-
-git_path <- "GitHub/environmental-inequality-atlas/"
-
 data_path <- "/Users/jfischman/Library/CloudStorage/OneDrive-BowdoinCollege/Documents/General Data/EIF atlas/"
 
-gridpoints_path <- paste0(data_path, "/race_income/gridpoints_with_county_2020 (1).rda")
+git_path <- "/Users/jfischman/Library/CloudStorage/OneDrive-BowdoinCollege/Documents/GitHub/environmental-inequality-atlas/"
+
+gridpoints_path <- paste0(data_path, "/raceincome/gridpoints_with_county_2020 (1).rda")
 
 processed_path <- paste0(git_path, "data/processed/")
 
