@@ -12,7 +12,7 @@
 
 #### Setting working directory and file paths ####
 
-setwd("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/")
+setwd("/Users/jfischman/Library/CloudStorage/OneDrive-BowdoinCollege/Documents/GitHub/environmental-inequality-atlas/")
 
 # File Paths
 

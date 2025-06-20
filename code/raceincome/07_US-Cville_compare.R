@@ -55,11 +55,11 @@ combined_prop <- combined_summary %>%
   group_by(region, race) %>%
   mutate(share = total_count / sum(total_count)) %>%
   ungroup()
-
+combined_prop$race <- factor(combined_prop$race, levels = c("White", "Black", "Hispanic", "Asian", "AIAN"))
 tk <- ggplot(combined_prop, aes(x = factor(decile), y = share, fill = region)) +
   geom_col(position = position_dodge(width = 1), width = 1) +
-  facet_wrap(~ race, scales = "free_y") +
-  scale_fill_manual(values = c("United States" = "#1f78b4", "Charlottesville/Albemarle" = "#FFA500")) +
+  facet_wrap(~ race, scales = "fixed") +
+  scale_fill_manual(values = c("United States" = "orange", "Charlottesville/Albemarle" = "#232d4b")) +
   labs(
     title = "Income Decile Share by Race: U.S. vs. Charlottesville/Albemarle (2023)",
     x = "Income Decile",
@@ -151,4 +151,42 @@ tw <- ggplot(avg_decile, aes(x = region, y = avg_decile, fill = region)) +
   )
 ggsave("output/raceincome/Average Income Decile: U.S. vs. CharlottesvilleAlbemarle.png", plot = tw, width = 6, height = 4)
 
+#graph just deciles
+
+decile_summary <- raceincome2023 %>%
+  filter(
+    !is.na(income_decile),
+    income_decile != 0,
+    !is.na(n_noise_postprocessed)
+  ) %>%
+  mutate(region = case_when(
+    STATEFP == "51" & COUNTYFP %in% c("540", "003") ~ "Charlottesville/Albemarle",
+    TRUE ~ "United States"
+  )) %>%
+  group_by(region, decile = income_decile) %>%
+  summarise(
+    total_count = sum(n_noise_postprocessed, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+decile_prop <- decile_summary %>%
+  group_by(region) %>%
+  mutate(share = total_count / sum(total_count)) %>%
+  ungroup()
+
+qq <- ggplot(decile_prop, aes(x = factor(decile), y = share, fill = region)) +
+  geom_col(position = position_dodge(width = 0.9), width = 0.9) +
+  scale_fill_manual(values = c("United States" = "#FFA500", "Charlottesville/Albemarle" = "#232d4b")) +
+  labs(
+    title = "Income Decile Distribution: U.S. vs. Charlottesville/Albemarle",
+    x = "Income Decile",
+    y = "Share of Total Population",
+    fill = "Region"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA)
+  )
+ggsave("output/raceincome/Income Decile Distribution: U.S. vs. CharlottesvilleAlbemarle.png", plot = qq, width = 6, height = 4)
 
