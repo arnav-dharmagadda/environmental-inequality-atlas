@@ -2,6 +2,7 @@ library(dplyr)
 library(tidyr)
 library(purrr)
 library(ggplot2)
+library(tmap)
 
 
 
@@ -65,11 +66,11 @@ points <- points %>%
 tm_basemap("CartoDB.Positron") +
   tm_shape(points) +
   tm_dots(
-    col = "income_decile",
-    palette = "viridis",
-    title = "Average Income Decile",
-    style = "cont",
-    legend.hist = FALSE,
+    col = "#232d4b",
+    #palette = "viridis",
+    title = "Population",
+    #style = "cont",
+    #legend.hist = FALSE,
     colorNA = "transparent",
     alpha = 0.6,
     size = 0.01  # adjust for visibility
@@ -84,8 +85,12 @@ tm_basemap("CartoDB.Positron") +
   tm_layout(
     main.title = "Charlottesville, 2023", 
     main.title.position = "center",
-    legend.outside = TRUE
+    legend.outside = TRUE,
+    bg.color = "transparent",
+    outer.bg.color = "transparent"
   )
+
+tmap_save(filename = "/Users/arnavdharmagadda/Downloads/test.png", bg = NA)
 
 load("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/raceincome_rda/raceincome_2023_point_hex.rda")
 hex <- people_points_sf
@@ -103,8 +108,8 @@ hex <- hex %>%
 # Plot with a gradient color scale
 tm_basemap("CartoDB.Positron") +
   tm_shape(hex) +
-  tm_polygons(col = "avg_income_decile", palette = "viridis",
-              title = "Average Income Decile",
+  tm_polygons(col = "total_income_count", palette = "-viridis",
+              title = "Total Population",
               style = "cont",
               legend.hist = FALSE,
               colorNA = "transparent",
@@ -140,8 +145,8 @@ fishnet <- fishnet %>%
 # Plot with a gradient color scale
 tm_basemap("CartoDB.Positron") +
   tm_shape(fishnet) +
-  tm_polygons(col = "avg_income_decile", palette = "viridis",
-              title = "Average Income Decile",
+  tm_polygons(col = "total_income_count", palette = "-viridis",
+              title = "Total Population",
               style = "cont",
               legend.hist = FALSE,
               colorNA = "transparent",
