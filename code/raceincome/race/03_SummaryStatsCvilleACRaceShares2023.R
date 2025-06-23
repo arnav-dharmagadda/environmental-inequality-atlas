@@ -14,7 +14,7 @@
 
 # Load in race and income data from 2023
 
-raceincome_2023 <- load("data/processed/raceincome_rda/raceincome_2023.rda")
+raceincome_2023 <- load("data/processed/raceincome_rda/nat_raceincome_2023.rda")
 raceincome2023 <- get(raceincome_2023)
 
 #### United States ####
@@ -155,62 +155,39 @@ combined_totals_display <- combined_totals %>%
 totals_row <- combined_totals %>%
   summarise(
     race = "Total", 
-    US_raw = sum(US_raw, na.rm = TRUE),
-    US_share = sum(US_share, na.rm = TRUE),
-    VA_raw = sum(VA_raw, na.rm = TRUE),
-    VA_share = sum(VA_share, na.rm = TRUE),
-    CvilleAC_raw = sum(CvilleAC_raw, na.rm = TRUE),
-    CvilleAC_share = sum(CvilleAC_share, na.rm = TRUE)
+    US_raw = round(sum(US_raw, na.rm = TRUE)),
+    US_share = round(sum(US_share, na.rm = TRUE), 1),
+    VA_raw = round(sum(VA_raw, na.rm = TRUE)),
+    VA_share = round(sum(VA_share, na.rm = TRUE), 1),
+    CvilleAC_raw = round(sum(CvilleAC_raw, na.rm = TRUE)),
+    CvilleAC_share = round(sum(CvilleAC_share, na.rm = TRUE), 1)
   )
 
-combined_totals_display_with_total <- bind_rows(combined_totals_display, totals_row)
+combined_totals_display_with_total <- bind_rows(combined_totals_display, totals_row)%>%
+  mutate(
+    US_raw = comma(round(US_raw)),
+    VA_raw = comma(round(VA_raw)),
+    CvilleAC_raw = comma(round(CvilleAC_raw)),
+    US_share = paste0(round(US_share * 100, 1), "%"),
+    VA_share = paste0(round(VA_share * 100, 1), "%"),
+    CvilleAC_share = paste0(round(CvilleAC_share * 100, 1), "%")
+  )
+
+combined_totals_display_with_total <- combined_totals_display_with_total %>%
+  select(
+    race,
+    CvilleAC_raw, CvilleAC_share,
+    VA_raw, VA_share,
+    US_raw, US_share
+  )
+
+combined_totals_display_with_total <- combined_totals_display_with_total %>%
+  rename_with(~ gsub("_", " ", .x))
 
 View(combined_totals_display_with_total)
 
-#Install packages for saving
+write.csv(combined_totals_display_with_total, "output/raceincome/race/race_summaryTable_2023.csv", row.names = FALSE)
 
-install.packages("openxlsx")
-library(openxlsx)
-
-# ✅ Create the full nested folder path first
-dir.create("output/raceincome/race", showWarnings = FALSE, recursive = TRUE)
-
-# Create workbook and add worksheet
-
-wb <- createWorkbook()
-addWorksheet(wb, "Race Summary")
-
-# Write data
-
-writeData(wb, "Race Summary", combined_totals_display_with_total)
-
-# Formatting 
-
-bold_text <- createStyle(textDecoration = "bold")
-
-# Bold the word "Total"
-
-total_row_index <- which(combined_totals_display_with_total$race == "Total") + 1  # +1 for header
-addStyle(
-  wb,
-  sheet = "Race Summary",
-  style = bold_text,
-  rows = total_row_index,
-  cols = 1,  # Only race column
-  gridExpand = FALSE
-)
-
-# Bold the header row
-addStyle(
-  wb,
-  sheet = "Race Summary",
-  style = bold_text,
-  rows = 1,
-  cols = 1:ncol(combined_totals_display_with_total),
-  gridExpand = TRUE
-)
-# Save
-saveWorkbook(wb, "output/raceincome/race/race_summary_table.xlsx", overwrite = TRUE)
 
 ##### How much more white is Cville/AC than VA or the US? #####
 
