@@ -21,6 +21,11 @@ for (year in 1999:2023) {
   
   # Merge with filtered gridpoints
   merged_year <- left_join(gridpoints, raceincome_year, by = c("grid_lon", "grid_lat"))
+
+  # Replace NAs in numeric columns (e.g., population counts) with 0, but do not modify grid_lon or grid_lat
+  num_cols <- sapply(merged_year, is.numeric)
+  num_cols[names(num_cols) %in% c("grid_lon", "grid_lat")] <- FALSE
+  merged_year[num_cols] <- lapply(merged_year[num_cols], function(x) ifelse(is.na(x), 0, x))
   
   # Write to Stata .dta
   output_file <- paste0(dta_path_ri, "raceincome_", year, ".dta")
@@ -40,6 +45,11 @@ for (year in 2023) {
   
   # Merge with filtered gridpoints
   merged_year <- left_join(gridpoints_nat, raceincome_year, by = c("grid_lon", "grid_lat"))
+
+  # Replace NAs in numeric columns (e.g., population counts) with 0, but do not modify grid_lon or grid_lat
+  num_cols <- sapply(merged_year, is.numeric)
+  num_cols[names(num_cols) %in% c("grid_lon", "grid_lat")] <- FALSE
+  merged_year[num_cols] <- lapply(merged_year[num_cols], function(x) ifelse(is.na(x), 0, x))
   
   # Write to Stata .dta
   output_file <- paste0(dta_path_ri, "nat_raceincome_", year, ".dta")
@@ -123,6 +133,11 @@ income_wide <- raceincome_combined %>%
 raceincome_year_long <- raceincome_wide %>%
   left_join(income_wide, by = c("grid_lon", "grid_lat", "year"))
 
-save(raceincome_year_long, file = paste0(rda_path_ri, "raceincome_long_year.rda"))
+# Set all numeric columns except grid_lon, grid_lat, and year to 0 if NA
+num_cols <- sapply(raceincome_year_long, is.numeric)
+num_cols[names(num_cols) %in% c("grid_lon", "grid_lat", "year")] <- FALSE
+raceincome_year_long[num_cols] <- lapply(raceincome_year_long[num_cols], function(x) ifelse(is.na(x), 0, x))
 
-write_dta(raceincome_year_long, paste0(dta_path_ri, "raceincome_long_year.dta"))
+save(raceincome_year_long, file = paste0(rda_path_ri, "raceincome_year_long.rda"))
+
+write_dta(raceincome_year_long, paste0(dta_path_ri, "raceincome_year_long.dta"))

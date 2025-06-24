@@ -12,7 +12,7 @@
 
 #### Define Functions ####
 
-process_rda_to_hex_grid <- function(file_path, lon_col = "grid_lon", lat_col = "grid_lat", hex_cellsize = 0.02) {
+process_rda_to_hex_grid <- function(file_path, lon_col = "grid_lon", lat_col = "grid_lat", hex_cellsize = 0.01) {
   
   # Step 1: Load the .rda file
   env <- new.env()

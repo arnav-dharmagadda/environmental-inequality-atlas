@@ -21,6 +21,11 @@ for (year in 1999:2023) {
   
   # Merge with filtered gridpoints
   merged_year <- left_join(gridpoints, ageracesex_year, by = c("grid_lon", "grid_lat"))
+
+  # Replace NAs in numeric columns (e.g., population counts) with 0, but do not modify grid_lon or grid_lat
+  num_cols <- sapply(merged_year, is.numeric)
+  num_cols[names(num_cols) %in% c("grid_lon", "grid_lat")] <- FALSE
+  merged_year[num_cols] <- lapply(merged_year[num_cols], function(x) ifelse(is.na(x), 0, x))
   
   # Write to Stata .dta
   output_file <- paste0(dta_path_ars, "ageracesex_", year, ".dta")
@@ -40,6 +45,11 @@ for (year in 2023) {
   
   # Merge with filtered gridpoints
   merged_year <- left_join(gridpoints_nat, ageracesex_year, by = c("grid_lon", "grid_lat"))
+
+  # Replace NAs in numeric columns (e.g., population counts) with 0, but do not modify grid_lon or grid_lat
+  num_cols <- sapply(merged_year, is.numeric)
+  num_cols[names(num_cols) %in% c("grid_lon", "grid_lat")] <- FALSE
+  merged_year[num_cols] <- lapply(merged_year[num_cols], function(x) ifelse(is.na(x), 0, x))
   
   # Write to Stata .dta
   output_file <- paste0(dta_path_ars, "nat_ageracesex_", year, ".dta")
@@ -130,7 +140,7 @@ race_wide <- ageracesex_combined %>%
     names_from = race_ethnicity,
     values_from = total_race_pop
   ) %>%
-  rename(NA_race = `NA`)
+  {if("NA" %in% names(.)) rename(., NA_race = `NA`) else .}
 
 # Reshape for age_group variables
 
@@ -142,7 +152,7 @@ age_group_wide <- ageracesex_combined %>%
     names_from = age_group,
     values_from = total_age_pop
   ) %>%
-  rename(NA_age = `NA`)
+  {if("NA" %in% names(.)) rename(., NA_age = `NA`) else .}
 
 # Reshape for sex variables
 
@@ -154,7 +164,7 @@ sex_wide <- ageracesex_combined %>%
     names_from = sex,
     values_from = total_sex_pop
   ) %>%
-  rename(NA_sex = `NA`)
+  {if("NA" %in% names(.)) rename(., NA_sex = `NA`) else .}
 
 # Combine all reshaped dataframes into a long format
 
@@ -163,6 +173,11 @@ ageracesex_year_long <- ageracesex_wide %>%
   left_join(race_wide, by = c("grid_lon", "grid_lat", "year")) %>%
   left_join(age_group_wide, by = c("grid_lon", "grid_lat", "year")) %>%
   left_join(sex_wide, by = c("grid_lon", "grid_lat", "year"))
+
+# Set all numeric columns except grid_lon, grid_lat, and year to 0 if NA
+num_cols <- sapply(ageracesex_year_long, is.numeric)
+num_cols[names(num_cols) %in% c("grid_lon", "grid_lat", "year")] <- FALSE
+ageracesex_year_long[num_cols] <- lapply(ageracesex_year_long[num_cols], function(x) ifelse(is.na(x), 0, x))
 
 save(ageracesex_year_long, file = paste0(rda_path_ars, "ageracesex_year_long.rda"))
 write_dta(ageracesex_year_long, paste0(dta_path_ars, "ageracesex_year_long.dta"))

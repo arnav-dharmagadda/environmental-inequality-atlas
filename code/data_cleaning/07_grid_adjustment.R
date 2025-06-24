@@ -46,6 +46,16 @@ process_rda_file <- function(file_path, lon_col = "grid_lon", lat_col = "grid_la
   # Step 5: Spatial join
   df_gridded <- st_join(grid_sf, df_sf, join = st_contains)
   
+  # Step 5.1: Optional - Remove grid cells with no data (uncomment if desired)
+   df_gridded <- df_gridded[!is.na(df_gridded$n_noise_postprocessed), ]
+  
+  # Step 5.2: Replace NAs with 0s for numeric columns (except grid coordinates)
+  for (col_name in names(df_gridded)) {
+    if (is.numeric(df_gridded[[col_name]]) && !col_name %in% c("grid_lon", "grid_lat")) {
+      df_gridded[[col_name]] <- ifelse(is.na(df_gridded[[col_name]]), 0, df_gridded[[col_name]])
+    }
+  }
+  
   # Overwrite the object in the environment
   assign(df_name, df_gridded, envir = env)
   
