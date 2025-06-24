@@ -125,8 +125,12 @@ income_wide <- raceincome_combined %>%
   pivot_wider(
     names_from = income_decile,
     values_from = total_inc_pop
-  ) %>%
-  rename(NA_inc = `NA`)
+  )
+
+# Only rename NA column if it exists
+if ("NA" %in% names(income_wide)) {
+  income_wide <- income_wide %>% rename(NA_inc = `NA`)
+}
 
 # Combine all into a single dataframe with year
 
