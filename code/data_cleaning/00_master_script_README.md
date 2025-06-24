@@ -6,11 +6,11 @@
 
 # Purpose
 
-This script will run the six scripts that are used in this module to clean the Gridded EIF age-race-sex and race-income data. 
+This script will run the seven scripts that are used in this module to clean the Gridded EIF age-race-sex and race-income data. 
 
 # Instructions
 
-1. Set the working directory and git_path in 01_setup.R
-2. Run these two lines
+1. Set the working directory, data_path, and git_path in 01_setup.R
+2. Run these three lines
 3. TEMPORARY: While the data is stored offline, adjust the data path to be wherever your data is located.
 4. Run.

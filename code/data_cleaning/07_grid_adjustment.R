@@ -1,5 +1,5 @@
 ################################################################################
-# FILE: 06_grid_adjustment.R
+# FILE: 07_grid_adjustment.R
 # PURPOSE: Make grid polygons instead of points
 # AUTHOR: Arnav Dharmagadda
 # CREATED: June 9th, 2025
@@ -46,6 +46,16 @@ process_rda_file <- function(file_path, lon_col = "grid_lon", lat_col = "grid_la
   # Step 5: Spatial join
   df_gridded <- st_join(grid_sf, df_sf, join = st_contains)
   
+  # Step 5.1: Optional - Remove grid cells with no data (uncomment if desired)
+   df_gridded <- df_gridded[!is.na(df_gridded$n_noise_postprocessed), ]
+  
+  # Step 5.2: Replace NAs with 0s for numeric columns (except grid coordinates)
+  for (col_name in names(df_gridded)) {
+    if (is.numeric(df_gridded[[col_name]]) && !col_name %in% c("grid_lon", "grid_lat")) {
+      df_gridded[[col_name]] <- ifelse(is.na(df_gridded[[col_name]]), 0, df_gridded[[col_name]])
+    }
+  }
+  
   # Overwrite the object in the environment
   assign(df_name, df_gridded, envir = env)
   
@@ -58,7 +68,7 @@ process_rda_file <- function(file_path, lon_col = "grid_lon", lat_col = "grid_la
 all_rda_files <- list.files(processed_path, pattern = "\\.rda$", full.names = TRUE, recursive = TRUE)
 
 # Filter to exclude files ending in "_hex.rda"
-file_paths <- all_rda_files[!grepl("_hex\\.rda$", all_rda_files) & !grepl("^nat_", basename(all_rda_files))]
+file_paths <- all_rda_files[!grepl("_hex\\.rda$", all_rda_files) & !grepl("^nat_", basename(all_rda_files)) & !grepl("_point\\.rda$", all_rda_files) & !grepl("_point_with_hex_id\\.rda$", all_rda_files)]
 
 walk(file_paths, process_rda_file)
 

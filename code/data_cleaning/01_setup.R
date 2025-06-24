@@ -5,7 +5,7 @@
 # AUTHOR: Arnav Dharmagadda
 # CREATED: June 3rd, 2025
 ################################################################################
-# INPUTS: gridpoints_with_county_2020.rda
+# INPUTS: gridpoints_with_county_2024.rda
 # OUTPUTS: None.
 ################################################################################
 
@@ -21,7 +21,7 @@ data_path <- "/Users/jfischman/Library/CloudStorage/OneDrive-BowdoinCollege/Docu
 
 git_path <- "/Users/jfischman/Library/CloudStorage/OneDrive-BowdoinCollege/Documents/GitHub/environmental-inequality-atlas/"
 
-gridpoints_path <- paste0(data_path, "/raceincome/gridpoints_with_county_2020 (1).rda")
+gridpoints_path <- paste0(data_path, "gridpoints_with_county_2024.rda")
 
 processed_path <- paste0(git_path, "data/processed/")
 
@@ -41,7 +41,7 @@ if (!requireNamespace("pacman", quietly = TRUE)) {
   install.packages("pacman")
 }
 
-pacman::p_load(sf, terra, dplyr, ggplot2, tmap, arrow, dplyr, tidyr, scales, haven, stringr, purrr)
+pacman::p_load(ncdf4, sf, terra, dplyr, ggplot2, tmap, arrow, dplyr, tidyr, scales, haven, stringr, purrr)
 
 #### Load Data ####
 
@@ -54,14 +54,14 @@ rm(df)
 
 gridpoints <- gridpoints %>%
   filter(STATEFP == "51" & COUNTYFP == "003" | COUNTYFP == "540") %>%
-  rename(
-    grid_lon = pm25_grid_x,
-    grid_lat = pm25_grid_y
+  mutate(
+    grid_lon = as.character(grid_lon),
+    grid_lat = as.character(grid_lat)
   )
 
 gridpoints_nat <- gridpoints_nat %>%
-  rename(
-    grid_lon = pm25_grid_x,
-    grid_lat = pm25_grid_y
+  mutate(
+    grid_lon = as.character(grid_lon),
+    grid_lat = as.character(grid_lat)
   )
 
