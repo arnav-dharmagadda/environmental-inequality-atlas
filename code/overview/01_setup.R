@@ -17,8 +17,7 @@ if (!requireNamespace("pacman", quietly = TRUE)) {
 
 pacman::p_load(sf, terra, dplyr, ggplot2, tmap, arrow, dplyr, tidyr, scales, haven, stringr, purrr, forcats)
 
-
-#### Setting working directory and file paths ####
+### Setting working directory and file paths ####
 
 setwd("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/")
 
@@ -70,9 +69,7 @@ data_2023_hex <- data_2023_hex %>%
 
 grid_2023_total <- data_2023 %>%
   group_by(grid_lon, grid_lat) %>%
-  summarise(total = ifelse(all(is.na(n_noise_postprocessed)), 
-                          NA, 
-                          sum(n_noise_postprocessed, na.rm = TRUE)), 
+  summarise(total = sum(n_noise_postprocessed, na.rm = TRUE), 
             .groups = "keep")
 
 #### Generate map ####
