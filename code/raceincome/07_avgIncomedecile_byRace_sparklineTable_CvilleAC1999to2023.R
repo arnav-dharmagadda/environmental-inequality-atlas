@@ -1,8 +1,8 @@
 ################################################################################
 # FILE: 07_avgIncomedecile_byRace_sparklineTable_CvilleAC1999to2023.R
 # PURPOSE: Use gridded EIF data for race/income from 1999 to 2023 to generate 
-# table with columns race/ethnicity, average income decile trend between 1999
-# and 2023, and avergae income decile in 2023.
+# a table with columns race/ethnicity, average income decile trend between 1999
+# and 2023, and average income decile in 2023.
 # AUTHOR: Elizabeth Shiker
 # CREATED: June 20th, 2025
 ################################################################################
