@@ -32,7 +32,7 @@ data_all <- data_all %>%
 dissimilarity_by_county_year <- data_all %>%
   group_by(NAME, year) %>%
   summarise(
-    di_white_non_white = calculate_dissimilarity(pick(everything()), "White", "non_white"),
+   # di_white_non_white = calculate_dissimilarity(pick(everything()), "White", "non_white"),
     di_white_black     = calculate_dissimilarity(pick(everything()), "White", "Black"),
     di_white_hispanic  = calculate_dissimilarity(pick(everything()), "White", "Hispanic"),
     di_white_asian     = calculate_dissimilarity(pick(everything()), "White", "Asian"),
@@ -44,7 +44,7 @@ dissimilarity_by_county_year <- data_all %>%
 total_dissimilarity_by_year <- data_all %>%
   group_by(year) %>%
   summarise(
-    di_white_non_white = calculate_dissimilarity(pick(everything()), "White", "non_white"),
+   # di_white_non_white = calculate_dissimilarity(pick(everything()), "White", "non_white"),
     di_white_black     = calculate_dissimilarity(pick(everything()), "White", "Black"),
     di_white_hispanic  = calculate_dissimilarity(pick(everything()), "White", "Hispanic"),
     di_white_asian     = calculate_dissimilarity(pick(everything()), "White", "Asian"),
@@ -66,7 +66,7 @@ dissimilarity_long <- dissimilarity_combined %>%
 
 library(ggplot2)
 
-ggplot(dissimilarity_long %>% filter(NAME == "Total"), 
+Tt <- ggplot(dissimilarity_long %>% filter(NAME == "Total"), 
        aes(x = year, y = dissimilarity_index, color = group_pair)) +
   geom_line(size = 1.2) +
   scale_color_manual(
@@ -74,20 +74,20 @@ ggplot(dissimilarity_long %>% filter(NAME == "Total"),
       "di_white_black" = "#1b9e77",
       "di_white_hispanic" = "#7570b3",
       "di_white_asian" = "#d95f02",
-      "di_white_AIAN" = "#e7298a",
-      "di_white_non_white" = "#66a61e"
+      "di_white_AIAN" = "#e7298a"
+      #"di_white_non_white" = "#66a61e"
     ),
     labels = c(
       "di_white_black" = "White vs Black",
       "di_white_hispanic" = "White vs Hispanic",
       "di_white_asian" = "White vs Asian",
-      "di_white_AIAN" = "White vs AIAN",
-      "di_white_non_white" = "White vs Non-White"
+      "di_white_AIAN" = "White vs AIAN"
+      #"di_white_non_white" = "White vs Non-White"
     )
   ) +
   labs(
-    title = "Trends in Racial Residential Segregation (1999–2023)",
-    subtitle = "Dissimilarity Index between White and Other Groups, U.S. Total",
+    title = "Trends in Racial Residential Clustering (1999–2023)",
+    subtitle = "Dissimilarity Index between White and Other Groups",
     x = "Year",
     y = "Dissimilarity Index",
     color = ""
@@ -102,3 +102,5 @@ ggplot(dissimilarity_long %>% filter(NAME == "Total"),
     legend.text = element_text(size = 12),
     panel.grid.minor = element_blank()
   )
+ggsave("output/ageracesex/03_charts/Trends in Racial Residential Clustering.png", plot = Tt, width = 10, height = 6)
+
