@@ -75,7 +75,7 @@ grid_2023_total <- data_2023 %>%
 #### Generate map ####
 
 # Plot with a gradient color scale
-tm_basemap("OpenStreetMap", alpha = 0.7) +  # Added alpha for basemap transparency (0.1-1.0)
+tm_basemap("OpenStreetMap", alpha = 1) +  # Added alpha for basemap transparency (0.1-1.0)
   tm_shape(people_points_sf) +
   tm_dots(
     col = "#232d4b",
@@ -109,22 +109,24 @@ tm_basemap("OpenStreetMap", alpha = 0.7) +  # Added alpha for basemap transparen
     outer.bg.color = "transparent"
   )
 
-file_path <- paste0(output_path, "total_pop_map.png")
+file_path <- paste0(output_path, "total_pop_point_map.png")
 
-tmap_save(filename = file_path, bg = NA, width = 4, height = 5)
+tmap_save(filename = file_path, bg = NA, width = 6, height = 8)
 
 # Test with hexagon
 
-tm_basemap("OpenStreetMap", alpha = 0.7) +  # Added alpha for basemap transparency (0.1-1.0)
+tm_basemap("OpenStreetMap", alpha = 1) +  # Added alpha for basemap transparency (0.1-1.0)
   tm_shape(data_2023_hex) +
   tm_polygons(
     col = "total",                         # Color by a variable (or use a fixed color)
     palette = "Blues",                     # Color palette for the polygons
     title = "Population",
+    style = "cont",                        # Continuous gradient style
     alpha = 0.7,                          # Polygon transparency
     border.col = "white",                  # Border color
     border.lwd = 0.2,                     # Border line width
-    colorNA = "transparent"
+    colorNA = "transparent",
+    textNA = ""                           # Remove "missing" text from legend
   ) +
   tm_graticules(
     n.x = 5,
@@ -133,13 +135,6 @@ tm_basemap("OpenStreetMap", alpha = 0.7) +  # Added alpha for basemap transparen
     lwd = 0.3,
     labels.size = 0.8
   ) +
-  tm_add_legend(
-    type = "fill",                        # Changed from "symbol" to "fill" for polygons
-    labels = "Hexagon Area",              # Updated label
-    col = "lightblue",                    # Color to match polygon style
-    alpha = 0.7                          # Match polygon transparency
-    #title = "Legend"
-  ) +
   tm_layout(
     main.title = "Charlottesville Population (2023)", 
     #main.title.position = "left",         # left-aligned like ggplot
@@ -147,22 +142,30 @@ tm_basemap("OpenStreetMap", alpha = 0.7) +  # Added alpha for basemap transparen
     main.title.fontface = "bold",         # match bold styling
     legend.outside = FALSE,
     legend.position = c("right", "bottom"),
+    legend.text.size = 0.4,               # Larger text for readability
+    legend.title.size = 1.0,              # Normal size title
     bg.color = "transparent",
     outer.bg.color = "transparent"
   )
 
+file_path <- paste0(output_path, "total_pop_hex_map.png")
+
+tmap_save(filename = file_path, bg = NA, width = 6, height = 8)
+
 # Test with Grid
 
-tm_basemap("OpenStreetMap", alpha = 0.7) +  # Added alpha for basemap transparency (0.1-1.0)
+tm_basemap("OpenStreetMap", alpha = 1) +  # Added alpha for basemap transparency (0.1-1.0)
   tm_shape(grid_2023_total) +
   tm_polygons(
     col = "total",                         # Color by a variable (or use a fixed color)
     palette = "Blues",                     # Color palette for the polygons
     title = "Population",
-    alpha = 0.7,                          # Polygon transparency
+    alpha = 0.7, 
+    style = "cont",                        # Continuous gradient style
     border.col = "white",                  # Border color
     border.lwd = 0.2,                     # Border line width
-    colorNA = "transparent"
+    colorNA = "transparent",
+    textNA = ""                           # Remove "missing" text from legend
   ) +
   tm_graticules(
     n.x = 5,
@@ -171,23 +174,21 @@ tm_basemap("OpenStreetMap", alpha = 0.7) +  # Added alpha for basemap transparen
     lwd = 0.3,
     labels.size = 0.8
   ) +
-  tm_add_legend(
-    type = "fill",                        # Changed from "symbol" to "fill" for polygons
-    labels = "Hexagon Area",              # Updated label
-    col = "lightblue",                    # Color to match polygon style
-    alpha = 0.7                          # Match polygon transparency
-    #title = "Legend"
-  ) +
   tm_layout(
     main.title = "Charlottesville Population (2023)", 
-    #main.title.position = "left",         # left-aligned like ggplot
     main.title.size = 1.6,                # ~18 pt equivalent in tmap
     main.title.fontface = "bold",         # match bold styling
     legend.outside = FALSE,
     legend.position = c("right", "bottom"),
+    legend.text.size = 0.4,               # Larger text for readability
+    legend.title.size = 1.0,              # Normal size title
     bg.color = "transparent",
     outer.bg.color = "transparent"
   )
+
+file_path <- paste0(output_path, "total_pop_grid_map.png")
+
+tmap_save(filename = file_path, bg = NA, width = 6, height = 8)
 
 #### Generate time series ####
 
