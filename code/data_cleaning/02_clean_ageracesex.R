@@ -10,16 +10,16 @@
 #          ageracesex_year_long.rda/.dta
 ################################################################################
 
-#fix 2024 parquet file first
+# Fix 2024 parquet file first
 
 ageracesexparquet2024_path <- paste0(data_path, "/ageracesex/gridded_v5a_pop_ageracesexeif_2024_realtime.parquet copy")
 ageracesexparquet2024 <- read_parquet(ageracesexparquet2024_path)
 
 #Change variables within parquet2024
 
-colnames(ageracesexparquet2024) <- c("grid_lon", "grid_lat", "income_decile", "race_ethnicity", "n_noise", "n_noise_postprocessed")
+colnames(ageracesexparquet2024) <- c("grid_lon", "grid_lat", "age_group", "race_ethnicity", "sex", "n_noise", "n_noise_postprocessed")
 
-#Write new parquet
+# Write new parquet
 
 ageracesexoutput2024_path <- paste0(data_path, "/ageracesex/gridded_eif_pop_ageracesex_2024.parquet")
 
@@ -75,12 +75,6 @@ for (year in 2024) {
   save(merged_year, file = output_file_rda)
 }
 
-####error checking####
-dir.exists(rda_path_ars)
-print(output_file_rda)
-save(merged_year, file = "~/Desktop/test_save.rda")
-str(merged_year)
-object.size(merged_year)
 # Append
 
 rda_files <- list.files(path = rda_path_ars, pattern = "^ageracesex_\\d{4}\\.rda$", full.names = TRUE)
