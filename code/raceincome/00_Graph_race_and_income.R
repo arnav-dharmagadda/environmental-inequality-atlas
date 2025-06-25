@@ -18,6 +18,7 @@ raceincome_sf <- st_as_sf(
   crs = 4326  # WGS 84 (standard GPS lat/lon)
 )
 
+View(raceincome_sf)
 # Convert to long format, extract components, and filter to 2023
 raceincome_2023 <- raceincome_sf %>%
   pivot_longer(
@@ -29,45 +30,55 @@ raceincome_2023 <- raceincome_sf %>%
   mutate(
     race = gsub("_.*", "", variable),
     decile = as.integer(str_extract(variable, "(?<=_inc_)\\d+")),
-    year = as.integer(str_extract(variable, "\\d{4}$"))
+    year = 2023  # Just assign the known year
   ) %>%
-  filter(year == 2023, race != "other", !is.na(decile))
+  filter(race != "other", !is.na(decile))
 
-
+View(raceincome_2023)
 # Separate into race and decile
 
 #summarize by counts
 race_summary <- raceincome_2023 %>%
-  filter(!is.na(race)) %>%
+  filter(!is.na(race), decile != 0) %>%
   group_by(race, decile) %>%
   summarise(total_count = sum(count, na.rm = TRUE), .groups = "drop")
+
+
 #plot income deciles by race
 
 p <- ggplot(race_summary, aes(x = factor(decile), y = total_count, fill = race)) +
   geom_col(position = "dodge") +
   scale_fill_brewer(palette = "Set2") +
   labs(
-    title = paste("Income Decile Distribution by Race in", year),
-    x = "Income Decile (0 = lowest, 9 = highest)",
+    title = paste("Income Decile Distribution by Race in", 2023),
+    x = "Income Decile (1 = lowest, 9 = highest)",
     y = "Number of People"
   ) +
-  theme_minimal()
+  theme_minimal()+
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA)
+  )
 
 ggsave("output/raceincome/Income Decile Distribution by Race.png", plot = p, width = 6, height = 4)
 
 #facet
-race_summary_filtered <- race_summary_filtered %>%
+race_summary_filtered <- race_summary %>%
   filter(!race %in% c(NA, "NA", "Unknown", "Other/Unknown"))
 
 q <- ggplot(race_summary_filtered, aes(x = factor(decile), y = total_count)) +
   geom_col(fill = "#1f78b4") +
   facet_wrap(~ race, scales = "free_y", ncol = 3) +
   labs(
-    title = paste("Income Distribution by Race in", year),
+    title = paste("Income Distribution by Race in", 2023),
     x = "Income Decile",
     y = "Number of People"
   ) +
-  theme_minimal()
+  theme_minimal()+
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA)
+  )
 ggsave("output/raceincome/Income Distribution by Race Facet.png", plot = q, width = 6, height = 4)
 
 #facet share
@@ -83,11 +94,15 @@ q_share <- ggplot(race_income_share, aes(x = factor(decile), y = share)) +
   facet_wrap(~ race, scales = "free_y", ncol = 3) +
   #scale_fill_brewer(palette = "Set3") +
   labs(
-    title = paste("Income Decile Distribution Within Each Race (", year, ")", sep = ""),
-    x = "Income Decile (0 = lowest, 9 = highest)",
+    title = paste("Income Decile Distribution Within Each Race (", 2023, ")", sep = ""),
+    x = "Income Decile (1 = lowest, 9 = highest)",
     y = "Share of Race Population"
   ) +
-  theme_minimal()
+  theme_minimal()+
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA)
+  )
 
 # Save to file
 ggsave("output/raceincome/Race Share Within Income Deciles.png", plot = q_share, width = 6, height = 4)
@@ -190,6 +205,29 @@ u <- ggplot(race_summary_selected_share, aes(x = race, y = share, fill = decile)
   ) +
   theme_minimal()
 ggsave("output/raceincome/Share of Race Group in 2nd, 5th, and 10th Income Deciles.png", plot = u, width = 6, height = 4)
+
+
+# K-density
+
+jk <- ggplot(race_income_share, aes(x = as.numeric(decile), weight = total_count )) +
+  geom_density(alpha = 0.3, adjust = 1.2, fill = "blue", color = "blue") +
+  scale_x_continuous(breaks = 1:10, limits = c(1, 10)) +
+  facet_wrap(~ race, scales = "free_y", ncol = 3) +
+  labs(
+    title = "Kernel Density of Income Deciles by Race",
+    x = "Income Decile (1 = lowest, 10 = highest)",
+    y = "Density",
+    color = "Race",
+    fill = "Race"
+  ) + 
+  theme_minimal() +
+  theme(
+    plot.background = element_rect(fill = "white", color = NA),
+    panel.background = element_rect(fill = "white", color = NA)
+  )
+ggsave("output/raceincome/K-Density plot of Faceted Races.png", plot = jk, width = 6, height = 4)
+
+
 
 #map?
 

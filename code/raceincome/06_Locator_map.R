@@ -7,7 +7,7 @@
 # Outputs: 
 ###################################################################
 
-gridpoints_path <- paste0(data_path, "/race_income/gridpoints_with_county_2020 (1).rda")
+gridpoints_path <- paste0(data_path, "/raceincome/gridpoints_with_county_2020 (1).rda")
 
 #### Load Data ####
 
@@ -29,7 +29,7 @@ highlighted <- va_counties %>%
 # Plot
 ggplot() +
   geom_sf(data = va_counties, fill = "grey90", color = "black") +
-  geom_sf(data = highlighted, fill = "blue", color = "black", size = 0.6) +
+  geom_sf(data = highlighted, fill = "#232d4b", color = "black", size = 0.6) +
   
   theme_minimal() +
   theme(

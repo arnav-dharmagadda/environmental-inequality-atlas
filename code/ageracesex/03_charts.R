@@ -89,7 +89,7 @@ ggplot(plot_data_long, aes(x = race, y = population_count, fill = race)) +
   theme(legend.position = "none")
 # Race Distributions by Age
 
-ggplot(plot_data, aes(x = age_group, y = population, fill = race_ethnicity)) +
+ggplot(plot_data_long, aes(x = age_group, y = population_count, fill = race)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Race Distributions by Age",
        x = "Age Group",
@@ -100,16 +100,16 @@ ggplot(plot_data, aes(x = age_group, y = population, fill = race_ethnicity)) +
 # Share Distributions
 
 # Calculate total per race
-race_totals <- plot_data %>%
-  group_by(race_ethnicity) %>%
-  summarise(total = sum(population, na.rm = TRUE))
+race_totals <- plot_data_long %>%
+  group_by(race) %>%
+  summarise(total = sum(population_count, na.rm = TRUE))
 
 # Join total back and compute share
-df_shares <- plot_data %>%
-  left_join(race_totals, by = "race_ethnicity") %>%
-  mutate(share = population / total)
+df_shares <- plot_data_long %>%
+  left_join(race_totals, by = "race") %>%
+  mutate(share = population_count / total)
 
-ggplot(df_shares, aes(x = age_group, y = share, fill = race_ethnicity)) +
+pp <- ggplot(df_shares, aes(x = age_group, y = share, fill = race)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "Age Group Share Within Each Race",
        x = "Age Group",
@@ -117,3 +117,6 @@ ggplot(df_shares, aes(x = age_group, y = share, fill = race_ethnicity)) +
        fill = "Race/Ethnicity") +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   theme_minimal()
+
+ggsave("output/ageracesex/03_charts/Age Group Share Within Each Race.png", plot = pp, width = 6, height = 4)
+
