@@ -17,7 +17,7 @@
 
 setwd("/Users/jfischman/Library/CloudStorage/OneDrive-BowdoinCollege/Documents/GitHub/environmental-inequality-atlas/")
 
-data_path <- "/Users/jfischman/Library/CloudStorage/OneDrive-BowdoinCollege/Documents/General Data/EIF atlas/"
+data_path <- "/Users/jfischman/Library/CloudStorage/Dropbox-TheLab/Josie Fischman/gridded_eif_data/"
 
 git_path <- "/Users/jfischman/Library/CloudStorage/OneDrive-BowdoinCollege/Documents/GitHub/environmental-inequality-atlas/"
 
