@@ -1,7 +1,7 @@
 ################################################################################
 # FILE: 06_hexagon_adjustment.R
 # PURPOSE: Make hexagonal polygons instead of square polygons, with optional
-# filtering to specific geographic areas (counties or custom shapefiles).
+# filtering to specific geographic areas (counties).
 # AUTHOR: Arnav Dharmagadda
 # CREATED: June 10th, 2025
 ################################################################################
@@ -9,17 +9,11 @@
 # data/processed/raceincome_rda/, and data/processed/
 # OUTPUTS: Versions of those files with _hex suffixes, versions of those files 
 # with hex IDs attached (_with_hex_id)
-# 
-# NEW FEATURES:
-# - filter_to_counties: Automatically filters hexagons to Charlottesville/Albemarle area
-# - area_shapefile: Allows filtering to custom shapefile boundaries
-# - Creates empty hexagons within the filtered area (preserves all hexagons)
-# - Replaces non-numeric values with 0 for empty hexagons
 ################################################################################
 
 #### Define Functions ####
 
-process_rda_to_hex_grid <- function(file_path, lon_col = "grid_lon", lat_col = "grid_lat", hex_cellsize = 0.01, area_shapefile = NULL, filter_to_counties = TRUE) {
+process_rda_to_hex_grid <- function(file_path, lon_col = "grid_lon", lat_col = "grid_lat", hex_cellsize = 0.01, filter_to_counties = TRUE) {
   
   # Step 1: Load the .rda file
   env <- new.env()
@@ -62,25 +56,6 @@ process_rda_to_hex_grid <- function(file_path, lon_col = "grid_lon", lat_col = "
       
       message("Filtered hexagonal grid to ", nrow(hex_grid_sf), " hexagons within Charlottesville/Albemarle area")
     }
-  }
-  
-  # Optional: Filter hexagons to specific area using shapefile
-  if (!is.null(area_shapefile)) {
-    if (is.character(area_shapefile)) {
-      # If path provided, read the shapefile
-      area_sf <- st_read(area_shapefile)
-    } else {
-      # If sf object provided directly
-      area_sf <- area_shapefile
-    }
-    
-    # Ensure CRS compatibility
-    area_sf <- st_transform(area_sf, st_crs(hex_grid_sf))
-    
-    # Keep only hexagons that intersect with the area
-    hex_grid_sf <- st_filter(hex_grid_sf, area_sf, .predicate = st_intersects)
-    
-    message("Filtered hexagonal grid to ", nrow(hex_grid_sf), " hexagons within specified shapefile area")
   }
   
   # Step 4: Spatially join your original points to the new hexagonal grid.
@@ -168,7 +143,7 @@ all_rda_files <- unlist(lapply(folders, function(dir) {
 }))
 
 file_paths <- all_rda_files[!grepl("_hex\\.rda$", all_rda_files) & !grepl("^nat_", basename(all_rda_files)) & !grepl("_with_hex_id\\.rda$", basename(all_rda_files))]
-file_paths <- '/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/raceincome_rda/raceincome_2023_point.rda'
+
 # Run the processing function on each file with county filtering enabled
 walk(file_paths, ~ process_rda_to_hex_grid(.x, filter_to_counties = TRUE))
 
