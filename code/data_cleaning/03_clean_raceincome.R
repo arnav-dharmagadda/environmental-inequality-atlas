@@ -1,18 +1,32 @@
 ################################################################################
 # FILE: 03_clean_raceincome.R
-# PURPOSE: Download raceincome files as rda and dta for 1999-2023, save long and
+# PURPOSE: Download raceincome files as rda and dta for 1999-2024, save long and
 # reshaped versions.
 # AUTHOR: Arnav Dharmagadda
 # CREATED: June 9th, 2025
 ################################################################################
-# INPUTS: gridded_eif_pop_raceincome files (1999-2023)
+# INPUTS: gridded_eif_pop_raceincome files (1999-2024)
 # OUTPUTS: raceincome_{YEAR}.dta/.rda, raceincome_combined.rda/.dta,
 #          raceincome_year_long.rda/.dta
 ################################################################################
+#fix 2024 parquet file first
 
-# Loop through 1999-2023
+raceincomeparquet2024_path <- paste0(data_path, "/raceincome/gridded_v5a_pop_race_incomeeif_2024_realtime.parquet copy")
+raceincomeparquet2024 <- read_parquet(raceincomeparquet2024_path)
 
-for (year in 1999:2023) {
+#Change variables within parquet2024
+
+colnames(raceincomeparquet2024) <- c("grid_lon", "grid_lat", "income_decile", "race_ethnicity", "n_noise", "n_noise_postprocessed")
+
+#Write new parquet
+
+raceincomeoutput2024_path <- paste0(data_path, "/raceincome/gridded_eif_pop_raceincome_2024.parquet")
+
+write_parquet(raceincomeparquet2024, raceincomeoutput2024_path)
+
+# Loop through 1999-2024
+
+for (year in 1999:2024) {
   # Construct path to parquet file
   parquet_path <- paste0(data_path, "raceincome/gridded_eif_pop_raceincome_", year, ".parquet")
   
@@ -36,7 +50,7 @@ for (year in 1999:2023) {
   save(merged_year, file = output_file_rda)
 }
 
-for (year in 2023) {
+for (year in 2024) {
   # Construct path to parquet file
   parquet_path <- paste0(data_path, "raceincome/gridded_eif_pop_raceincome_", year, ".parquet")
   
