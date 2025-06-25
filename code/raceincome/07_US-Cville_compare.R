@@ -174,14 +174,27 @@ decile_prop <- decile_summary %>%
   mutate(share = total_count / sum(total_count)) %>%
   ungroup()
 
-qq <- ggplot(decile_prop, aes(x = factor(decile), y = share, fill = region)) +
-  geom_col(position = position_dodge(width = 0.9), width = 0.9) +
-  scale_fill_manual(values = c("United States" = "#FFA500", "Charlottesville/Albemarle" = "#232d4b")) +
+qq <- ggplot(decile_prop, aes(x = factor(decile))) +
+  # Bars for Charlottesville/Albemarle
+  geom_col(
+    data = decile_prop %>% filter(region == "Charlottesville/Albemarle"),
+    aes(y = share, fill = region),
+    width = 0.9
+  ) +
+  # Horizontal lines for U.S.
+  geom_hline(
+    data = decile_prop %>% filter(region == "United States"),
+    aes(yintercept = share, color = region),
+    linewidth = 1
+  ) +
+  scale_fill_manual(values = c("Charlottesville/Albemarle" = "#232d4b")) +
+  scale_color_manual(values = c("United States" = "#FFA500")) +
   labs(
     title = "Income Decile Distribution: U.S. vs. Charlottesville/Albemarle",
     x = "Income Decile",
     y = "Share of Total Population",
-    fill = "Region"
+    fill = "Region",
+    color = "Region"
   ) +
   theme_minimal() +
   theme(
