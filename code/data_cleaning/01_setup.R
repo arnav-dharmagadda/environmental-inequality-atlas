@@ -15,11 +15,11 @@
 
 #### Setting working directory and file paths ####
 
-setwd("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/")
+setwd("/Users/jfischman/Library/CloudStorage/OneDrive-BowdoinCollege/Documents/GitHub/environmental-inequality-atlas/")
 
-data_path <- "gridded_eif_data/"
+data_path <- "/Users/jfischman/Library/CloudStorage/Dropbox-TheLab/Josie Fischman/gridded_eif_data/"
 
-git_path <- "GitHub/environmental-inequality-atlas/"
+git_path <- "/Users/jfischman/Library/CloudStorage/OneDrive-BowdoinCollege/Documents/GitHub/environmental-inequality-atlas/"
 
 gridpoints_path <- paste0(data_path, "gridpoints_with_county_2024.rda")
 
