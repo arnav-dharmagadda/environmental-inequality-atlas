@@ -52,6 +52,12 @@ total_aland <- data_2023 %>%
   distinct(COUNTYFP, ALAND) %>%
   summarise(total_ALAND = sum(ALAND, na.rm = TRUE))
 
+# Create separate data for each county from the original raceincome_combined
+raceincome_by_county <- raceincome_combined %>%
+  group_by(year, COUNTYFP, NAME) %>%
+  summarise(n_noise_postprocessed = sum(n_noise_postprocessed, na.rm = TRUE), .groups = "drop")
+
+# Aggregate for total population calculations
 raceincome_combined <- raceincome_combined %>%
   group_by(year) %>%
   summarise(n_noise_postprocessed = sum(n_noise_postprocessed, na.rm = TRUE)) %>%
@@ -192,37 +198,95 @@ tmap_save(filename = file_path, bg = NA, width = 6, height = 8)
 
 #### Generate time series ####
 
-ggplot(raceincome_combined, aes(x = year, y = n_noise_postprocessed)) +
-  geom_area(fill = "#232d4b", alpha = 0.2) +
-  geom_line(color = "#232d4b", size = 1.2) +
-  geom_point(color = "#232d4b", size = 2) +
+# Combine county data with total data for plotting
+plot_data <- bind_rows(
+  raceincome_by_county,
+  raceincome_combined %>% mutate(NAME = "Total", COUNTYFP = "Total")
+)
+
+ggplot(plot_data, aes(x = year, y = n_noise_postprocessed, color = NAME)) +
+  geom_line(size = 1.5, alpha = 0.9) +
+  geom_point(size = 2.5, alpha = 0.9) +
   labs(
-    title = "Charlottesville and Albemarle County Population (1999–2023)",
+    title = "Population Trends in Charlottesville and Albemarle County",
+    subtitle = "1999–2023",
     x = "Year",
-    y = "Population"
+    y = "Population",
+    color = ""
   ) +
-  scale_x_continuous(breaks = seq(2000, 2023, by = 5)) +
-  scale_y_continuous(labels = scales::comma) +
-  theme_minimal(base_size = 14) +
+  scale_x_continuous(
+    breaks = seq(2000, 2020, by = 5),
+    minor_breaks = seq(1999, 2023, by = 1),
+    expand = c(0.02, 0)
+  ) +
+  scale_y_continuous(
+    labels = scales::comma_format(scale = 1e-3, suffix = "K"),
+    expand = c(0.02, 0)
+  ) +
+  scale_color_manual(
+    values = c("Albemarle" = "#232d4b", "Charlottesville" = "#e57200", "Total" = "maroon"),
+    labels = c("Albemarle County", "Charlottesville City", "Combined Total")
+  ) +
+  theme_minimal(base_size = 12) +
   theme(
-    plot.title.position = "plot",
-    plot.title = element_text(face = "bold", size = 18, hjust = 0),
-    axis.title = element_text(size = 14),
-    axis.text = element_text(size = 12),
-    panel.grid.major = element_line(color = "gray85"),
-    panel.grid.minor = element_blank(),
-    plot.margin = margin(10, 20, 10, 20)
+    # Plot titles
+    plot.title = element_text(
+      face = "bold", 
+      size = 16, 
+      hjust = 0,
+      margin = margin(b = 5),
+      color = "black"
+    ),
+    plot.subtitle = element_text(
+      size = 14,
+      hjust = 0,
+      margin = margin(b = 20),
+      color = "gray30"
+    ),
+    plot.caption = element_text(
+      size = 9,
+      hjust = 0,
+      margin = margin(t = 15),
+      color = "gray50",
+      lineheight = 1.1
+    ),
+    
+    # Axes
+    axis.title = element_text(size = 12, color = "gray20"),
+    axis.text = element_text(size = 10, color = "gray30"),
+    axis.title.x = element_text(margin = margin(t = 10)),
+    axis.title.y = element_text(margin = margin(r = 10)),
+    
+    # Grid
+    panel.grid.major = element_line(color = "gray90", size = 0.5),
+    panel.grid.minor = element_line(color = "gray95", size = 0.25),
+    panel.background = element_rect(fill = "white", color = NA),
+    
+    # Legend
+    legend.position = "bottom",
+    legend.title = element_blank(),
+    legend.text = element_text(size = 11, color = "gray20"),
+    legend.key.width = unit(1.5, "cm"),
+    legend.margin = margin(t = 15),
+    legend.box.spacing = unit(0, "pt"),
+    
+    # Plot margins
+    plot.margin = margin(20, 25, 15, 20),
+    
+    # Remove plot background
+    plot.background = element_rect(fill = "white", color = NA)
   )
 
 file_path <- paste0(output_path, "pop_time_series.png")
 
 ggsave(
   filename = file_path,
-  plot = last_plot(),        # or specify your plot object if named
-  width = 8,                 # in inches
-  height = 5,                # adjust as needed
-  dpi = 300,                 # high resolution
-  bg = NA               # or "transparent" if needed
+  plot = last_plot(),
+  width = 10,                # Wider for better proportions
+  height = 6,                # Publication aspect ratio
+  dpi = 300,                 # High resolution for print
+  bg = "white",              # White background for publications
+  device = "png"             # PNG format
 )
 
 #### Calculate average growth rate ####
@@ -289,3 +353,96 @@ ggsave(
   dpi = 300,                 # high resolution
   bg = NA               # or "transparent" if needed
 )
+
+#### RACE MAP ####
+
+# Create faceted map by race using specified race columns
+race_columns <- c("race_ethnicity_AIAN", "race_ethnicity_Asian", "race_ethnicity_Black", "race_ethnicity_Hispanic", "race_ethnicity_White")
+
+# Check if all race columns exist in the data
+missing_cols <- setdiff(race_columns, names(data_2023_hex))
+if (length(missing_cols) > 0) {
+  cat("Warning: Missing columns in data:", paste(missing_cols, collapse = ", "), "\n")
+  race_columns <- intersect(race_columns, names(data_2023_hex))
+}
+
+if (length(race_columns) > 0) {
+  # Convert race columns to numeric and reshape data for faceting
+  data_race_long <- data_2023_hex %>%
+    select(hex_id, geometry, all_of(race_columns)) %>%
+    mutate(across(all_of(race_columns), as.numeric)) %>%
+    pivot_longer(
+      cols = all_of(race_columns),
+      names_to = "race_ethnicity",
+      values_to = "population"
+    ) %>%
+    # Clean up race labels for better display
+    mutate(
+      race_ethnicity = case_when(
+        race_ethnicity == "race_ethnicity_AIAN" ~ "American Indian/Alaska Native",
+        race_ethnicity == "race_ethnicity_Asian" ~ "Asian",
+        race_ethnicity == "race_ethnicity_Black" ~ "Black/African American",
+        race_ethnicity == "race_ethnicity_Hispanic" ~ "Hispanic/Latino",
+        race_ethnicity == "race_ethnicity_White" ~ "White",
+        TRUE ~ race_ethnicity
+      )
+    )
+  
+  # Create faceted map with individual legends
+  race_map <- tm_basemap("OpenStreetMap", alpha = 0.3) +
+    tm_shape(data_race_long) +
+    tm_polygons(
+      col = "population",
+      palette = "Blues",
+      title = "",  # Remove legend title
+      style = "cont",
+      alpha = 0.8,
+      border.col = "white",
+      border.lwd = 0.1,
+      colorNA = "transparent",
+      textNA = "",
+      legend.show = TRUE  # Enable individual legends
+    ) +
+    tm_facets(
+      by = "race_ethnicity",
+      nrow = 2,
+      ncol = 3,
+      free.coords = FALSE,
+      free.scales = TRUE,  # Allow different scales for each panel
+      showNA = FALSE
+    ) +
+    tm_layout(
+      title = "",  # Main title restored
+      title.size = 1.2,
+      title.position = c("center", "top"),
+      panel.labels = c("AIAN", "Asian", "Black", "Hispanic", "White"),
+      panel.label.size = 1.0,
+      panel.label.fontface = "bold",
+      legend.outside = FALSE,  # Keep legends inside each panel
+      legend.position = c("right", "bottom"),  # Position within each panel
+      legend.text.size = 0.25,
+      legend.height = 16,  # Fixed legend height for consistency
+      legend.width = 4,   # Fixed legend width for consistency
+      bg.color = "transparent",
+      outer.bg.color = "transparent",
+      between.margin = 0.5
+    )
+  
+  # Save the faceted race map
+  file_path <- paste0(output_path, "population_by_race_faceted_map.png")
+  
+  tmap_save(
+    tm = race_map,
+    filename = file_path,
+    bg = "NA",
+    width = 7,
+    height = 5,
+    dpi = 300
+  )
+  
+  cat("Faceted race map saved to:", file_path, "\n")
+  
+} else {
+  cat("No valid race columns found in the data.\n")
+}
+
