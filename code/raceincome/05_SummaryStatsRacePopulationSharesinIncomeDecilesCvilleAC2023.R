@@ -1,5 +1,5 @@
 ################################################################################
-# FILE: 05SummaryStatsRacePopulationSharesinIncomeDecilesCvilleAC2023.R
+# FILE: 05_SummaryStatsRacePopulationSharesinIncomeDecilesCvilleAC2023.R
 # PURPOSE: Use 2023 race/income data from the gridded EIF to generate summary 
 # statistics for race population shares at low, mid, and high income deciles in the United 
 # States, Virginia, and Charlottesville and Albemarle County.
