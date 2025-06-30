@@ -1,0 +1,280 @@
+---
+format:
+  pdf:
+    documentclass: article
+    pdf-engine: xelatex  # Required for system fonts
+    geometry:
+      - top=0.5in
+      - bottom=0.5in
+      - left=0.5in
+      - right=0.5in
+    fontsize: 11pt
+    colorlinks: true
+    fig-pos: 'H'
+    mainfont: "Lato"  # Main body text font
+    include-in-header:
+      text: |
+        \usepackage{multicol}
+        \usepackage{paracol}
+        \usepackage{xcolor}
+        \usepackage{tcolorbox}
+        \usepackage{graphicx}
+        \usepackage{float}
+        \definecolor{maroon}{RGB}{128,0,0}
+        \usepackage{fontspec}
+        \usepackage{datetime}
+        \newfontfamily\leaguegothic{League Gothic}
+        \newfontfamily\lato{Lato}
+        % Suppress page numbers
+        \pagestyle{empty}
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+<!-- Header Logo App -->
+```{=latex}
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{brief_title_logo.png}
+\end{figure}
+```
+
+<!-- Location Box -->
+```{=latex}
+\begin{tcolorbox}[
+  colback=white,
+  colframe=maroon,
+  width=\textwidth,
+  arc=0mm,
+  boxrule=2pt,
+  left=10pt,
+  right=10pt,
+  top=8pt,
+  bottom=8pt
+]
+\centering
+{\leaguegothic\textcolor{maroon}{\textbf{\Huge Virginia's 5th Congressional District}}}
+\end{tcolorbox}
+```
+
+\vspace{0.3cm}
+
+```{r setup}
+#| include: false
+library(knitr)
+library(ggplot2)
+library(dplyr)
+
+# Set figure defaults
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.height = 4,
+  dpi = 300,
+  out.width = "100%"
+)
+
+# Set file paths (use relative paths instead of setwd)
+data_path <- "/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/gridded_eif_data/"
+git_path <- "/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/"
+
+# Load packages
+
+if (!requireNamespace("pacman", quietly = TRUE)) {
+  install.packages("pacman")
+}
+
+pacman::p_load(ncdf4, sf, terra, dplyr, ggplot2, tmap, arrow, dplyr, tidyr, scales, haven, stringr, purrr, tigris)
+
+```
+
+```{=latex}
+\setlength{\columnsep}{20pt}
+\columnratio{0.6}
+\begin{paracol}{2}
+```
+
+<!-- LEFT COLUMN -->
+
+```{r locator}
+#| warning: false
+#| message: false
+
+gridpoints_path <- paste0(data_path, "/gridpoints_with_county_2024.rda")
+
+#### Load Data ####
+
+options(tigris_progress = FALSE)
+options(tidycensus_progress = FALSE)
+suppress_all_output <- function(expr) {
+  out_con <- file(tempfile(), open = "wt")
+  msg_con <- file(tempfile(), open = "wt")
+  sink(out_con)
+  sink(msg_con, type = "message")
+  on.exit({
+    sink(type = "message")
+    sink()
+    close(out_con)
+    close(msg_con)
+  })
+  invisible(force(expr))
+}
+
+# Get congressional districts for Virginia (state FIPS = 51)
+va_cd <- suppress_all_output({
+  congressional_districts(state = "51", cb = TRUE, class = "sf")
+})
+
+# Filter to the 5th district
+va_cd_5th <- va_cd %>%
+  filter(CD119FP == "05") 
+# Plot
+ggplot() +
+  geom_sf(data = va_cd, fill = "grey90", color = "black") +
+  geom_sf(data = va_cd_5th, fill = "#601215", color = "black", size = 0.6) +
+  theme_void() +
+  theme(
+    panel.background = element_rect(fill = "white", colour = NA),
+    plot.background = element_rect(fill = "white", colour = NA),
+    plot.margin = unit(c(0, 0, 0, 0), "cm")
+  )
+```
+
+\vspace{6em}
+
+\leaguegothic\textcolor{maroon}{\LARGE\textbf{About This Analysis}}
+
+\lato This brief provides an unprecedented view of demographic and economic patterns and trends for Albemarle County and Charlottesville City using the most detailed publicly available Census data. The analysis provides local leaders, residents, and service-providers with data-driven insights to provide context and facilitate planning, resource allocation, and investment.
+
+\vspace{1em}
+
+\leaguegothic\textcolor{maroon}{\LARGE\textbf{Data Source}}
+
+\lato The Gridded Environmental Impacts Frame (Gridded EIF) is an innovative, privacy-protected dataset derived from the Census Bureau's confidential Environmental Impacts Frame (EIF) microdata. The EIF integrates detailed administrative record and survey data on the U.S. population with high-resolution geospatial information. Organized on a fixed 0.01-degree grid (approximately 1km$^2$), the Gridded EIF provides detailed demographic counts by age, sex, race and ethnicity, as well as population counts by race, ethnicity, and household income decile. This approach enables more precise spatial analysis than traditional place-based data while maintaining strict confidentiality standards.
+
+```{=latex}
+\switchcolumn
+```
+
+<!-- RIGHT COLUMN -->
+
+\leaguegothic\textcolor{maroon}{\LARGE\textbf{Key Findings}}
+
+\lato \textbf{Population Growth \& Demographics}: Charlottesville and Albemarle County have experienced significant population growth of 64,264 people since 1999, with notable shifts in age structure and racial composition.
+
+\vspace{0.5em}
+
+\lato \textbf{Income Distribution}: 30\% of the region's population falls in the top two national income deciles, with substantial variation both across and within racial and ethnic groups compared to national income distributions.
+
+\vspace{0.5em}
+
+\lato \textbf{Aging Population}: The region's dependency ratio has increased to 0.64, driven primarily by a growing elderly population, creating new demands for age-appropriate services and infrastructure.
+
+\vspace{0.5em}
+
+```{=latex}
+\begin{tcolorbox}[
+  colback=maroon,
+  colframe=maroon,
+  boxrule=0pt,
+  arc=0pt,
+  left=12pt, right=12pt, top=10pt, bottom=10pt
+]
+{\leaguegothic\textcolor{white}{\LARGE\textbf{About the Environmental Inequality Lab}}}
+
+\vspace{0.5em}
+
+{\lato\textcolor{white}{
+The Environmental Inequality Lab is a nonpartisan research group that applies a rigorous, data-driven approach to understand how our environment shapes economic opportunity and well-being.
+}}
+
+\vspace{3em}
+
+{\leaguegothic\textcolor{white}{\LARGE\textbf{Connect with the EIL!}}}
+
+\vspace{0.5em}
+
+{\lato\textcolor{white}{Twitter: @en\_inequality\_lab}}
+
+\vspace{0.25em}
+
+{\lato\textcolor{white}{contact@environmental-inequality-lab.org}}
+
+\vspace{1em}
+
+\end{tcolorbox}
+```
+
+```{=latex}
+\end{paracol}
+```
+
+```{=latex}
+\vfill
+\hrule
+\vspace{0.2cm}
+\footnotesize
+\textit{This brief was generated on \today~\currenttime.}
+```
+
+\newpage
+
+\leaguegothic\textcolor{maroon}{\huge\textbf{Understanding Charlottesville's Population}}
+```{r, pop_map_hex}
+file_path <- paste0('/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/raceincome_rda/raceincome_2023_point_hex.rda')
+load(file_path)
+data_2023_hex <- people_points_sf
+data_2023_hex <- data_2023_hex %>%
+  mutate(across(starts_with("income_decile_"), as.numeric)) %>%
+  mutate(
+    total = rowSums(
+      select(., starts_with("income_decile_")) %>%
+        mutate(across(everything(), as.numeric)),
+      na.rm = TRUE
+    )
+  )
+tm_basemap("OpenStreetMap", alpha = 1) +  # Added alpha for basemap transparency (0.1-1.0)
+  tm_shape(data_2023_hex) +
+  tm_polygons(
+    col = "total",                         # Color by a variable (or use a fixed color)
+    palette = "Blues",                     # Color palette for the polygons
+    title = "Population",
+    style = "cont",                        # Continuous gradient style
+    alpha = 0.7,                          # Polygon transparency
+    border.col = "white",                  # Border color
+    border.lwd = 0.2,                     # Border line width
+    colorNA = "transparent",
+    textNA = ""                           # Remove "missing" text from legend
+  ) +
+  tm_graticules(
+    n.x = 5,
+    n.y = 5,
+    col = "gray70",
+    lwd = 0.3,
+    labels.size = 0.8
+  ) +
+  tm_layout(
+    main.title = "Charlottesville Population (2023)",
+    #main.title.position = "left",         # left-aligned like ggplot
+    main.title.size = 1.6,                # ~18 pt equivalent in tmap
+    main.title.fontface = "bold",         # match bold styling
+    legend.outside = FALSE,
+    legend.position = c("right", "bottom"),
+    legend.text.size = 0.4,               # Larger text for readability
+    legend.title.size = 1.0,              # Normal size title
+    bg.color = "transparent",
+    outer.bg.color = "transparent"
+  )
+```
+
+
+
+
+
+
+
+
+
+
+
