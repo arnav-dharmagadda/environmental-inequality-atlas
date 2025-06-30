@@ -221,7 +221,6 @@ The Environmental Inequality Lab is a nonpartisan research group that applies a 
 \newpage
 
 \leaguegothic\textcolor{maroon}{\huge\textbf{Understanding Charlottesville's Population}}
-
 ```{r, pop_map_hex}
 file_path <- paste0('/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/raceincome_rda/raceincome_2023_point_hex.rda')
 load(file_path)
@@ -235,7 +234,6 @@ data_2023_hex <- data_2023_hex %>%
       na.rm = TRUE
     )
   )
-
 tm_basemap("OpenStreetMap", alpha = 1) +  # Added alpha for basemap transparency (0.1-1.0)
   tm_shape(data_2023_hex) +
   tm_polygons(
@@ -268,5 +266,15 @@ tm_basemap("OpenStreetMap", alpha = 1) +  # Added alpha for basemap transparency
     bg.color = "transparent",
     outer.bg.color = "transparent"
   )
-
 ```
+
+
+
+
+
+
+
+
+
+
+
