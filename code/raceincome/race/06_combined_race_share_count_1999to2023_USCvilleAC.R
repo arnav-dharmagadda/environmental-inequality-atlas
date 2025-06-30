@@ -318,3 +318,7 @@ htmltools::save_html(
   ),
   file = "output/raceincome/race/race_combined_count_share_1999to2023_USCvilleAC.html"
 )
+
+install.packages("webshot2")
+library(webshot2)
+webshot("output/raceincome/race/race_combined_count_share_1999to2023_USCvilleAC.html", "output/raceincome/race/race_table_with_sparklines.png", vwidth = 1200, vheight = 800)
