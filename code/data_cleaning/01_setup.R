@@ -21,7 +21,7 @@ data_path <- "gridded_eif_data/"
 
 git_path <- "GitHub/environmental-inequality-atlas/"
 
-gridpoints_path <- paste0(data_path, "gridpoints_with_county_2024.rda")
+gridpoints_path <- paste0(data_path, "gridpoints_with_cd_2024.rda")
 
 processed_path <- paste0(git_path, "data/processed/")
 
@@ -53,15 +53,23 @@ rm(df)
 #### Filter Gridpoints to Focus Area ####
 
 gridpoints <- gridpoints %>%
-  filter(STATEFP == "51" & COUNTYFP == "003" | COUNTYFP == "540") %>%
+  filter(GEOID == "5105") %>%
   mutate(
-    grid_lon = as.character(grid_lon),
-    grid_lat = as.character(grid_lat)
+    #grid_lon = as.character(grid_lon),
+    #grid_lat = as.character(grid_lat)
+  ) %>%
+  rename(
+    grid_lon = pm25_grid_x,
+    grid_lat = pm25_grid_y
   )
 
 gridpoints_nat <- gridpoints_nat %>%
   mutate(
-    grid_lon = as.character(grid_lon),
-    grid_lat = as.character(grid_lat)
+    #grid_lon = as.character(grid_lon),
+    #grid_lat = as.character(grid_lat)
+  ) %>%
+  rename(
+    grid_lon = pm25_grid_x,
+    grid_lat = pm25_grid_y
   )
 

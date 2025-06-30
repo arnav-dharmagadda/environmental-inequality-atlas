@@ -220,7 +220,18 @@ The Environmental Inequality Lab is a nonpartisan research group that applies a 
 
 \newpage
 
-\leaguegothic\textcolor{maroon}{\huge\textbf{Understanding Charlottesville's Population}}
+\leaguegothic\textcolor{maroon}{\Huge\textbf{Population Trends and Age Dynamics}}
+
+\vspace{0.5em}
+
+```{=latex}
+\setlength{\columnsep}{20pt}
+\columnratio{0.65}
+\begin{paracol}{2}
+```
+
+<!-- LEFT COLUMN -->
+
 ```{r, pop_map_hex}
 file_path <- paste0('/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/raceincome_rda/raceincome_2023_point_hex.rda')
 load(file_path)
@@ -234,16 +245,17 @@ data_2023_hex <- data_2023_hex %>%
       na.rm = TRUE
     )
   )
-tm_basemap("OpenStreetMap", alpha = 1) +  # Added alpha for basemap transparency (0.1-1.0)
+
+tm_basemap("CartoDB.Positron", alpha = 1) +  # Added alpha for basemap transparency (0.1-1.0)
   tm_shape(data_2023_hex) +
   tm_polygons(
     col = "total",                         # Color by a variable (or use a fixed color)
-    palette = "Blues",                     # Color palette for the polygons
+    palette = "Greens",                     # Color palette for the polygons
     title = "Population",
     style = "cont",                        # Continuous gradient style
     alpha = 0.7,                          # Polygon transparency
     border.col = "white",                  # Border color
-    border.lwd = 0.2,                     # Border line width
+    border.lwd = 0.01,                     # Border line width
     colorNA = "transparent",
     textNA = ""                           # Remove "missing" text from legend
   ) +
@@ -252,29 +264,319 @@ tm_basemap("OpenStreetMap", alpha = 1) +  # Added alpha for basemap transparency
     n.y = 5,
     col = "gray70",
     lwd = 0.3,
-    labels.size = 0.8
+    labels.size = 0.3
   ) +
   tm_layout(
-    main.title = "Charlottesville Population (2023)",
+    #main.title = "Charlottesville Population (2023)",
     #main.title.position = "left",         # left-aligned like ggplot
     main.title.size = 1.6,                # ~18 pt equivalent in tmap
     main.title.fontface = "bold",         # match bold styling
-    legend.outside = FALSE,
-    legend.position = c("right", "bottom"),
-    legend.text.size = 0.4,               # Larger text for readability
-    legend.title.size = 1.0,              # Normal size title
+    legend.outside = TRUE,
+    #legend.position = c("right", "bottom"),
+    legend.text.size = 0.6,               # Larger text for readability
+    legend.title.size = 0.7,              # Normal size title
     bg.color = "transparent",
     outer.bg.color = "transparent"
   )
 ```
 
+```{=latex}
+\switchcolumn
+```
+
+<!-- RIGHT COLUMN -->
+
+\leaguegothic\textcolor{maroon}{\LARGE\textbf{Where People Live}}
+
+\lato
+
+* Charlottesville and Albemarle County are home to 145,735 people. 
+
+* The most populous county is Charlottesville. 
+
+* The most populous areas are Charlottesville City, Crozet, and Hollymead.
+
+* The region’s has a population density of 77 people per square kilometer, which is more/less dense than the national average of XX per square kilometer.
 
 
 
+```{=latex}
+\end{paracol}
+```
+
+\vspace{0.5em}
+
+```{=latex}
+\setlength{\columnsep}{20pt}
+\columnratio{0.5}
+\begin{paracol}{2}
+```
+
+<!-- LEFT COLUMN -->
+
+\leaguegothic\textcolor{maroon}{\LARGE\textbf{Population Over Time}}
+
+\lato 
+
+* The population has grown since 1999 by 64,264 people at an average growth rate of 2.45%. This is faster/slower than the national average growth rate of X.XX%.
 
 
+* Albemarle County has the highest growth rate relative to other counties in the region.
 
 
+```{=latex}
+\switchcolumn
+```
+
+```{r, pop_over_time}
+
+file_path <- paste0('/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/raceincome_rda/raceincome_long.rda')
+load(file_path)
+
+raceincome_combined <- raceincome_combined %>%
+  group_by(year) %>%
+  summarise(n_noise_postprocessed = sum(n_noise_postprocessed, na.rm = TRUE))
+
+ggplot(raceincome_combined, aes(x = year, y = n_noise_postprocessed)) +
+  geom_line(size = 1.5, alpha = 0.9) +
+  geom_point(size = 2.5, alpha = 0.9) +
+  labs(
+    x = "Year",
+    y = "Population"
+  ) +
+  scale_x_continuous(
+    breaks = seq(2000, 2020, by = 5),
+    minor_breaks = NULL,  # Remove minor grid lines
+    expand = c(0.02, 0)
+  ) +
+  scale_y_continuous(
+    labels = scales::comma_format(scale = 1e-3, suffix = "K"),
+    expand = c(0.02, 0)
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    # Plot titles
+    plot.title = element_text(
+      face = "bold", 
+      size = 16, 
+      hjust = 0,
+      margin = margin(b = 5),
+      color = "black"
+    ),
+    plot.subtitle = element_text(
+      size = 14,
+      hjust = 0,
+      margin = margin(b = 20),
+      color = "gray30"
+    ),
+    plot.caption = element_text(
+      size = 9,
+      hjust = 0,
+      margin = margin(t = 15),
+      color = "gray50",
+      lineheight = 1.1
+    ),
+    # Axes
+    axis.title = element_text(size = 12, color = "gray20"),
+    axis.text = element_text(size = 10, color = "gray30"),
+    axis.title.x = element_text(margin = margin(t = 10), size = 12),
+    axis.title.y = element_text(margin = margin(r = 10), size = 12),
+    axis.text.x = element_text(size = 10),
+    axis.text.y = element_text(size = 10),
+    # Grid
+    panel.grid.major.x = element_blank(),  # Remove vertical major grid lines
+    panel.grid.minor.x = element_blank(),  # Remove vertical minor grid lines
+    panel.grid.major = element_line(color = "gray90", size = 0.5),
+    panel.grid.minor = element_line(color = "gray95", size = 0.25),
+    panel.background = element_rect(fill = "white", color = NA),
+    # Legend
+    legend.position = "bottom",
+    legend.title = element_blank(),
+    legend.text = element_text(size = 11, color = "gray20"),
+    legend.key.width = unit(1.5, "cm"),
+    legend.margin = margin(t = 15),
+    legend.box.spacing = unit(0, "pt"),
+    # Plot margins
+    plot.margin = margin(20, 25, 15, 20),
+    # Remove plot background
+    plot.background = element_rect(fill = "white", color = NA)
+  )
+
+```
+
+```{=latex}
+\end{paracol}
+```
+
+\vspace{0.5em}
+
+```{=latex}
+\setlength{\columnsep}{20pt}
+\columnratio{0.5}
+\begin{paracol}{2}
+```
+
+```{r, dep_ratio}
+
+file_path <- '/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/ageracesex_rda/ageracesex_year_long.rda'
+load(file_path)
+data_all <- ageracesex_year_long
+
+data_all <- data_all %>%
+  filter(GEOID == "5105") %>%
+  rowwise() %>%
+  mutate(total = sum(c(M, F, NA_sex, na_sex), na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(
+    black_share = Black / total,
+    white_share = White / total,
+    hispanic_share = Hispanic / total,
+    asian_share = Asian / total,
+    male_share = M / total,
+    female_share = F / total,
+    under_18_share = under_18 / total,
+    bet_19_65_share = bet_19_65 / total,
+    over_65_share = over_65 / total,
+  )
+
+data_collapsed <- data_all %>%
+  group_by(year) %>%
+  summarise(across(
+    c(AIAN, Asian, Black, Hispanic, NA_race, White, other_race, under_18, bet_19_65, over_65, total),
+    ~ sum(.x, na.rm = TRUE)
+  )) %>%
+  mutate(
+    young_dep_ratio = under_18 / bet_19_65,
+    old_dep_ratio = over_65 / bet_19_65,
+    dep_ratio = (under_18 + over_65) / bet_19_65
+  ) %>%
+  ungroup()
+
+dep_data_long <- data_collapsed %>%
+  pivot_longer(cols = c(dep_ratio, young_dep_ratio, old_dep_ratio),
+               names_to = "type",
+               values_to = "value")
+
+ggplot(dep_data_long, aes(x = year, y = value, color = type)) +
+  geom_line(size = 1.2) +
+  scale_color_manual(
+    values = c(
+      "dep_ratio" = "black",
+      "young_dep_ratio" = "dodgerblue",
+      "old_dep_ratio" = "firebrick"
+    ),
+    labels = c(
+      "dep_ratio" = "Total Dependency Ratio",
+      "young_dep_ratio" = "Youth Dependency Ratio",
+      "old_dep_ratio" = "Old-Age Dependency Ratio"
+    )
+  ) +
+  labs(
+    x = "Year",
+    y = "Ratio",
+    color = "Type"
+  ) +
+  theme_minimal() +
+  theme(
+    # Axes
+    axis.title = element_text(size = 12, color = "gray20"),
+    axis.text = element_text(size = 10, color = "gray30"),
+    axis.title.x = element_text(margin = margin(t = 10), size = 12),
+    axis.title.y = element_text(margin = margin(r = 10), size = 12),
+    axis.text.x = element_text(size = 10),
+    axis.text.y = element_text(size = 10),
+    legend.position = "bottom",
+    plot.title = element_text(size = 14, face = "bold"),
+    panel.grid.major.x = element_blank(),  # Remove vertical major grid lines
+    panel.grid.minor.x = element_blank()   # Remove vertical minor grid lines
+  )
+
+```
+
+```{=latex}
+\switchcolumn
+```
+\leaguegothic\textcolor{maroon}{\LARGE\textbf{Dependency Ratio}}
+
+\lato 
+
+* 19% of Charlottesville’s population is under 18, 61% of the population is 19-65, and 20% of the population is over 65.
+
+* Charlottesville has a lower share of people under 18 and 19-65 than the US. Charlottesville has a higher share of people over 65 than the US. 
+
+* The region’s total dependency ratio is the ratio of the non-working age population to the working age population. It can be separated into the elderly ratio and the youth ratio, which add to the total ratio.
+
+* Charlottesville’s total dependency ratio is 0.64. It has increased in recent years, driven by the elderly.
+
+```{=latex}
+\end{paracol}
+```
+\newpage
+
+```{r, race_map}
+race_columns <- c("race_ethnicity_AIAN", "race_ethnicity_Asian", "race_ethnicity_Black", "race_ethnicity_Hispanic", "race_ethnicity_White")
 
 
+data_race_long <- data_2023_hex %>%
+    select(hex_id, geometry, all_of(race_columns)) %>%
+    mutate(across(all_of(race_columns), as.numeric)) %>%
+    pivot_longer(
+      cols = all_of(race_columns),
+      names_to = "race_ethnicity",
+      values_to = "population"
+    ) %>%
+    # Clean up race labels for better display
+    mutate(
+      race_ethnicity = case_when(
+        race_ethnicity == "race_ethnicity_AIAN" ~ "American Indian/Alaska Native",
+        race_ethnicity == "race_ethnicity_Asian" ~ "Asian",
+        race_ethnicity == "race_ethnicity_Black" ~ "Black/African American",
+        race_ethnicity == "race_ethnicity_Hispanic" ~ "Hispanic/Latino",
+        race_ethnicity == "race_ethnicity_White" ~ "White",
+        TRUE ~ race_ethnicity
+      )
+    )
+
+race_map <- tm_basemap("OpenStreetMap", alpha = 0.3) +
+    tm_shape(data_race_long) +
+    tm_polygons(
+      col = "population",
+      palette = "Blues",
+      title = "",  # Remove legend title
+      style = "cont",
+      alpha = 0.8,
+      border.col = "white",
+      border.lwd = 0.1,
+      colorNA = "transparent",
+      textNA = "",
+      legend.show = TRUE,  # Enable individual legends
+      fill.free = TRUE
+    ) +
+    tm_facets(
+      by = "race_ethnicity",
+      nrow = 2,
+      ncol = 3,
+      free.coords = FALSE,
+      showNA = FALSE
+    ) +
+    tm_layout(
+      title = "",  # Main title restored
+      title.size = 1.2,
+      title.position = c("center", "top"),
+      panel.labels = c("AIAN", "Asian", "Black", "Hispanic", "White"),
+      panel.label.size = 1.0,
+      panel.label.fontface = "bold",
+      legend.outside = TRUE,  # Keep legends inside each panel
+      legend.position = c("right", "bottom"),  # Position within each panel
+      legend.text.size = 0.25,
+      legend.height = 16,  # Fixed legend height for consistency
+      legend.width = 4,   # Fixed legend width for consistency
+      bg.color = "transparent",
+      outer.bg.color = "transparent",
+      between.margin = 0.5
+    )
+
+race_map
+
+```
 

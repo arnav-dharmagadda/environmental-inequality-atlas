@@ -125,7 +125,7 @@ ageracesex_combined <- ageracesex_combined %>%
 # Reshape for ageracesex variables
 
 ageracesex_wide <- ageracesex_combined %>%
-  select(year, grid_lon, grid_lat, STATEFP, COUNTYFP, GEOID, NAME, race_age_sex, n_noise_postprocessed) %>%
+  select(year, grid_lon, grid_lat, STATEFP, GEOID, NAMELSAD, race_age_sex, n_noise_postprocessed) %>%
   pivot_wider(
     names_from = race_age_sex,
     values_from = n_noise_postprocessed

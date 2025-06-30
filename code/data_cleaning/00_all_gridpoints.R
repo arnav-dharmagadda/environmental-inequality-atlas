@@ -14,7 +14,7 @@
 nc_file_path <- paste0(data_path, "V6GL02.03.CNNPM25.NA.202301-202312.nc")
 
 # Shapefile path
-shapefile_path <- paste0(data_path, "cb_2024_us_county_500k/cb_2024_us_county_500k.shp")
+shapefile_cd_path <- paste0(data_path, "cb_2024_us_cd119_500k/cb_2024_us_cd119_500k.shp")
 
 # Output path for gridpoints
 gridpoints_output_path <- paste0(data_path, "gridpoints_with_county_2024.rda")
@@ -208,13 +208,14 @@ if (nrow(gridpoints) > 1000000) {
   # Or use geographic filter for study area (Charlottesville/Albemarle region):
   gridpoints <- gridpoints %>%
     filter(
-      grid_lat >= 37.6 & grid_lat <= 38.6,
-      grid_lon >= -78.9 & grid_lon <= -78.0
+      #grid_lat >= 37.6 & grid_lat <= 38.6,
+      #grid_lon >= -78.9 & grid_lon <= -78.0
     )
   cat("After geographic filtering:", nrow(gridpoints), "points remaining\n")
 }
 
-shapefile <- st_read(shapefile_path)
+# Read both shapefiles
+shapefile <- st_read(shapefile_cd_path)
 
 # Performance optimization: Check if CRS transformation is actually needed
 cat("Shapefile CRS:", st_crs(shapefile)$input, "\n")

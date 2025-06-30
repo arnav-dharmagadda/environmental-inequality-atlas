@@ -13,7 +13,7 @@
 
 #### Define Functions ####
 
-process_rda_to_hex_grid <- function(file_path, lon_col = "grid_lon", lat_col = "grid_lat", hex_cellsize = 0.01, filter_to_counties = TRUE) {
+process_rda_to_hex_grid <- function(file_path, lon_col = "grid_lon", lat_col = "grid_lat", hex_cellsize = 0.05, filter_to_counties = TRUE) {
   
   # Step 1: Load the .rda file
   env <- new.env()
@@ -36,10 +36,10 @@ process_rda_to_hex_grid <- function(file_path, lon_col = "grid_lon", lat_col = "
     mutate(hex_id = row_number()) # Add a unique ID to each hexagon
   
   # Optional: Filter hexagons to county area using existing county data
-  if (filter_to_counties && "COUNTYFP" %in% colnames(df) && "STATEFP" %in% colnames(df)) {
+  if (filter_to_counties && "GEOID" %in% colnames(df) && "STATEFP" %in% colnames(df)) {
     # Create a boundary from the county points (convex hull)
     county_points <- df %>%
-      filter(STATEFP == "51" & (COUNTYFP == "003" | COUNTYFP == "540")) %>%
+      filter(STATEFP == "51" & (GEOID == "5105")) %>%
       dplyr::select(all_of(c(lon_col, lat_col))) %>%
       distinct()
     
@@ -86,16 +86,15 @@ process_rda_to_hex_grid <- function(file_path, lon_col = "grid_lon", lat_col = "
       # any_of() will not throw an error if a column is not found.
       # This correctly handles `hex_id` being a grouping variable.
       across(
-        c(where(is.numeric), -any_of(c(lon_col, lat_col, "hex_id", "COUNTYFP", "STATEFP", "GEOID", "name"))),
+        c(where(is.numeric), -any_of(c(lon_col, lat_col, "hex_id", "STATEFP", "GEOID", "name"))),
         ~if(all(is.na(.))) NA_real_ else sum(., na.rm = TRUE),
         .names = "{.col}"
       ),
       # The rest of the summary remains the same
       grid_lon = first(grid_lon),
       grid_lat = first(grid_lat),
-      COUNTYFP = first(COUNTYFP),
       STATEFP = first(STATEFP),
-      name = first(NAME),
+      name = first(NAMELSAD),
       GEOID = first(GEOID),
       n_points = n(),
       .groups = "drop" # Use .groups = "drop" to automatically ungroup
@@ -111,7 +110,6 @@ process_rda_to_hex_grid <- function(file_path, lon_col = "grid_lon", lat_col = "
       # For character columns that should have values, use appropriate defaults
       grid_lon = ifelse(is.na(grid_lon), st_coordinates(st_centroid(geometry))[,1], grid_lon),
       grid_lat = ifelse(is.na(grid_lat), st_coordinates(st_centroid(geometry))[,2], grid_lat),
-      COUNTYFP = ifelse(is.na(COUNTYFP), "unknown", COUNTYFP),
       STATEFP = ifelse(is.na(STATEFP), "unknown", STATEFP),
       name = ifelse(is.na(name), "unknown", name),
       GEOID = ifelse(is.na(GEOID), "unknown", GEOID),
