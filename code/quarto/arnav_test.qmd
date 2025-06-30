@@ -280,6 +280,8 @@ tm_basemap("CartoDB.Positron", alpha = 1) +  # Added alpha for basemap transpare
   )
 ```
 
+```
+
 ```{=latex}
 \switchcolumn
 ```
