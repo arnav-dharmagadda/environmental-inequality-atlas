@@ -55,7 +55,7 @@ execute:
   bottom=8pt
 ]
 \centering
-{\leaguegothic\textcolor{maroon}{\textbf{\huge Charlottesville \& Albemarle County}}}
+{\leaguegothic\textcolor{maroon}{\textbf{\Huge Virginia's 5th Congressional District}}}
 \end{tcolorbox}
 ```
 
@@ -120,14 +120,19 @@ suppress_all_output <- function(expr) {
   })
   invisible(force(expr))
 }
-va_counties <- suppress_all_output({
-  counties(state = "51", cb = TRUE, class = "sf")
+
+# Get congressional districts for Virginia (state FIPS = 51)
+va_cd <- suppress_all_output({
+  congressional_districts(state = "51", cb = TRUE, class = "sf")
 })
-highlighted <- va_counties %>%
-  filter(COUNTYFP %in% c("003", "540"))
+
+# Filter to the 5th district
+va_cd_5th <- va_cd %>%
+  filter(CD119FP == "05") 
+# Plot
 ggplot() +
-  geom_sf(data = va_counties, fill = "grey90", color = "black") +
-  geom_sf(data = highlighted, fill = "#601215", color = "black", size = 0.6) +
+  geom_sf(data = va_cd, fill = "grey90", color = "black") +
+  geom_sf(data = va_cd_5th, fill = "#601215", color = "black", size = 0.6) +
   theme_void() +
   theme(
     panel.background = element_rect(fill = "white", colour = NA),
@@ -218,7 +223,7 @@ The Environmental Inequality Lab is a nonpartisan research group that applies a 
 \leaguegothic\textcolor{maroon}{\huge\textbf{Understanding Charlottesville's Population}}
 
 ```{r, pop_map_hex}
-file_path <- paste0('/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/raceincome_rda/raceincome_2024_point_hex.rda')
+file_path <- paste0('/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/raceincome_rda/raceincome_2023_point_hex.rda')
 load(file_path)
 data_2023_hex <- people_points_sf
 data_2023_hex <- data_2023_hex %>%
