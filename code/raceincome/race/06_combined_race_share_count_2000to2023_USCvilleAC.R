@@ -1,13 +1,13 @@
 ################################################################################
-# FILE: 06_combined_race_share_count_1999to2023_USCvilleAC.R
-# PURPOSE: Use gridded EIF data for race/income from 1999 to 2023 to generate 
+# FILE: 06_combined_race_share_count_2000to2023_USCvilleAC.R
+# PURPOSE: Use gridded EIF data for race/income from 2000 to 2023 to generate 
 # one table with columns race/ethnicity, 2023 population counts, trend in count,
 # race shares, shares trend, and U.S. shares trend in the form of a sparkline.
 # AUTHOR: Elizabeth Shiker
 # CREATED: June 26th, 2025
 ################################################################################
 # INPUTS: raceincome_year.rda
-# OUTPUTS: race_combined_count_share_1999to2023_USCvilleAC.html
+# OUTPUTS: race_combined_count_share_2000to2023_USCvilleAC.html
 ################################################################################
 
 # Install and load required packages
@@ -20,7 +20,9 @@ install.packages("purrr")
 install.packages("scales")
 install.packages("arrow")
 install.packages("sf")
+install.packages("webshot2")
 
+library(webshot2)
 library(dplyr)
 library(tidyr)
 library(purrr)
@@ -34,7 +36,7 @@ library(sf)
 ##### Creating U.S. Data Set #####
 
 # Define the range of years and paths
-years <- 1999:2023
+years <- 2000:2023
 base_path <- "/Users/elizabethshiker/The Lab Dropbox/Elizabeth Shiker/gridded_eif_data/raceincome/"
 output_path <- "/Users/elizabethshiker/The Lab Dropbox/Elizabeth Shiker/GitHub/environmental-inequality-atlas/data/processed/raceincome_rda/raceincome_national.rda"
 
@@ -79,7 +81,7 @@ race_share_wide_natl <- race_share_long_natl %>%
 setwd("/Users/elizabethshiker/The Lab Dropbox/Elizabeth Shiker/GitHub/environmental-inequality-atlas/")
 
 # Define years and data path
-years <- 1999:2023
+years <- 2000:2023
 data_path <- "data/processed/raceincome_rda"
 
 ### Step 1: Load and calculate share trends ###
@@ -180,7 +182,7 @@ htmltools::save_html(
       ),
       
       Count_Trend = colDef(
-        name = "Count Trend (1999–2023)",
+        name = "Count Trend (2000–2023)",
         cell = function(values) {
           n <- length(values)
           left_label <- formatC(values[1], format = "f", big.mark = ",", digits = 0)
@@ -228,7 +230,7 @@ htmltools::save_html(
       ),
       
       Share_Trend = colDef(
-        name = "Share Trend (1999–2023)",
+        name = "Share Trend (2000–2023)",
         cell = function(values) {
           n <- length(values)
           left_label <- percent(values[1], accuracy = 0.1)
@@ -270,7 +272,7 @@ htmltools::save_html(
       ),
       
       US_Share_Trend = colDef(
-        name = "US Share Trend (1999–2023)",
+        name = "US Share Trend (2000–2023)",
         cell = function(values) {
           n <- length(values)
           left_label <- percent(values[1], accuracy = 0.1)
@@ -316,9 +318,7 @@ htmltools::save_html(
     highlight = TRUE,
     compact = TRUE
   ),
-  file = "output/raceincome/race/race_combined_count_share_1999to2023_USCvilleAC.html"
+  file = "output/raceincome/race/race_combined_count_share_2000to2023_USCvilleAC.html"
 )
 
-install.packages("webshot2")
-library(webshot2)
-webshot("output/raceincome/race/race_combined_count_share_1999to2023_USCvilleAC.html", "output/raceincome/race/race_table_with_sparklines.png", vwidth = 1200, vheight = 800)
+webshot("output/raceincome/race/race_combined_count_share_2000to2023_USCvilleAC.html", "output/raceincome/race/race_table_with_sparklines.png", vwidth = 1200, vheight = 800)
