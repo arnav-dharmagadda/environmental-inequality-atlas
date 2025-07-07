@@ -58,8 +58,9 @@ combined_prop <- combined_summary %>%
 combined_prop$race <- factor(combined_prop$race, levels = c("White", "Black", "Hispanic", "Asian", "AIAN"))
 tk <- ggplot(combined_prop, aes(x = factor(decile), y = share, fill = region)) +
   geom_col(position = position_dodge(width = 1), width = 1) +
-  facet_wrap(~ race, scales = "fixed") +
+  facet_wrap(~ race, scales = "fixed", ncol = 3) +  # 3 columns: bottom row has 2 facets, so empty space on bottom right
   scale_fill_manual(values = c("United States" = "orange", "Charlottesville/Albemarle" = "#232d4b")) +
+  scale_y_continuous(labels = percent_format(accuracy = 1)) +
   labs(
     title = "Income Decile Share by Race: U.S. vs. Charlottesville/Albemarle (2023)",
     x = "Income Decile",
@@ -69,9 +70,13 @@ tk <- ggplot(combined_prop, aes(x = factor(decile), y = share, fill = region)) +
   theme_minimal() +
   theme(
     panel.background = element_rect(fill = "white", color = NA),
-    plot.background = element_rect(fill = "white", color = NA)
+    plot.background = element_rect(fill = "white", color = NA),
+    legend.position = c(0.99, 0.05),  # bottom right inside plot area (x, y in [0,1])
+    legend.justification = c(1, 0),   # align legend's top right to (0.95, 0.05)
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank()
   )
-ggsave("output/raceincome/Income Decile Share by Race: U.S. vs. CharlottesvilleAlbemarle orange blue.png", plot = tk, width = 7, height = 4)
+ggsave("Github/environmental-inequality-atlas/output/raceincome/Income Decile Share by Race: U.S. vs. CharlottesvilleAlbemarle orange blue.png", plot = tk, width = 7, height = 4)
 
 
 us_data <- combined_prop %>% filter(region == "United States") %>% mutate(alpha = 0.5)
@@ -98,7 +103,7 @@ tj <- ggplot() +
     panel.background = element_rect(fill = "white", color = NA),
     plot.background = element_rect(fill = "white", color = NA)
   )
-ggsave("output/raceincome/Income Decile Share by Race: U.S. vs. CharlottesvilleAlbemarle.png", plot = tj, width = 6, height = 4)
+ggsave("Github/environmental-inequality-atlas/output/raceincome/Income Decile Share by Race: U.S. vs. CharlottesvilleAlbemarle.png", plot = tj, width = 6, height = 4)
 
 #average income by race
 
@@ -124,7 +129,7 @@ ty <- ggplot(avg_decile_by_race, aes(x = race, y = avg_decile, fill = region)) +
     plot.background = element_rect(fill = "white", color = NA),
     axis.text.x = element_text(angle = 30, hjust = 1)
   )
-ggsave("output/raceincome/Average Income Decile by Race: U.S. vs. CharlottesvilleAlbemarle.png", plot = ty, width = 6, height = 4)
+ggsave("Github/environmental-inequality-atlas/output/raceincome/Average Income Decile by Race: U.S. vs. CharlottesvilleAlbemarle.png", plot = ty, width = 6, height = 4)
 
 #average decile
 avg_decile <- combined_summary %>%
@@ -149,7 +154,7 @@ tw <- ggplot(avg_decile, aes(x = region, y = avg_decile, fill = region)) +
     plot.background = element_rect(fill = "white", color = NA),
     axis.text.x = element_text(angle = 30, hjust = 1)
   )
-ggsave("output/raceincome/Average Income Decile: U.S. vs. CharlottesvilleAlbemarle.png", plot = tw, width = 6, height = 4)
+ggsave("Github/environmental-inequality-atlas/output/raceincome/Average Income Decile: U.S. vs. CharlottesvilleAlbemarle.png", plot = tw, width = 6, height = 4)
 
 #graph just deciles
 
@@ -173,33 +178,87 @@ decile_prop <- decile_summary %>%
   group_by(region) %>%
   mutate(share = total_count / sum(total_count)) %>%
   ungroup()
+View(decile_prop)
 
-qq <- ggplot(decile_prop, aes(x = factor(decile))) +
-  # Bars for Charlottesville/Albemarle
+top2cville <- decile_prop %>%
+  filter(region == "Charlottesville/Albemarle", decile %in% c(9, 10)) %>%
+  summarise(
+    top2cville = sum (share)
+  )
+View(top2cville)
+
+qq <- ggplot(decile_prop %>% filter(region == "Charlottesville/Albemarle"),
+             aes(x = factor(decile), y = share)) +
+  
   geom_col(
-    data = decile_prop %>% filter(region == "Charlottesville/Albemarle"),
-    aes(y = share, fill = region),
+    fill = "#232d4b",
     width = 0.9
   ) +
-  # Horizontal lines for U.S.
+  
+  # Horizontal dotted lines for U.S.
   geom_hline(
     data = decile_prop %>% filter(region == "United States"),
-    aes(yintercept = share, color = region),
-    linewidth = 1
+    aes(yintercept = share),
+    color = "#FFA500",
+    linewidth = 1,
+    linetype = "dotted"
   ) +
-  scale_fill_manual(values = c("Charlottesville/Albemarle" = "#232d4b")) +
-  scale_color_manual(values = c("United States" = "#FFA500")) +
+  
+  # Annotation with arrow to dotted line
+  annotate(
+    "text",
+    x = 10,
+    y = decile_prop %>% filter(region == "United States", decile == 10) %>% pull(share),
+    label = "U.S. Decile Distribution",
+    color = "#FFA500",
+    hjust = 3,
+    vjust = -2,
+    fontface = "bold"
+  ) +
+  annotate(
+    "segment",
+    x = 3,
+    xend = 3,
+    y = decile_prop %>% filter(region == "United States", decile == 10) %>% pull(share) * 1.1,
+    yend = decile_prop %>% filter(region == "United States", decile == 10) %>% pull(share) *1.03,
+    color = "#FFA500"
+  ) +
+  
+  # Annotation with arrow to bars
+  annotate(
+    "text",
+    x = 9.5,
+    y = decile_prop %>% filter(region == "Charlottesville/Albemarle", decile == 1) %>% pull(share) * 1.3,
+    label = "Charlottesville/Albemarle",
+    color = "#232d4b",
+    hjust = 1,
+    vjust = -4,
+    fontface = "bold"
+  ) +
+  annotate(
+    "segment",
+    x = 8,
+    xend = 8,
+    y = decile_prop %>% filter(region == "Charlottesville/Albemarle", decile == 1) %>% pull(share) * 1.52,
+    yend = decile_prop %>% filter(region == "Charlottesville/Albemarle", decile == 1) %>% pull(share) * 1.13,
+    color = "#232d4b"
+   
+  ) +
+  
+  # Labels and themes
   labs(
     title = "Income Decile Distribution: U.S. vs. Charlottesville/Albemarle",
     x = "Income Decile",
-    y = "Share of Total Population",
-    fill = "Region",
-    color = "Region"
+    y = "Share of Total Population"
   ) +
+  scale_y_continuous(labels = percent_format(accuracy = 1)) +
   theme_minimal() +
   theme(
     panel.background = element_rect(fill = "white", color = NA),
-    plot.background = element_rect(fill = "white", color = NA)
+    plot.background = element_rect(fill = "white", color = NA),
+    legend.position = "none",
+    panel.grid.major.x = element_blank(),  # removes vertical gridlines
+    panel.grid.minor.x = element_blank()
   )
-ggsave("output/raceincome/Income Decile Distribution: U.S. vs. CharlottesvilleAlbemarle.png", plot = qq, width = 6, height = 4)
+ggsave("Github/environmental-inequality-atlas/output/raceincome/Income Decile Distribution: U.S. vs. CharlottesvilleAlbemarle.png", plot = qq, width = 7, height = 4)
 
