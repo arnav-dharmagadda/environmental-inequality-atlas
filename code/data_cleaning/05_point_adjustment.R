@@ -99,6 +99,9 @@ all_rda_files <- unlist(lapply(folders, function(dir) {
 
 file_paths <- all_rda_files[!grepl("_hex\\.rda$", all_rda_files) & !grepl("^nat_", basename(all_rda_files)) & !grepl("_point\\.rda$", all_rda_files) & !grepl("_with_hex_id\\.rda$", all_rda_files)]
 
+#file_paths <- '/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/raceincome_rda/raceincome_2024.rda'
+#file_paths <- '/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/ageracesex_rda/ageracesex_2024.rda'
+
 # Run the processing function on each file
 walk(file_paths, generate_people_points_from_file)
 

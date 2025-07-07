@@ -12,7 +12,7 @@
 #### DEFINE A FUNCTION ####
 
 # Function to process and overwrite an .rda file
-process_rda_file <- function(file_path, lon_col = "grid_lon", lat_col = "grid_lat", cellsize = 0.01) {
+process_rda_file <- function(file_path, lon_col = "grid_lon", lat_col = "grid_lat", cellsize = 0.01, filter_to_counties = TRUE) {
   # Step 0: Load the .rda file (assumes it contains ONE object, e.g., "race_2023")
   env <- new.env()
   load(file_path, envir = env)
@@ -43,6 +43,26 @@ process_rda_file <- function(file_path, lon_col = "grid_lon", lat_col = "grid_la
   # Step 4: Convert grid to sf
   grid_sf <- st_sf(geometry = grid_polygons)
   
+  # Optional: Filter grid to county area using existing county data (convex hull)
+  if (filter_to_counties && "COUNTYFP" %in% colnames(df) && "STATEFP" %in% colnames(df)) {
+    # Create a boundary from the county points (convex hull)
+    county_points <- df %>%
+      filter(STATEFP == "51" & (COUNTYFP == "003" | COUNTYFP == "540")) %>%
+      dplyr::select(all_of(c(lon_col, lat_col))) %>%
+      distinct()
+    
+    if (nrow(county_points) > 0) {
+      # Convert county points to sf and create convex hull
+      county_points_sf <- st_as_sf(county_points, coords = c(lon_col, lat_col), crs = 4326)
+      county_boundary <- st_convex_hull(st_union(county_points_sf))
+      
+      # Keep only grid cells that intersect with the county boundary
+      grid_sf <- st_filter(grid_sf, county_boundary, .predicate = st_intersects)
+      
+      message("Filtered grid to ", nrow(grid_sf), " cells within Charlottesville/Albemarle area")
+    }
+  }
+  
   # Step 5: Spatial join
   df_gridded <- st_join(grid_sf, df_sf, join = st_contains)
   
@@ -72,6 +92,10 @@ all_rda_files <- list.files(processed_path, pattern = "\\.rda$", full.names = TR
 
 # Filter to exclude files ending in "_hex.rda"
 file_paths <- all_rda_files[!grepl("_hex\\.rda$", all_rda_files) & !grepl("^nat_", basename(all_rda_files)) & !grepl("_point\\.rda$", all_rda_files) & !grepl("_point_with_hex_id\\.rda$", all_rda_files)]
+
+#file_paths <- '/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/raceincome_rda/raceincome_2024.rda'
+#file_paths <- '/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/ageracesex_rda/ageracesex_2024.rda'
+
 
 walk(file_paths, process_rda_file)
 
