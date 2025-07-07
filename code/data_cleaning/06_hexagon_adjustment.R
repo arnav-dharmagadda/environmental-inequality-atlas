@@ -39,7 +39,7 @@ process_rda_to_hex_grid <- function(file_path, lon_col = "grid_lon", lat_col = "
   if (filter_to_counties && "COUNTYFP" %in% colnames(df) && "STATEFP" %in% colnames(df)) {
     # Create a boundary from the county points (convex hull)
     county_points <- df %>%
-      filter(STATEFP == "51" & (COUNTYFP == "003" | COUNTYFP == "540")) %>%
+      filter(STATEFP == "51" & (COUNTYFP == "540" | COUNTYFP == "003")) %>%
       dplyr::select(all_of(c(lon_col, lat_col))) %>%
       distinct()
     
@@ -86,15 +86,15 @@ process_rda_to_hex_grid <- function(file_path, lon_col = "grid_lon", lat_col = "
       # any_of() will not throw an error if a column is not found.
       # This correctly handles `hex_id` being a grouping variable.
       across(
-        c(where(is.numeric), -any_of(c(lon_col, lat_col, "hex_id", "COUNTYFP", "STATEFP", "GEOID", "name"))),
+        c(where(is.numeric), -any_of(c(lon_col, lat_col, "hex_id", "STATEFP", "GEOID", "name"))),
         ~if(all(is.na(.))) NA_real_ else sum(., na.rm = TRUE),
         .names = "{.col}"
       ),
       # The rest of the summary remains the same
       grid_lon = first(grid_lon),
       grid_lat = first(grid_lat),
-      COUNTYFP = first(COUNTYFP),
       STATEFP = first(STATEFP),
+      COUNTYFP = first(COUNTYFP),
       name = first(NAME),
       GEOID = first(GEOID),
       n_points = n(),
@@ -111,7 +111,6 @@ process_rda_to_hex_grid <- function(file_path, lon_col = "grid_lon", lat_col = "
       # For character columns that should have values, use appropriate defaults
       grid_lon = ifelse(is.na(grid_lon), st_coordinates(st_centroid(geometry))[,1], grid_lon),
       grid_lat = ifelse(is.na(grid_lat), st_coordinates(st_centroid(geometry))[,2], grid_lat),
-      COUNTYFP = ifelse(is.na(COUNTYFP), "unknown", COUNTYFP),
       STATEFP = ifelse(is.na(STATEFP), "unknown", STATEFP),
       name = ifelse(is.na(name), "unknown", name),
       GEOID = ifelse(is.na(GEOID), "unknown", GEOID),
@@ -143,6 +142,9 @@ all_rda_files <- unlist(lapply(folders, function(dir) {
 }))
 
 file_paths <- all_rda_files[!grepl("_hex\\.rda$", all_rda_files) & !grepl("^nat_", basename(all_rda_files)) & !grepl("_with_hex_id\\.rda$", basename(all_rda_files))]
+
+#file_paths <- '/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/raceincome_rda/raceincome_2024_point.rda'
+#file_paths <- '/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/ageracesex_rda/ageracesex_2024_point.rda'
 
 # Run the processing function on each file with county filtering enabled
 walk(file_paths, ~ process_rda_to_hex_grid(.x, filter_to_counties = TRUE))

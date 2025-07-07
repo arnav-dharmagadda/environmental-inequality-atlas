@@ -22,19 +22,20 @@ pacman::p_load(sf, terra, dplyr, ggplot2, tmap, arrow, dplyr, tidyr, scales, hav
 setwd("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/")
 
 rda_path_ri <- "data/processed/raceincome_rda/"
+rda_path_ars <- "data/processed/ageracesex_rda/"
 
 output_path <- "output/overview/"
 
 #### Import data and clean ####
 
-file_path <- paste0(rda_path_ri, "raceincome_2023_point_hex.rda")
+file_path <- paste0(rda_path_ri, "raceincome_2024_point_hex.rda")
 load(file_path)
 data_2023_hex <- people_points_sf
 
-file_path <- paste0(rda_path_ri, "raceincome_2023_point.rda")
+file_path <- paste0(rda_path_ri, "raceincome_2024_point.rda")
 load(file_path)
 
-file_path <- paste0(rda_path_ri, "raceincome_2023.rda")
+file_path <- paste0(rda_path_ri, "raceincome_2024.rda")
 load(file_path)
 data_2023 <- merged_year
 
@@ -293,7 +294,7 @@ ggsave(
 
 # Get population values
 pop_vals <- raceincome_combined %>%
-  filter(year %in% c(1999, 2023)) %>%
+  filter(year %in% c(2000, 2024)) %>%
   arrange(year)
 
 # Calculate CAGR
@@ -312,7 +313,7 @@ cat("Population change from 1999 to 2023:", format(round(pop_final - pop_initial
 #### Calculate population density ####
 
 pop_density_2023 <- raceincome_combined %>%
-  filter(year == 2023)
+  filter(year == 2024)
 
 # Compute population density (people per square kilometer)
 pop_density_2023 <- pop_density_2023$n_noise_postprocessed / (pop_density_2023$total_ALAND / 1e6)
@@ -445,4 +446,39 @@ if (length(race_columns) > 0) {
 } else {
   cat("No valid race columns found in the data.\n")
 }
+
+parquet_path <- paste0(data_path, "ageracesex/gridded_eif_pop_ageracesex_", year, ".parquet")
+ageracesex_year <- read_parquet(parquet_path)
+
+#### Calculate Age Group Shares ####
+
+# Collapse data by age group and calculate shares
+age_group_shares <- ageracesex_year %>%
+  group_by(age_group) %>%
+  summarise(
+    population = sum(n_noise_postprocessed, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    total_population = sum(population),
+    share = population / total_population,
+    percent = share * 100
+  ) %>%
+  arrange(desc(population))
+
+# Print the results
+cat("Age Group Population Shares:\n")
+print(age_group_shares)
+
+# Create a summary table with formatted percentages
+age_summary <- age_group_shares %>%
+  select(age_group, population, percent) %>%
+  mutate(
+    population_formatted = scales::comma(population),
+    percent_formatted = paste0(round(percent, 1), "%")
+  )
+
+cat("\nFormatted Summary:\n")
+print(age_summary)
+
 
