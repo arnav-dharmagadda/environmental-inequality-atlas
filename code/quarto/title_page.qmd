@@ -1,0 +1,240 @@
+---
+format:
+  pdf:
+    documentclass: article
+    pdf-engine: xelatex  # Required for system fonts
+    geometry:
+      - top=0.5in
+      - bottom=0.5in
+      - left=0.5in
+      - right=0.5in
+    fontsize: 11pt
+    colorlinks: true
+    fig-pos: 'H'
+    mainfont: "Lato"  # Main body text font
+    include-in-header:
+      text: |
+        \newcommand{\districtname}{District 5}
+        \usepackage{multicol}
+        \usepackage{paracol}
+        \usepackage{xcolor}
+        \usepackage{tcolorbox}
+        \usepackage{graphicx}
+        \usepackage{url}
+        \usepackage{float}
+        \usepackage{hyperref}
+        \definecolor{maroon}{RGB}{128,0,0}
+        \definecolor{custommaroon}{HTML}{601215}
+        \definecolor{eilblue}{HTML}{003F5C}
+        \hypersetup{urlcolor=eilblue}
+        \usepackage{fontspec}
+        \usepackage{datetime}
+        \newfontfamily\leaguegothic{League Gothic}
+        \newfontfamily\lato{Lato}
+        % Suppress page numbers
+        \pagestyle{empty}
+        \usepackage[none]{hyphenat}
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+<!-- Header Logo App -->
+```{=latex}
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{brief_title_logo.png}
+\end{figure}
+```
+
+<!-- Location Box -->
+```{=latex}
+\begin{tcolorbox}[
+  colback=white,
+  colframe=custommaroon,
+  width=\textwidth,
+  arc=0mm,
+  boxrule=2pt,
+  left=10pt,
+  right=10pt,
+  top=8pt,
+  bottom=8pt
+]
+\centering
+{\leaguegothic\textcolor{custommaroon}{\textbf{\Huge CHARLOTTESVILLE CITY \& ALBEMARLE COUNTY}}}
+\end{tcolorbox}
+```
+
+\vspace{0.3cm}
+
+```{r setup}
+#| include: false
+library(knitr)
+library(ggplot2)
+library(dplyr)
+
+# Set figure defaults
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.height = 4,
+  dpi = 300,
+  out.width = "100%"
+)
+
+# Set file paths (use relative paths instead of setwd)
+data_path <- "/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/gridded_eif_data/"
+git_path <- "/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/"
+
+# Load packages
+
+if (!requireNamespace("pacman", quietly = TRUE)) {
+  install.packages("pacman")
+}
+
+pacman::p_load(ncdf4, sf, terra, dplyr, ggplot2, tmap, arrow, dplyr, tidyr, scales, haven, stringr, purrr, tigris)
+
+```
+
+```{=latex}
+\setlength{\columnsep}{20pt}
+\columnratio{0.6}
+\begin{paracol}{2}
+```
+
+<!-- LEFT COLUMN -->
+
+```{r locator}
+#| warning: false
+#| message: false
+
+#### Load Data ####
+
+options(tigris_progress = FALSE)
+options(tidycensus_progress = FALSE)
+suppress_all_output <- function(expr) {
+  out_con <- file(tempfile(), open = "wt")
+  msg_con <- file(tempfile(), open = "wt")
+  sink(out_con)
+  sink(msg_con, type = "message")
+  on.exit({
+    sink(type = "message")
+    sink()
+    close(out_con)
+    close(msg_con)
+  })
+  invisible(force(expr))
+}
+
+# Get congressional districts for Virginia (state FIPS = 51)
+va_counties <- suppress_all_output({
+  counties(state = "51", cb = TRUE, class = "sf")
+})
+
+# Filter to the 5th district
+va_counties_plot <- va_counties %>%
+  filter(COUNTYFP == "003" | COUNTYFP == "540") 
+# Plot
+ggplot() +
+  geom_sf(data = va_counties, fill = "grey90", color = "black") +
+  geom_sf(data = va_counties_plot, fill = "#601215", color = "black", size = 0.6) +
+  theme_void() +
+  theme(
+    panel.background = element_rect(fill = "white", colour = NA),
+    plot.background = element_rect(fill = "white", colour = NA),
+    plot.margin = unit(c(0, 0, 0, 0), "cm")
+  )
+```
+
+\begin{center}
+\lato\textcolor{black}{\footnotesize\textbf{Map of Charlottesville \& Albemarle County}}
+\end{center}
+
+\vspace{0.25em}
+
+\lato\textcolor{custommaroon}{\large\textbf{About This Analysis}}
+
+\lato This brief provides an unprecedented view of demographic and economic patterns and trends for Albemarle County and Charlottesville City using the  most detailed publicly available Census data. The analysis provides local leaders, residents, and service-providers with data-driven insights to provide context and facilitate planning, resource allocation, and investment
+
+\vspace{1em}
+
+\lato\textcolor{custommaroon}{\large\textbf{Data Source}}
+
+\lato The Gridded Environmental Impacts Frame (Gridded EIF) is an innovative, privacy-protected dataset derived from the Census Bureau's confidential Environmental Impacts Frame (EIF) microdata. Organized on a fixed 0.01$^{\circ}$ x 0.01$^{\circ}$ grid (approximately 1km$^\text{2}$ x 1km$^\text{2}$), the Gridded EIF provides population counts by age, sex, race and ethnicity, as well as race-specific population counts by household income decile from administrative tax records. This structure enables more spatially precise analysis than traditional place-based data while maintaining strict confidentiality standards.
+
+
+```{=latex}
+\definecolor{customurl}{HTML}{003F5C}
+\hypersetup{urlcolor=customurl}
+```
+
+Estimates reflect the most detailed available data on the local population, though some figures may understate true counts. Please see \href{https://www.census.gov/data/experimental-data-products/gridded-eif.html}{here} for more information about the data. 
+
+
+```{=latex}
+\switchcolumn
+```
+
+<!-- RIGHT COLUMN -->
+
+\lato\textcolor{custommaroon}{\large\textbf{Key Findings}}
+
+\lato \textbf{Population Growth \& Demographics}: Between 2000 and 2024, Charlottesville and Albemarle County have experienced population growth of 47,506 residents, alongside notable changes in the age distribution and racial composition.
+
+\vspace{0.5em}
+
+\lato \textbf{Income Distribution}: In 2024, 30% of the region's population falls within 
+the top two national income deciles, with substantial variation across and 
+within racial and ethnic groups compared to national income distributions.
+
+\vspace{0.5em}
+
+\lato \textbf{Aging Population}: Charlottesville's over 65 population is increasing over time, creating new demands for age-appropriate services and infrastructure.
+
+\vspace{0.5em}
+
+```{=latex}
+\begin{tcolorbox}[
+  colback=custommaroon,
+  colframe=custommaroon,
+  boxrule=0pt,
+  arc=0pt,
+  left=12pt, right=12pt, top=10pt, bottom=10pt
+]
+{\lato\textcolor{white}{\large\textbf{About the Lab}}}
+
+\vspace{0.5em}
+
+{\lato\textcolor{white}{
+The Environmental Inequality Lab is a nonpartisan research group that applies a rigorous, data-driven approach to understand how our environment shapes economic opportunity and well-being.
+}}
+
+\vspace{5em}
+
+{\lato\textcolor{white}{\large\textbf{Connect with the EIL!}}}
+
+\vspace{0.5em}
+
+{\lato\textcolor{white}{Twitter: @en\_inequality\_lab}}
+
+\vspace{0.25em}
+
+{\lato\textcolor{white}{contact@environmental-inequality
+-lab.org}}
+
+\vspace{1em}
+
+\end{tcolorbox}
+```
+
+```{=latex}
+\end{paracol}
+```
+
+```{=latex}
+\vfill
+\hrule
+\vspace{0.2cm}
+\footnotesize
+\textit{This brief was generated on \today~\currenttime.}
+```

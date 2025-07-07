@@ -13,7 +13,7 @@
 
 #### Define Functions ####
 
-process_rda_to_hex_grid <- function(file_path, lon_col = "grid_lon", lat_col = "grid_lat", hex_cellsize = 0.05, filter_to_counties = TRUE) {
+process_rda_to_hex_grid <- function(file_path, lon_col = "grid_lon", lat_col = "grid_lat", hex_cellsize = 0.01, filter_to_counties = TRUE) {
   
   # Step 1: Load the .rda file
   env <- new.env()
@@ -36,10 +36,10 @@ process_rda_to_hex_grid <- function(file_path, lon_col = "grid_lon", lat_col = "
     mutate(hex_id = row_number()) # Add a unique ID to each hexagon
   
   # Optional: Filter hexagons to county area using existing county data
-  if (filter_to_counties && "GEOID" %in% colnames(df) && "STATEFP" %in% colnames(df)) {
+  if (filter_to_counties && "COUNTYFP" %in% colnames(df) && "STATEFP" %in% colnames(df)) {
     # Create a boundary from the county points (convex hull)
     county_points <- df %>%
-      filter(STATEFP == "51" & (GEOID == "5105")) %>%
+      filter(STATEFP == "51" & (COUNTYFP == "540" | COUNTYFP == "003")) %>%
       dplyr::select(all_of(c(lon_col, lat_col))) %>%
       distinct()
     
@@ -94,7 +94,8 @@ process_rda_to_hex_grid <- function(file_path, lon_col = "grid_lon", lat_col = "
       grid_lon = first(grid_lon),
       grid_lat = first(grid_lat),
       STATEFP = first(STATEFP),
-      name = first(NAMELSAD),
+      COUNTYFP = first(COUNTYFP),
+      name = first(NAME),
       GEOID = first(GEOID),
       n_points = n(),
       .groups = "drop" # Use .groups = "drop" to automatically ungroup
@@ -141,6 +142,9 @@ all_rda_files <- unlist(lapply(folders, function(dir) {
 }))
 
 file_paths <- all_rda_files[!grepl("_hex\\.rda$", all_rda_files) & !grepl("^nat_", basename(all_rda_files)) & !grepl("_with_hex_id\\.rda$", basename(all_rda_files))]
+
+#file_paths <- '/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/raceincome_rda/raceincome_2024_point.rda'
+#file_paths <- '/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/ageracesex_rda/ageracesex_2024_point.rda'
 
 # Run the processing function on each file with county filtering enabled
 walk(file_paths, ~ process_rda_to_hex_grid(.x, filter_to_counties = TRUE))

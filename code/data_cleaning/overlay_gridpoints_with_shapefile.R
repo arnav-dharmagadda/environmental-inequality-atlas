@@ -6,7 +6,7 @@ setwd("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/gridded_eif_dat
 
 # Load the shapefile
 
-shapefile <- st_read("cb_2024_us_cd119_500k/cb_2024_us_cd119_500k.shp")
+shapefile <- st_read("cb_2024_us_county_500k/cb_2024_us_county_500k.shp")
 # Load the gridpoints
 
 load("all_gridpoints.rda")
@@ -23,4 +23,4 @@ df <- as.data.frame(gridpoints_with_sf)
 df <- df[, !grepl("geometry", names(df))]
 
 #save(df, file = "Data/Gridded_EIF/gridpoints_with_cbsa.rda")
-save(df, file = "gridpoints_with_cd_2024.rda")
+save(df, file = "gridpoints_with_county_2024.rda")

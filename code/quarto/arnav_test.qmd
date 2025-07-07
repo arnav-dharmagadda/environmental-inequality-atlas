@@ -14,6 +14,7 @@ format:
     mainfont: "Lato"  # Main body text font
     include-in-header:
       text: |
+        \newcommand{\districtname}{District 5}
         \usepackage{multicol}
         \usepackage{paracol}
         \usepackage{xcolor}
@@ -246,11 +247,11 @@ data_2023_hex <- data_2023_hex %>%
     )
   )
 
-tm_basemap("CartoDB.Positron", alpha = 1) +  # Added alpha for basemap transparency (0.1-1.0)
+tm_basemap("OpenStreetMap", alpha = 1) +  # Added alpha for basemap transparency (0.1-1.0)
   tm_shape(data_2023_hex) +
   tm_polygons(
     col = "total",                         # Color by a variable (or use a fixed color)
-    palette = "Greens",                     # Color palette for the polygons
+    palette = "Purples",                     # Color palette for the polygons
     title = "Population",
     style = "cont",                        # Continuous gradient style
     alpha = 0.7,                          # Polygon transparency
@@ -280,8 +281,6 @@ tm_basemap("CartoDB.Positron", alpha = 1) +  # Added alpha for basemap transpare
   )
 ```
 
-```
-
 ```{=latex}
 \switchcolumn
 ```
@@ -515,6 +514,48 @@ ggplot(dep_data_long, aes(x = year, y = value, color = type)) +
 ```
 \newpage
 
+\vspace{1em}
+\leaguegothic\textcolor{maroon}{\huge\textbf{Race and Ethnicity}}
+\vspace{0.5em}
+\begin{tcolorbox}[
+  colback=white,        % Background color
+  colframe=maroon,      % Border color
+  boxrule=1pt,          % Border thickness
+  arc=0mm,              % Square corners
+  left=10pt,            % Padding
+  right=10pt,
+  top=8pt,
+  bottom=8pt,
+  width=\textwidth
+]
+% Subheader inside box
+{\leaguegothic\textbf{Glossary of Race/Ethnicity Definitions}}
+\vspace{0.5em}
+% Body text
+{\lato
+Any individual identifying as Hispanic is listed as Hispanic. Racial classifications are for non-Hispanic White, non-Hispanic Black, non-Hispanic Asian, non-Hispanic AIAN (American Indian/Alaskan Native), and Other/Unknown.
+}
+\end{tcolorbox}
+\vspace{1em}
+```{=latex}
+\vspace{1em}
+\noindent
+\leaguegothic\textcolor{maroon}{\LARGE\textbf{Race and Ethnicity Trends}}
+\vspace{0.5em}
+```
+```{r embedding image}
+knitr::include_graphics("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/code/raceincome/race/race_table_with_sparklines.png")
+```
+\begin{center}
+\textit{Trend lines show population growth over time within the region. Upward-sloping lines indicate growth. Does not include Other/Unknown.}
+\end{center}
+\leaguegothic\textcolor{maroon}{\LARGE\textbf{A Comparison of 2023 National Racial Shares with District 5}}
+- 69.7% of people in District 5 identify as White, compared to 56.2% for the United States.
+- 10.9% of people in District 5 identify as Black, compared to 11.8% for the United States.
+- 4.5% of people in District 5 identify as Hispanic, compared to 15.9% for the United States.
+- 2.9% of people in District 5 identify as Asian, compared to 4.2% for the United States.
+- 0.2% of people in District 5 identify as AIAN, compared to 0.8% for the United States.
+
 ```{r, race_map}
 race_columns <- c("race_ethnicity_AIAN", "race_ethnicity_Asian", "race_ethnicity_Black", "race_ethnicity_Hispanic", "race_ethnicity_White")
 
@@ -582,308 +623,288 @@ race_map
 
 ```
 
-<<<<<<< Updated upstream
-=======
-```
+\newpage
 
-```{=latex}
-\switchcolumn
-```
-
-<!-- RIGHT COLUMN -->
-
-\leaguegothic\textcolor{maroon}{\LARGE\textbf{Where People Live}}
-
-\lato
-
-* Charlottesville and Albemarle County are home to 145,735 people. 
-
-* The most populous county is Charlottesville. 
-
-* The most populous areas are Charlottesville City, Crozet, and Hollymead.
-
-* The region’s has a population density of 77 people per square kilometer, which is more/less dense than the national average of XX per square kilometer.
+```{r, josie}
+#| include: false
+library(knitr)
+library(ggplot2)
+library(dplyr)
+library(here)
+# Set figure defaults
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.height = 4,
+  dpi = 300,
+  out.width = "100%"
+)
 
 
-
-```{=latex}
-\end{paracol}
-```
-
-\vspace{0.5em}
-
-```{=latex}
-\setlength{\columnsep}{20pt}
-\columnratio{0.5}
-\begin{paracol}{2}
-```
-
-<!-- LEFT COLUMN -->
-
-\leaguegothic\textcolor{maroon}{\LARGE\textbf{Population Over Time}}
-
-\lato 
-
-* The population has grown since 1999 by 64,264 people at an average growth rate of 2.45%. This is faster/slower than the national average growth rate of X.XX%.
-
-
-* Albemarle County has the highest growth rate relative to other counties in the region.
-
-
-```{=latex}
-\switchcolumn
-```
-
-```{r, pop_over_time}
-
-file_path <- paste0('/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/raceincome_rda/raceincome_long.rda')
-load(file_path)
-
-raceincome_combined <- raceincome_combined %>%
-  group_by(year) %>%
-  summarise(n_noise_postprocessed = sum(n_noise_postprocessed, na.rm = TRUE))
-
-ggplot(raceincome_combined, aes(x = year, y = n_noise_postprocessed)) +
-  geom_line(size = 1.5, alpha = 0.9) +
-  geom_point(size = 2.5, alpha = 0.9) +
-  labs(
-    x = "Year",
-    y = "Population"
-  ) +
-  scale_x_continuous(
-    breaks = seq(2000, 2020, by = 5),
-    minor_breaks = NULL,  # Remove minor grid lines
-    expand = c(0.02, 0)
-  ) +
-  scale_y_continuous(
-    labels = scales::comma_format(scale = 1e-3, suffix = "K"),
-    expand = c(0.02, 0)
-  ) +
-  theme_minimal(base_size = 12) +
-  theme(
-    # Plot titles
-    plot.title = element_text(
-      face = "bold", 
-      size = 16, 
-      hjust = 0,
-      margin = margin(b = 5),
-      color = "black"
-    ),
-    plot.subtitle = element_text(
-      size = 14,
-      hjust = 0,
-      margin = margin(b = 20),
-      color = "gray30"
-    ),
-    plot.caption = element_text(
-      size = 9,
-      hjust = 0,
-      margin = margin(t = 15),
-      color = "gray50",
-      lineheight = 1.1
-    ),
-    # Axes
-    axis.title = element_text(size = 12, color = "gray20"),
-    axis.text = element_text(size = 10, color = "gray30"),
-    axis.title.x = element_text(margin = margin(t = 10), size = 12),
-    axis.title.y = element_text(margin = margin(r = 10), size = 12),
-    axis.text.x = element_text(size = 10),
-    axis.text.y = element_text(size = 10),
-    # Grid
-    panel.grid.major.x = element_blank(),  # Remove vertical major grid lines
-    panel.grid.minor.x = element_blank(),  # Remove vertical minor grid lines
-    panel.grid.major = element_line(color = "gray90", size = 0.5),
-    panel.grid.minor = element_line(color = "gray95", size = 0.25),
-    panel.background = element_rect(fill = "white", color = NA),
-    # Legend
-    legend.position = "bottom",
-    legend.title = element_blank(),
-    legend.text = element_text(size = 11, color = "gray20"),
-    legend.key.width = unit(1.5, "cm"),
-    legend.margin = margin(t = 15),
-    legend.box.spacing = unit(0, "pt"),
-    # Plot margins
-    plot.margin = margin(20, 25, 15, 20),
-    # Remove plot background
-    plot.background = element_rect(fill = "white", color = NA)
-  )
-
-```
-
-```{=latex}
-\end{paracol}
-```
-
-\vspace{0.5em}
-
-```{=latex}
-\setlength{\columnsep}{20pt}
-\columnratio{0.5}
-\begin{paracol}{2}
-```
-
-```{r, dep_ratio}
-
-file_path <- '/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/ageracesex_rda/ageracesex_year_long.rda'
-load(file_path)
-data_all <- ageracesex_year_long
-
-data_all <- data_all %>%
-  filter(GEOID == "5105") %>%
-  rowwise() %>%
-  mutate(total = sum(c(M, F, NA_sex, na_sex), na.rm = TRUE)) %>%
-  ungroup() %>%
-  mutate(
-    black_share = Black / total,
-    white_share = White / total,
-    hispanic_share = Hispanic / total,
-    asian_share = Asian / total,
-    male_share = M / total,
-    female_share = F / total,
-    under_18_share = under_18 / total,
-    bet_19_65_share = bet_19_65 / total,
-    over_65_share = over_65 / total,
-  )
-
-data_collapsed <- data_all %>%
-  group_by(year) %>%
-  summarise(across(
-    c(AIAN, Asian, Black, Hispanic, NA_race, White, other_race, under_18, bet_19_65, over_65, total),
-    ~ sum(.x, na.rm = TRUE)
-  )) %>%
-  mutate(
-    young_dep_ratio = under_18 / bet_19_65,
-    old_dep_ratio = over_65 / bet_19_65,
-    dep_ratio = (under_18 + over_65) / bet_19_65
+# Load packages
+if (!requireNamespace("pacman", quietly = TRUE)) {
+  install.packages("pacman")
+}
+pacman::p_load(ncdf4, sf, terra, dplyr, ggplot2, tmap, arrow, dplyr, tidyr, scales, haven, stringr, purrr, tigris, here)
+raceincome_path <- here::here("data", "processed", "raceincome_rda", "nat_raceincome_2023.rda")
+raceincome_2023 <- load(raceincome_path)
+raceincome2023 <- get(raceincome_2023)
+# Compute summaries
+race_summary2023 <- raceincome2023 %>%
+  filter(
+    !is.na(race_ethnicity),
+    !is.na(income_decile)
   ) %>%
+  group_by(race_ethnicity, income_decile) %>%
+  summarise(
+    total_count = sum(n_noise_postprocessed, na.rm = TRUE),
+    .groups = "drop"
+  )
+# U.S. Summary
+us_summary <- raceincome2023 %>%
+  filter(!is.na(race_ethnicity), !is.na(income_decile), !race_ethnicity %in% c(NA, "NA", "Unknown", "Other/Unknown"), income_decile != 0) %>%
+  group_by(region = "United States", race = race_ethnicity, decile = income_decile) %>%
+  summarise(total_count = sum(n_noise_postprocessed, na.rm = TRUE), .groups = "drop")
+# Charlottesville/Albemarle Summary
+# Load ONLY District 5 data from 2024 file (if file is big)
+raceincome_path_2024 <- here::here("data", "processed", "raceincome_rda", "raceincome_2024.rda")
+# Load into a temp environment so you don’t load everything
+temp_env <- new.env()
+load(raceincome_path_2024, envir = temp_env)
+# Find the object name in that file
+obj_name_2024 <- ls(temp_env)
+raceincome2024 <- temp_env[[obj_name_2024]]
+# Now filter for District 5 only
+district_summary <- raceincome2024 %>%
+  filter(
+    STATEFP == "51",
+    GEOID == "5105",  # double-check this is correct for District 5
+    !is.na(race_ethnicity),
+    !is.na(income_decile),
+    !race_ethnicity %in% c("NA", "Unknown", "Other/Unknown"),
+    income_decile != 0
+  ) %>%
+  group_by(region = "District 5", race = race_ethnicity, decile = income_decile) %>%
+  summarise(
+    total_count = sum(n_noise_postprocessed, na.rm = TRUE),
+    .groups = "drop"
+  )
+# Combine and process
+combined_summary <- bind_rows(us_summary, district_summary)
+combined_prop <- bind_rows(us_summary, district_summary) %>%
+  mutate(region = as.character(region)) %>%
+  group_by(region, race) %>%
+  mutate(share = total_count / sum(total_count)) %>%
   ungroup()
-
-dep_data_long <- data_collapsed %>%
-  pivot_longer(cols = c(dep_ratio, young_dep_ratio, old_dep_ratio),
-               names_to = "type",
-               values_to = "value")
-
-ggplot(dep_data_long, aes(x = year, y = value, color = type)) +
-  geom_line(size = 1.2) +
-  scale_color_manual(
-    values = c(
-      "dep_ratio" = "black",
-      "young_dep_ratio" = "dodgerblue",
-      "old_dep_ratio" = "firebrick"
-    ),
-    labels = c(
-      "dep_ratio" = "Total Dependency Ratio",
-      "young_dep_ratio" = "Youth Dependency Ratio",
-      "old_dep_ratio" = "Old-Age Dependency Ratio"
-    )
+combined_prop$race <- factor(combined_prop$race, levels = c("White", "Black", "Hispanic", "Asian", "AIAN"))
+us_data <- combined_prop %>% filter(region == "United States") %>% mutate(alpha = 0.5)
+district_data <- combined_prop %>% filter(region == "District 5") %>% mutate(alpha = 1)
+avg_decile_by_race <- combined_summary %>%
+  group_by(region, race) %>%
+  summarise(avg_decile = weighted.mean(decile, total_count, na.rm = TRUE), .groups = "drop")
+avg_decile <- combined_summary %>%
+  group_by(region) %>%
+  summarise(avg_decile = weighted.mean(decile, total_count, na.rm = TRUE), .groups = "drop")
+district_decile_summary <- raceincome2024 %>%
+  filter(
+    STATEFP == "51",
+    GEOID == "5105",
+    !is.na(income_decile),
+    income_decile != 0,
+    !is.na(n_noise_postprocessed)
+  ) %>%
+  mutate(region = "District 5") %>%
+  group_by(region, decile = income_decile) %>%
+  summarise(
+    total_count = sum(n_noise_postprocessed, na.rm = TRUE),
+    .groups = "drop"
+  )
+# From the 2023 dataset, get national summary
+us_decile_summary <- raceincome2023 %>%
+  filter(
+    !is.na(income_decile),
+    income_decile != 0,
+    !is.na(n_noise_postprocessed)
+  ) %>%
+  mutate(region = "United States") %>%
+  group_by(region, decile = income_decile) %>%
+  summarise(
+    total_count = sum(n_noise_postprocessed, na.rm = TRUE),
+    .groups = "drop"
+  )
+# Combine U.S. and District 5
+decile_summary <- bind_rows(us_decile_summary, district_decile_summary)
+# Calculate share
+decile_prop <- decile_summary %>%
+  group_by(region) %>%
+  mutate(share = total_count / sum(total_count)) %>%
+  ungroup()
+```
+```{=latex}
+\begin{tcolorbox}[
+  colback=white,
+  colframe=white,
+  width=\textwidth,
+  arc=0mm,
+  boxrule=2pt,
+  left=10pt,
+  right=10pt,
+  top=8pt,
+  bottom=8pt
+]
+{\leaguegothic\textcolor{maroon}{\textbf{\Huge Income}}}
+\end{tcolorbox}
+```
+\vspace{0.3cm}
+```{=latex}
+\setlength{\columnsep}{20pt}
+\columnratio{0.6}
+\begin{paracol}{2}
+```
+<!-- LEFT COLUMN -->
+```{=latex}
+\begin{tcolorbox}[
+  colback=white,
+  colframe=white,
+  width=\textwidth,
+  arc=0mm,
+  boxrule=2pt,
+  left=10pt,
+  right=10pt,
+  top=8pt,
+  bottom=8pt
+]
+{\leaguegothic\textcolor{maroon}{\textbf{\LARGE \districtname~ Decile Distribution}}}
+\end{tcolorbox}
+```
+``` {r income}
+#| fig-width: 9
+#| fig-height: 4.5
+#| warning: false
+#| message: false
+ggplot(decile_prop %>% filter(region == "District 5"),
+             aes(x = factor(decile), y = share)) +
+  geom_col(
+    fill = "#003F5C",
+    width = 0.9
   ) +
+  # Labels and themes
   labs(
-    x = "Year",
-    y = "Ratio",
-    color = "Type"
+    title = "",
+    x = "Income Decile",
+    y = "Share of Total Population"
+  ) +
+  scale_y_continuous(labels = percent_format(accuracy = 1)) +
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA),
+    legend.position = "none",
+    panel.grid.major.x = element_blank(),  # removes vertical gridlines
+    panel.grid.minor.x = element_blank()
+  )
+```
+```{=latex}
+\switchcolumn
+```
+<!-- RIGHT COLUMN -->
+```{=latex}
+\begin{minipage}[t]{\linewidth}
+\begin{tcolorbox}[
+  colback=white,
+  colframe=maroon,
+  boxrule=1pt,
+  arc=0pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt,
+  width=\linewidth
+]
+\color{maroon}
+\begin{minipage}{\dimexpr\linewidth-16pt}
+Income deciles divide the national population into ten equal income bins. The first decile reflects the 10\% of the US population with the lowest income, while the 10th decile reflects the 10\% of the population with the highest income.
+\end{minipage}
+\end{tcolorbox}
+\vspace{0.3cm}
+\begin{tcolorbox}[
+  colback=maroon,
+  colframe=maroon,
+  boxrule=0pt,
+  arc=0pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt,
+  width=\linewidth
+]
+\color{white}
+\begin{minipage}{\dimexpr\linewidth-16pt}
+\textbf{30\% of the \districtname~population is in the top 2 deciles.}
+\end{minipage}
+\end{tcolorbox}
+\end{minipage}
+```
+```{=latex}
+\end{paracol}
+```
+```{=latex}
+\begin{tcolorbox}[
+  colback=white,
+  colframe=white,
+  width=\textwidth,
+  arc=0mm,
+  boxrule=2pt,
+  left=10pt,
+  right=10pt,
+  top=8pt,
+  bottom=8pt
+]
+{\leaguegothic\textcolor{maroon}{\textbf{\LARGE Income by Race: US vs. \districtname~}}}
+\end{tcolorbox}
+```
+```{r}
+#| warning: false
+#| message: false
+#| fig-width: 9
+#| fig-height: 4.5
+ggplot(combined_prop, aes(x = as.numeric(decile), y = share, fill = region)) +
+  geom_col(position = position_dodge2(padding = 0), width = 0.7) +
+  scale_x_continuous(breaks = 1:10, labels = as.character(1:10)) +
+  facet_wrap(~ race, scales = "fixed", ncol = 3) +  # 3 columns: bottom row has 2 facets, so empty space on bottom right
+  scale_fill_manual(values = c("United States" = "#A6CEE3", "District 5" = "#003F5C")) +
+  scale_y_continuous(labels = percent_format(accuracy = 1)) +
+  labs(
+    title = "",
+    x = "Income Decile",
+    y = "Share of Race Group",
+    fill = "Region"
   ) +
   theme_minimal() +
   theme(
-    # Axes
-    axis.title = element_text(size = 12, color = "gray20"),
-    axis.text = element_text(size = 10, color = "gray30"),
-    axis.title.x = element_text(margin = margin(t = 10), size = 12),
-    axis.title.y = element_text(margin = margin(r = 10), size = 12),
-    axis.text.x = element_text(size = 10),
-    axis.text.y = element_text(size = 10),
-    legend.position = "bottom",
-    plot.title = element_text(size = 14, face = "bold"),
-    panel.grid.major.x = element_blank(),  # Remove vertical major grid lines
-    panel.grid.minor.x = element_blank()   # Remove vertical minor grid lines
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA),
+    legend.position = c(0.99, 0.05),  # bottom right inside plot area (x, y in [0,1])
+    legend.justification = c(1, 0),   # align legend's top right to (0.95, 0.05)
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank()
   )
-
 ```
 
 ```{=latex}
-\switchcolumn
-```
-\leaguegothic\textcolor{maroon}{\LARGE\textbf{Dependency Ratio}}
-
-\lato 
-
-* 19% of Charlottesville’s population is under 18, 61% of the population is 19-65, and 20% of the population is over 65.
-
-* Charlottesville has a lower share of people under 18 and 19-65 than the US. Charlottesville has a higher share of people over 65 than the US. 
-
-* The region’s total dependency ratio is the ratio of the non-working age population to the working age population. It can be separated into the elderly ratio and the youth ratio, which add to the total ratio.
-
-* Charlottesville’s total dependency ratio is 0.64. It has increased in recent years, driven by the elderly.
-
-```{=latex}
-\end{paracol}
-```
-\newpage
-
-```{r, race_map}
-race_columns <- c("race_ethnicity_AIAN", "race_ethnicity_Asian", "race_ethnicity_Black", "race_ethnicity_Hispanic", "race_ethnicity_White")
-
-
-data_race_long <- data_2023_hex %>%
-    select(hex_id, geometry, all_of(race_columns)) %>%
-    mutate(across(all_of(race_columns), as.numeric)) %>%
-    pivot_longer(
-      cols = all_of(race_columns),
-      names_to = "race_ethnicity",
-      values_to = "population"
-    ) %>%
-    # Clean up race labels for better display
-    mutate(
-      race_ethnicity = case_when(
-        race_ethnicity == "race_ethnicity_AIAN" ~ "American Indian/Alaska Native",
-        race_ethnicity == "race_ethnicity_Asian" ~ "Asian",
-        race_ethnicity == "race_ethnicity_Black" ~ "Black/African American",
-        race_ethnicity == "race_ethnicity_Hispanic" ~ "Hispanic/Latino",
-        race_ethnicity == "race_ethnicity_White" ~ "White",
-        TRUE ~ race_ethnicity
-      )
-    )
-
-race_map <- tm_basemap("OpenStreetMap", alpha = 0.3) +
-    tm_shape(data_race_long) +
-    tm_polygons(
-      col = "population",
-      palette = "Blues",
-      title = "",  # Remove legend title
-      style = "cont",
-      alpha = 0.8,
-      border.col = "white",
-      border.lwd = 0.1,
-      colorNA = "transparent",
-      textNA = "",
-      legend.show = TRUE,  # Enable individual legends
-      fill.free = TRUE
-    ) +
-    tm_facets(
-      by = "race_ethnicity",
-      nrow = 2,
-      ncol = 3,
-      free.coords = FALSE,
-      showNA = FALSE
-    ) +
-    tm_layout(
-      title = "",  # Main title restored
-      title.size = 1.2,
-      title.position = c("center", "top"),
-      panel.labels = c("AIAN", "Asian", "Black", "Hispanic", "White"),
-      panel.label.size = 1.0,
-      panel.label.fontface = "bold",
-      legend.outside = TRUE,  # Keep legends inside each panel
-      legend.position = c("right", "bottom"),  # Position within each panel
-      legend.text.size = 0.25,
-      legend.height = 16,  # Fixed legend height for consistency
-      legend.width = 4,   # Fixed legend width for consistency
-      bg.color = "transparent",
-      outer.bg.color = "transparent",
-      between.margin = 0.5
-    )
-
-race_map
-
+\begin{tcolorbox}[
+  colback=white,
+  colframe=maroon,
+  boxrule=1pt,
+  width=\textwidth,  % full width
+  arc=0pt,
+  left=6pt, right=6pt, top=4pt, bottom=4pt
+]
+\color{black}
+\footnotesize
+\begin{minipage}{\dimexpr\linewidth-16pt}
+\begin{itemize}
+  \setlength\itemsep{0.25em}
+  \item The White population has a larger share of people in the highest decile and a smaller share of people in the lowest decile than the US.
+  \item The Black population has a larger share of people in the lowest decile but otherwise reflects the US distribution.
+  \item The \districtname~Asian income distribution reflects the US Asian income distribution.
+  \item The Hispanic population has a larger share of people in the lowest decile and a larger share of people in the highest decile than the US.
+  \item The AIAN population has a smaller share of people in the lowest decile and a larger share of people in the highest income decile than the US distribution.
+\end{itemize}
+\end{minipage}
+\end{tcolorbox}
 ```
 
->>>>>>> Stashed changes

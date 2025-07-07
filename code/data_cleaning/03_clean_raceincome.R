@@ -124,7 +124,7 @@ raceincome_combined <- raceincome_combined %>%
 # Reshape for raceincome variables
 
 raceincome_wide <- raceincome_combined %>%
-  select(year, grid_lon, grid_lat, STATEFP, GEOID, NAMELSAD, race_income, n_noise_postprocessed) %>%
+  select(year, grid_lon, grid_lat, STATEFP, COUNTYFP, NAME, race_income, n_noise_postprocessed) %>%
   pivot_wider(
     names_from = race_income,
     values_from = n_noise_postprocessed
