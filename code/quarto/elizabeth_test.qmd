@@ -1,0 +1,121 @@
+---
+format:
+  pdf:
+    documentclass: article
+    pdf-engine: xelatex  # Required for system fonts
+    geometry:
+      - top=0.5in
+      - bottom=0.5in
+      - left=0.5in
+      - right=0.5in
+    fontsize: 11pt
+    colorlinks: true
+    fig-pos: 'H'
+    mainfont: "Lato"  # Main body text font
+    include-in-header:
+      text: |
+        \usepackage{multicol}
+        \usepackage{paracol}
+        \usepackage{xcolor}
+        \usepackage{tcolorbox}
+        \usepackage{graphicx}
+        \usepackage{float}
+        \definecolor{maroon}{RGB}{128,0,0}
+        \definecolor{custommaroon}{HTML}{601215}
+        \usepackage{fontspec}
+        \usepackage{datetime}
+        \newfontfamily\leaguegothic{League Gothic}
+        \newfontfamily\lato{Lato}
+        % Suppress page numbers
+        \pagestyle{empty}
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+
+\newpage
+
+\vspace{0.5em}
+
+
+\leaguegothic\textcolor{custommaroon}{\Huge\textbf{Race and Ethnicity}}
+
+\vspace{0.75em}
+
+
+\begin{tcolorbox}[
+  colback=white,
+  colframe=custommaroon,
+  boxrule=1pt,
+  arc=0mm,
+  left=12pt,
+  right=12pt,
+  top=10pt,
+  bottom=10pt,
+  width=\textwidth
+]
+{\lato\large\textbf{Glossary of Race and Ethnicity Definitions}}
+
+\vspace{0.5em}
+
+{\lato
+Individuals who identify as Hispanic are categorized as Hispanic, regardless of race. Racial categories include Non-Hispanic White, Non-Hispanic Black, Non-Hispanic Asian, and Non-Hispanic AIAN (American Indian/Alaskan Native). A residual category is constructed containing all Non-Hispanic Other but not reported separately in the statistics.
+}
+\end{tcolorbox}
+
+\vspace{1em}
+
+\leaguegothic\textcolor{custommaroon}{\LARGE\textbf{Trends in Population Counts and Shares (2000-2024)}}
+
+\vspace{0.5em}
+
+```{r sparkline table, out.width="100%"}
+
+knitr::include_graphics("/Users/elizabethshiker/The Lab Dropbox/Elizabeth Shiker/GitHub/environmental-inequality-atlas/output/raceincome/race/raceCountShare_sparklineTable2000to2024.png")
+
+```
+
+\begin{center}
+{\lato\small\textit{The trend lines show how the population has changed over time within the region. An upward-sloping line indicates population growth.}}
+\end{center}
+
+\vspace{1em}
+
+\columnratio{.35}
+\begin{paracol}{2}
+
+\lato\large\textbf{Comparing 2024 Racial Shares}
+
+\lato{In Charlottesville and Albemarle County, 68.4\% of people identify as White, compared to 55.0\% nationwide.}
+{\lato
+\begin{itemize}
+  \item 10.6\% identify as Black in Charlottesville and Albemarle County, compared to 11.6\% nationwide
+  \item 4.6\% identify as Hispanic in Charlottesville and Albemarle County, compared to 15.8\% nationwide
+  \item 3.0\% identify as Asian in Charlottesville and Albemarle County, compared to 4.1\% nationwide
+  \item 0.2\% identify as AIAN in Charlottesville and Albemarle County, compared to 0.8\% nationwide
+\end{itemize}
+}
+
+\switchcolumn
+
+\leaguegothic\textcolor{custommaroon}{\LARGE\textbf{Population Maps by Race/Ethnicity for Charlottesville and Albemarle County in 2024}}
+
+\vspace{0.5em}
+
+
+\includegraphics[width=1.25\linewidth, trim=18cm 1cm 1cm 0.5cm, clip]{/Users/elizabethshiker/The Lab Dropbox/Elizabeth Shiker/GitHub/environmental-inequality-atlas/output/raceincome/race/race_map_2024.png}
+
+
+\begin{center}
+{\lato\small\textit{Darker hexagons represent higher concentrations of each racial group. The scales vary to reflect differences in overall population levels across groups.}}
+\end{center}
+
+\end{paracol}
+
+
+
+
+
+
