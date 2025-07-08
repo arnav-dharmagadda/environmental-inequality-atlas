@@ -233,6 +233,8 @@ ggplot(avg_income_by_race, aes(x = year, y = avg_income, color = race_ethnicity)
     legend.position = "top"
   ) +
   scale_y_continuous(labels = scales::dollar_format(), limits = c(0, NA))
+
+
 #Sparkline
 
 # Clean race_ethnicity, remove unwanted categories, and handle negative incomes
@@ -480,3 +482,31 @@ saveWidget(jjj, "income_trend_thirds_table.html", selfcontained = TRUE)
 
 # Save as PNG
 webshot("income_trend_thirds_table.html", "output/raceincome/income_trend_thirds_table.png", zoom = 2)
+
+
+#GGPLOT
+ggplot(income_trend_thirds, aes(x = year, y = avg_income, color = Group)) +
+  geom_line(size = 1.2) +
+  scale_color_manual(values = c(
+    "Bottom Third" = "#a6cee3",
+    "Middle Third" = "#1f78b4",
+    "Top Third" = "#003f5c"
+  )) +
+  scale_y_continuous(labels = dollar_format(), limits = c(0, NA)) +
+  labs(
+    title = "Average Income Over Time by Income Tier",
+    x = "Year",
+    y = "Average Income (2024-adjusted $)",
+    color = "Income Group"
+  ) +
+  theme_minimal(base_family = "Lato") +
+  theme(
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10),
+    legend.position = "top",
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA)
+  )
