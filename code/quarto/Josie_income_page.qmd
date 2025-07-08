@@ -1,0 +1,433 @@
+---
+format:
+  pdf:
+    documentclass: article
+    pdf-engine: xelatex  # Required for system fonts
+    geometry:
+      - top=0.5in
+      - bottom=0.5in
+      - left=0.5in
+      - right=0.5in
+    fontsize: 11pt
+    colorlinks: true
+    fig-pos: 'H'
+    mainfont: "Lato"  # Main body text font
+    include-in-header:
+      text: |
+        \newcommand{\districtname}{Charlottesville}
+        \usepackage{multicol}
+        \usepackage{paracol}
+        \usepackage{xcolor}
+        \usepackage{tcolorbox}
+        \usepackage{graphicx}
+        \usepackage{float}
+        \definecolor{maroon}{HTML}{601215}
+        \usepackage{fontspec}
+        \newfontfamily\leaguegothic{League Gothic}
+        \newfontfamily\lato{Lato}
+execute:
+  echo: false
+  warning: false
+  message: false
+
+---
+```{r setup}
+#| include: false
+library(knitr)
+library(ggplot2)
+library(dplyr)
+library(here)
+
+# Set figure defaults
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.height = 4,
+  dpi = 300,
+  out.width = "100%"
+)
+
+
+
+data_path <- "/Users/jfischman/Library/CloudStorage/Dropbox-TheLab/Josie Fischman/Github/gridded_eif_data/"
+git_path <- "/Users/jfischman/Library/CloudStorage/Dropbox-TheLab/Josie Fischman/Github/environmental-inequality-atlas"
+
+# Load packages
+
+if (!requireNamespace("pacman", quietly = TRUE)) {
+  install.packages("pacman")
+}
+
+pacman::p_load(ncdf4, sf, terra, dplyr, ggplot2, tmap, arrow, dplyr, tidyr, scales, haven, stringr, purrr, tigris, here, showtext, patchwork, cowplot)
+
+
+raceincome_path <- here::here("data", "processed", "raceincome_rda", "nat_raceincome_2023.rda")
+raceincome_2023 <- load(raceincome_path)
+raceincome2023 <- get(raceincome_2023)
+
+# Compute summaries
+race_summary2023 <- raceincome2023 %>%
+  filter(
+    !is.na(race_ethnicity),
+    !is.na(income_decile)
+  ) %>%
+  group_by(race_ethnicity, income_decile) %>%
+  summarise(
+    total_count = sum(n_noise_postprocessed, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# U.S. Summary
+us_summary <- raceincome2023 %>%
+  filter(!is.na(race_ethnicity), !is.na(income_decile), !race_ethnicity %in% c(NA, "NA", "Unknown", "Other/Unknown"), income_decile != 0) %>%
+  group_by(region = "United States", race = race_ethnicity, decile = income_decile) %>%
+  summarise(total_count = sum(n_noise_postprocessed, na.rm = TRUE), .groups = "drop")
+
+
+# Charlottesville/Albemarle Summary
+# Load ONLY District 5 data from 2024 file (if file is big)
+raceincome_path_2024 <- here::here("data", "processed", "raceincome_rda", "raceincome_2024.rda")
+
+# Load into a temp environment so you don’t load everything
+temp_env <- new.env()
+load(raceincome_path_2024, envir = temp_env)
+
+# Find the object name in that file
+obj_name_2024 <- ls(temp_env)
+raceincome2024 <- temp_env[[obj_name_2024]]
+
+
+# Now filter for District 5 only
+district_summary <- raceincome2023 %>%
+  filter(
+    STATEFP == "51",
+    COUNTYFP %in% c("003", "540"), 
+    !is.na(race_ethnicity),
+    !is.na(income_decile),
+    !race_ethnicity %in% c("NA", "Unknown", "Other/Unknown"),
+    income_decile != 0
+  ) %>%
+  group_by(region = "Charlottesville", race = race_ethnicity, decile = income_decile) %>%
+  summarise(
+    total_count = sum(n_noise_postprocessed, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Combine and process
+combined_summary <- bind_rows(us_summary, district_summary)
+
+combined_prop <- bind_rows(us_summary, district_summary) %>%
+  mutate(region = as.character(region)) %>%
+  group_by(region, race) %>%
+  mutate(share = total_count / sum(total_count)) %>%
+  ungroup()
+
+combined_prop$race <- factor(combined_prop$race, levels = c("White", "Black", "Hispanic", "Asian", "AIAN"))
+
+us_data <- combined_prop %>% filter(region == "United States") %>% mutate(alpha = 0.5)
+district_data <- combined_prop %>% filter(region == "Charlottesville") %>% mutate(alpha = 1)
+
+avg_decile_by_race <- combined_summary %>%
+  group_by(region, race) %>%
+  summarise(avg_decile = weighted.mean(decile, total_count, na.rm = TRUE), .groups = "drop")
+
+avg_decile <- combined_summary %>%
+  group_by(region) %>%
+  summarise(avg_decile = weighted.mean(decile, total_count, na.rm = TRUE), .groups = "drop")
+
+district_decile_summary <- raceincome2024 %>%
+  filter(
+    STATEFP == "51",
+    COUNTYFP %in% c("003", "540"),,
+    !is.na(income_decile),
+    income_decile != 0,
+    !is.na(n_noise_postprocessed)
+  ) %>%
+  mutate(region = "Charlottesville") %>%
+  group_by(region, decile = income_decile) %>%
+  summarise(
+    total_count = sum(n_noise_postprocessed, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# From the 2023 dataset, get national summary
+us_decile_summary <- raceincome2023 %>%
+  filter(
+    !is.na(income_decile),
+    income_decile != 0,
+    !is.na(n_noise_postprocessed)
+  ) %>%
+  mutate(region = "United States") %>%
+  group_by(region, decile = income_decile) %>%
+  summarise(
+    total_count = sum(n_noise_postprocessed, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Combine U.S. and District 5
+decile_summary <- bind_rows(us_decile_summary, district_decile_summary)
+
+# Calculate share
+decile_prop <- decile_summary %>%
+  group_by(region) %>%
+  mutate(share = total_count / sum(total_count)) %>%
+  ungroup()
+
+font_add(family = "Lato", regular = "/Users/jfischman/Library/CloudStorage/Dropbox-TheLab/Josie Fischman/Github/environmental-inequality-atlas/code/quarto/Lato,League_Gothic (1)/Lato/Lato-Regular.ttf")  # optional, if not auto-detected
+showtext_auto()
+
+
+```
+
+
+```{=latex}
+\begin{tcolorbox}[
+  colback=white,
+  colframe=white,
+  width=\textwidth,
+  arc=0mm,
+  boxrule=2pt,
+  left=10pt,
+  right=10pt,
+  top=2pt,
+  bottom=2pt
+]
+
+{\leaguegothic\textcolor{maroon}{{\Huge Income}}}
+\end{tcolorbox}
+```
+\vspace{0.05cm}
+
+
+```{=latex}
+\setlength{\columnsep}{20pt}
+\columnratio{0.6}
+\begin{paracol}{2}
+```
+
+<!-- LEFT COLUMN -->
+```{=latex}
+\begin{tcolorbox}[
+  colback=white,
+  colframe=white,
+  width=\textwidth,
+  arc=0mm,
+  boxrule=2pt,
+  left=10pt,
+  right=10pt,
+  top=2pt,
+  bottom=2pt
+]
+
+{\lato\textcolor{maroon}{\textbf{\large \districtname~and Albemarle County Decile Distribution}}}
+\end{tcolorbox}
+```
+
+```{r income}
+
+#| fig-cap: "Income Decile Distribution in Charlottesville"
+#| fig-width: 9
+#| fig-height: 4.5
+#| warning: false
+#| message: false
+
+
+
+
+ggplot(decile_prop %>% filter(region == "Charlottesville"),
+             aes(x = factor(decile), y = share)) +
+  
+  geom_col(
+    fill = "#003f5c",
+    width = 0.9
+  ) +
+  geom_hline(yintercept = 0, color = "black", size = 0.5) +
+  # Labels and themes
+  labs(
+    title = "",
+    x = "Income Decile",
+    y = "Share of Total Population"
+  ) +
+  scale_y_continuous(labels = percent_format(accuracy = 1)) +
+  theme_minimal(base_family = "Lato") +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background = element_rect(fill = "white", color = NA),
+    legend.position = "none",
+    panel.grid.major.x = element_blank(),  # removes vertical gridlines
+    panel.grid.minor.x = element_blank(),
+    
+  )
+
+```
+
+
+
+
+```{=latex}
+\switchcolumn
+```
+
+<!-- RIGHT COLUMN -->
+
+```{=latex}
+\vspace*{\fill}
+
+\begin{minipage}[t]{\linewidth}
+
+\begin{tcolorbox}[
+  colback=white,
+  colframe=maroon,
+  boxrule=1pt,
+  arc=0pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt,
+  width=\linewidth
+]
+\color{black}
+\begin{minipage}{\dimexpr\linewidth-16pt}
+Income deciles divide the national population into ten equal income bins. The first decile reflects the 10\% of the U.S. population with the lowest income, while the 10th decile reflects the 10\% of the population with the highest income. The figure shows the share of the Charlottesville City and Albemarle County population within each decile of the national income distribution.
+\end{minipage}
+\end{tcolorbox}
+
+
+
+\begin{tcolorbox}[
+  colback=maroon,
+  colframe=maroon,
+  boxrule=0pt,
+  arc=0pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt,
+  width=\linewidth
+]
+\color{white}
+\begin{minipage}{\dimexpr\linewidth-16pt}
+30\% of the \districtname~population is in the top 2 deciles.
+\end{minipage}
+\end{tcolorbox}
+
+\end{minipage}
+
+```
+
+```{=latex}
+\end{paracol}
+```
+
+```{=latex}
+\begin{tcolorbox}[
+  colback=white,
+  colframe=white,
+  width=\textwidth,
+  arc=0mm,
+  boxrule=2pt,
+  left=10pt,
+  right=10pt,
+  top=2pt,
+  bottom=2pt
+]
+
+{\lato\textcolor{maroon}{\textbf{\large Race Specific Income Distributions: \districtname~and Albemarle vs. U.S.}}}
+\end{tcolorbox}
+```
+
+```{r income by race}
+#| warning: false
+#| message: false
+#| fig-width: 9
+#| fig-height: 4.5
+
+race_order <- c("White", "Black", "Hispanic", "Asian", "AIAN")
+
+library(ggplot2)
+library(patchwork)
+library(grid)        # for grid.draw
+library(cowplot)     # for get_legend
+
+# Your plotting function without legend:
+plot_income_by_race <- function(df, race_name, show_legend = FALSE) {
+  df_filtered <- df %>% filter(race == race_name)
+  
+  p <- ggplot(df_filtered, aes(x = as.numeric(decile), y = share, fill = region)) +
+    geom_col(position = position_dodge2(padding = 0), width = 0.7) +
+    geom_hline(yintercept = 0, color = "black", size = 0.5) +
+    scale_x_continuous(breaks = 1:10, labels = as.character(1:10)) +
+    scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+    scale_fill_manual(values = c("United States" = "#a6cee3", "Charlottesville" = "#003f5c")) +
+    labs(
+      title = race_name,
+      x = "Income Decile",
+      y = "Share of Race Group",
+      fill = "Region"
+    ) +
+    theme_minimal(base_size = 14, base_family = "Lato") +
+    theme(
+      plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+      axis.title.x = element_text(size = 12),
+      axis.title.y = element_text(size = 8),
+      axis.text = element_text(size = 8),
+      panel.background = element_blank(),
+      plot.background = element_rect(fill = "white", color = NA),
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank(),
+      panel.grid.major.y = element_line(color = "gray90"),
+      legend.position = if (show_legend) "right" else "none"   # legend only on last plot, on right side
+    )
+  
+  return(p)
+}
+
+# Create plots:
+plots_no_legend <- lapply(race_order[-length(race_order)], function(r) plot_income_by_race(combined_prop, r, FALSE))
+last_plot_with_legend <- plot_income_by_race(combined_prop, race_order[length(race_order)], TRUE)
+
+# 2. Extract legend from last plot
+legend <- get_legend(last_plot_with_legend)
+
+# 3. Remove legend from last plot
+last_plot_no_legend <- last_plot_with_legend + theme(legend.position = "none")
+
+# 4. Combine all 5 plots (no legends)
+all_plots <- c(plots_no_legend, list(last_plot_no_legend))
+
+# 5. Create an "empty" blank plot for the 6th cell where the legend will go
+empty_plot <- ggplot() + theme_void()
+
+# 6. Build the grid with 6 plots (5 plots + 1 empty)
+plots_grid <- plot_grid(plotlist = c(all_plots, list(empty_plot)),
+                        ncol = 3,
+                        align = "hv")
+
+# 7. Overlay the legend **on top of the empty plot** cell using cowplot’s `ggdraw()`
+
+# Create a drawing canvas over the whole grid
+final_with_legend <- ggdraw(plots_grid) +
+  draw_grob(legend, 
+            x = 0.67,  # roughly center in the last column (3rd column)
+            y = 0.05,        # center in the bottom row (2nd row)
+            width = 1/3,    # width covering about one cell width
+            height = 1/2)   # height covering about one cell height
+
+print(final_with_legend)
+```
+
+```{=latex}
+\begin{tcolorbox}[
+  colback=white,
+  colframe=maroon,
+  boxrule=1pt,
+  width=\textwidth,  % full width
+  arc=0pt,
+  left=6pt, right=6pt, top=4pt, bottom=4pt
+]
+\color{black}
+\footnotesize
+\begin{minipage}{\dimexpr\linewidth-16pt}
+\begin{itemize}
+  \setlength\itemsep{0.25em}
+  \item The dark blue bars show the share of the population within each decile of the national income distribution for each race in \districtname~while the light blue bars show the income decile distributions for every race in the U.S.
+  \item The set of figures shows how race specific income distributions in \districtname~differ from U.S. race specific income distributions
+  \item A positive slope indicates a higher proportion of individuals in the upper deciles while a negative slope indicates a higher proportion of individuals in the lower deciles. 
+  \item Differences between the dark and light blue lines indicate a difference in income distribution for the given decile.
+\end{itemize}
+\end{minipage}
+\end{tcolorbox}
+```
