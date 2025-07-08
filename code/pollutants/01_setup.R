@@ -17,6 +17,7 @@ setwd("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/")
 
 data_path <- "gridded_eif_data/"
 processed <- "GitHub/environmental-inequality-atlas/data/processed/"
+map_data <- "GitHub/environmental-inequality-atlas/data/map_data/"
 output <- "GitHub/environmental-inequality-atlas/output/pollutants/"
 
 #### Load Libraries ####

@@ -1,0 +1,426 @@
+---
+format:
+  pdf:
+    documentclass: article
+    pdf-engine: xelatex  # Required for system fonts
+    geometry:
+      - top=0.5in
+      - bottom=0.5in
+      - left=0.5in
+      - right=0.5in
+    fontsize: 11pt
+    colorlinks: true
+    fig-pos: 'H'
+    mainfont: "Lato"  # Main body text font
+    include-in-header:
+      text: |
+        \newcommand{\districtname}{District 5}
+        \usepackage{multicol}
+        \usepackage{paracol}
+        \usepackage{xcolor}
+        \usepackage{tcolorbox}
+        \usepackage{graphicx}
+        \usepackage{float}
+        \definecolor{maroon}{RGB}{128,0,0}
+        \usepackage{fontspec}
+        \usepackage{datetime}
+        \newfontfamily\leaguegothic{League Gothic}
+        \newfontfamily\lato{Lato}
+        % Suppress page numbers
+        \pagestyle{empty}
+        \definecolor{custommaroon}{HTML}{601215}
+        \usepackage[none]{hyphenat}
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+#| include: false
+library(knitr)
+library(ggplot2)
+library(dplyr)
+
+# Set figure defaults
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.height = 4,
+  dpi = 300,
+  out.width = "100%"
+)
+
+# Set file paths (use relative paths instead of setwd)
+data_path <- "/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/gridded_eif_data/"
+git_path <- "/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/"
+
+# Load packages
+
+if (!requireNamespace("pacman", quietly = TRUE)) {
+  install.packages("pacman")
+}
+
+pacman::p_load(ncdf4, sf, terra, dplyr, ggplot2, tmap, arrow, dplyr, tidyr, scales, haven, stringr, purrr, tigris, systemfonts, showtext)
+
+# Set default ggplot2 font to Lato (system font)
+theme_set(theme_minimal(base_family = "Lato"))
+
+font_add(family = "Lato", regular = "/Users/arnavdharmagadda/Library/Group Containers/UBF8T346G9.Office/FontCache/4/CloudFonts/Lato/25090817022.ttf")  # optional, if not auto-detected
+showtext_auto()
+
+```
+
+\leaguegothic\textcolor{custommaroon}{\Huge\textbf{Air Quality: PM2.5 Exposure}}
+
+\vspace{0.5em}
+
+```{=latex}
+\setlength{\columnsep}{20pt}
+\columnratio{0.60}
+\begin{paracol}{2}
+```
+
+<!-- LEFT COLUMN -->
+
+\lato\textcolor{black}{\large\textbf{Population Over Space}}
+
+```{r, pm25_map}
+file_path <- paste0('/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/map_data/pm25_with_county.rda')
+load(file_path)
+
+# Create hexagonal map with publication styling
+hex_map <- tm_basemap("CartoDB.Positron", alpha = 1) +
+  tm_shape(hex_grid_sf) +
+  tm_fill(
+    col = "PM25",
+    title = "PM2.5 (μg/m³)",
+    style = "cont",
+    palette = "-inferno",
+    fill_alpha = 0.9,
+    colorNA = "transparent",
+    textNA = "",
+    lwd = 0
+  ) +
+  tm_borders(
+    col = "white",
+    lwd = 0.3
+  ) +
+  tm_graticules(
+    n.x = 5,
+    n.y = 5,
+    col = "gray70",
+    lwd = 0.3,
+    labels.size = 0.3
+  ) +
+  tm_layout(
+    main.title.size = 0.8,
+    main.title.fontfamily = "Lato",
+    legend.outside = TRUE,
+    legend.text.size = 0.6,
+    legend.title.size = 0.7,
+    legend.text.fontfamily = "Lato",
+    legend.title.fontfamily = "Lato",
+    fontfamily = "Lato",
+    bg.color = "transparent",
+    outer.bg.color = "transparent"
+  )
+
+# Display the hexagonal map
+print(hex_map)
+
+
+
+```
+
+```{=latex}
+\switchcolumn
+```
+```{=latex}
+\begin{tcolorbox}[
+  colback=white,
+  colframe=white,
+  boxrule=1pt,
+  arc=0pt,
+  left=12pt, right=12pt, top=10pt, bottom=10pt
+]
+
+\vspace{0em}
+
+\color{black}
+\lato{\textcolor{custommaroon}{\large\textbf{Where People Live}}}
+
+\vspace{1em}
+
+\begin{itemize}
+
+\item Charlottesville and Albemarle County are home to 147,428 people. 
+
+\item The most populous county is Albemarle. 
+
+\item The most populous localities are Charlottesville City, Crozet, and Hollymead.
+
+\item The region has a population density of 78 people per square kilometer, which is more dense than the national average of 37 per square kilometer.
+
+\end{itemize}
+
+\vspace{1em}
+
+\end{tcolorbox}
+```
+
+
+
+```{=latex}
+\end{paracol}
+```
+
+\vspace{0.5em}
+
+```{=latex}
+\setlength{\columnsep}{20pt}
+\columnratio{0.55}
+\begin{paracol}{2}
+```
+
+<!-- LEFT COLUMN -->
+
+\lato\textcolor{custommaroon}{\large\textbf{Population Trends}}
+
+\lato 
+
+* The population has grown since 2000 by 47,506 people at an average growth rate of 1.63%. This is faster than the national average growth rate of 0.8%.
+
+
+* Albemarle County has the highest growth rate relative to other counties in the region.
+
+
+```{=latex}
+\switchcolumn
+```
+
+\lato\textcolor{black}{\large\textbf{Population Over Time}}
+
+```{r, pop_over_time}
+
+file_path <- paste0('/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/raceincome_rda/raceincome_long.rda')
+load(file_path)
+
+raceincome_by_county <- raceincome_combined %>%
+  group_by(year, COUNTYFP, NAME) %>%
+  summarise(n_noise_postprocessed = sum(n_noise_postprocessed, na.rm = TRUE), .groups = "drop") %>%
+  filter(year != 1999)
+
+raceincome_combined <- raceincome_combined %>%
+  group_by(year) %>%
+  summarise(n_noise_postprocessed = sum(n_noise_postprocessed, na.rm = TRUE)) %>%
+  filter(year != 1999)
+
+plot_data <- bind_rows(
+  raceincome_by_county,
+  raceincome_combined %>% mutate(NAME = "Total", COUNTYFP = "Total")
+)
+
+ggplot(plot_data, aes(x = year, y = n_noise_postprocessed, color = NAME)) +
+  geom_line(size = 1.2, alpha = 0.9) +
+  geom_point(size = 2.5, alpha = 0.9) +
+  scale_color_manual(
+    values = c(
+      "Total" = "#601215",
+      "Albemarle" = "#A6CEE3",
+      "Charlottesville" = "#003F5C"
+    )
+  ) +
+  labs(
+    #title = "Population Over Time",
+    x = "Year",
+    y = "Population"
+  ) +
+  scale_x_continuous(
+    breaks = seq(2000, 2020, by = 5),
+    minor_breaks = NULL,  # Remove minor grid lines
+    expand = c(0.02, 0)
+  ) +
+  scale_y_continuous(
+    labels = scales::comma_format(scale = 1e-3, suffix = "K"),
+    expand = c(0.02, 0),
+    limits = c(0, NA)  # Ensure y-axis starts at zero
+  ) +
+  theme_minimal(base_size = 12, base_family = "Lato") +
+  theme(
+    # Plot titles
+    plot.title = element_text(
+      face = "bold", 
+      size = 16, 
+      hjust = 0,
+      margin = margin(b = 5),
+      color = "black"
+    ),
+    plot.subtitle = element_text(
+      size = 14,
+      hjust = 0,
+      margin = margin(b = 20),
+      color = "gray30"
+    ),
+    plot.caption = element_text(
+      size = 9,
+      hjust = 0,
+      margin = margin(t = 15),
+      color = "gray50",
+      lineheight = 1.1
+    ),
+    # Axes
+    axis.title = element_text(size = 12, color = "gray20"),
+    axis.text = element_text(size = 10, color = "gray30"),
+    axis.title.x = element_text(margin = margin(t = 10), size = 12),
+    axis.title.y = element_text(margin = margin(r = 10), size = 12),
+    axis.text.x = element_text(size = 10),
+    axis.text.y = element_text(size = 10),
+    # Grid
+    panel.grid.major.x = element_blank(),  # Remove vertical major grid lines
+    panel.grid.minor.x = element_blank(),  # Remove vertical minor grid lines
+    panel.grid.major = element_line(color = "gray90", size = 0.5),
+    panel.grid.minor = element_line(color = "gray95", size = 0.25),
+    panel.background = element_rect(fill = "white", color = NA),
+    # Add solid x-axis line
+    axis.line.x = element_line(color = "black", size = 0.5),
+    # Legend
+    legend.position = "top",
+    legend.title = element_blank(),
+    legend.text = element_text(size = 11, color = "gray20"),
+    legend.key.width = unit(1.5, "cm"),
+    legend.margin = margin(b = 15),
+    legend.box.spacing = unit(0, "pt"),
+    # Plot margins
+    plot.margin = margin(20, 25, 15, 20),
+    # Remove plot background
+    plot.background = element_rect(fill = "white", color = NA)
+  )
+
+```
+
+```{=latex}
+\end{paracol}
+```
+
+\vspace{0.5em}
+
+```{=latex}
+\setlength{\columnsep}{20pt}
+\columnratio{0.45}
+\begin{paracol}{2}
+```
+
+\lato\textcolor{black}{\large\textbf{Age Over Time}}
+
+```{r, age_share}
+
+file_path <- '/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/ageracesex_rda/ageracesex_year_long.rda'
+load(file_path)
+data_all <- ageracesex_year_long
+
+data_all <- data_all %>%
+  rowwise() %>%
+  mutate(total = sum(c(M, F, NA_sex, na_sex), na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(
+    black_share = Black / total,
+    white_share = White / total,
+    hispanic_share = Hispanic / total,
+    asian_share = Asian / total,
+    male_share = M / total,
+    female_share = F / total,
+    under_18_share = under_18 / total,
+    bet_19_65_share = bet_19_65 / total,
+    over_65_share = over_65 / total,
+  )
+
+data_collapsed <- data_all %>%
+  group_by(year) %>%
+  summarise(across(
+    c(AIAN, Asian, Black, Hispanic, NA_race, White, other_race, under_18, bet_19_65, over_65, total),
+    ~ sum(.x, na.rm = TRUE)
+  )) %>%
+  mutate(
+    under_18_share = under_18 / total,
+    bet_19_65_share = bet_19_65 / total,
+    over_65_share = over_65 / total
+  ) %>%
+  filter(year != 1999) %>%
+  ungroup()
+
+age_data_long <- data_collapsed %>%
+  pivot_longer(cols = c(under_18_share, bet_19_65_share, over_65_share),
+               names_to = "type",
+               values_to = "value")
+
+ggplot(age_data_long, aes(x = year, y = value, color = type)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2.5, alpha = 0.9) +
+  scale_color_manual(
+    values = c(
+      "under_18_share" = "#A6CEE3",
+      "bet_19_65_share" = "#601215",
+      "over_65_share" = "#003F5C"
+    ),
+    labels = c(
+      "under_18_share" = "Under 18",
+      "bet_19_65_share" = "Ages 19-65",
+      "over_65_share" = "Over 65"
+    )
+  ) +
+  labs(
+    #title = "Age Over Time",
+    x = "Year",
+    y = "Share of Population"
+  ) +
+  scale_y_continuous(
+    labels = scales::percent_format(),
+    expand = c(0.02, 0),
+    limits = c(0, 0.8),  # Ensure y-axis starts at zero and goes to 80%
+    breaks = seq(0, 0.8, by = 0.2)  # Labels at 0%, 20%, 40%, 60%, 80%
+  ) +
+  scale_x_continuous(
+    breaks = seq(2000, 2020, by = 5),
+    minor_breaks = NULL,  # Remove minor grid lines
+    expand = c(0.02, 0)
+  ) +
+  theme_minimal(base_family = "Lato") +
+  theme(
+    # Axes
+    axis.title = element_text(size = 12, color = "gray20"),
+    axis.text = element_text(size = 10, color = "gray30"),
+    axis.title.x = element_text(margin = margin(t = 10), size = 12),
+    axis.title.y = element_text(margin = margin(r = 10), size = 12),
+    axis.text.x = element_text(size = 10),
+    axis.text.y = element_text(size = 10),
+    legend.position = "top",
+    legend.title = element_blank(),
+    legend.text = element_text(size = 11, color = "gray20"),
+    legend.key.width = unit(1.5, "cm"),
+    legend.margin = margin(b = 15),
+    legend.box.spacing = unit(0, "pt"),
+    plot.title = element_text(size = 16, face = "bold"),
+    panel.grid.major.x = element_blank(),  # Remove vertical major grid lines
+    panel.grid.minor.x = element_blank(),   # Remove vertical minor grid lines
+    # Add solid x-axis line
+    axis.line.x = element_line(color = "black", size = 0.5)
+  )
+
+```
+
+```{=latex}
+\switchcolumn
+```
+\lato\textcolor{custommaroon}{\large\textbf{Age Dynamics}}
+
+\lato 
+
+* 18% of Charlottesville’s population is under 18, 60% of the population is 19-65, and 20% of the population is over 65.
+
+* Charlottesville has a lower share of people under 18, and a similar share of people between 19 and 65 relative to the US. Charlottesville has a higher share of people over 65 than the US. 
+
+* The over 65 population in Charlottesville is growing, while the under 18 and 19-65 population is declining.
+
+```{=latex}
+\end{paracol}
+```

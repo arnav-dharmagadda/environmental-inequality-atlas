@@ -197,6 +197,10 @@ hex_grid_sf <- hex_grid_sf[!is.na(hex_grid_sf$PM25), ]
 
 message("Created ", nrow(hex_grid_sf), " hexagons with PM2.5 data")
 
+# Save PM2.5 point data with county info for reproducibility
+file_path <- paste0(map_data, "pm25_with_county.rda")
+save(pm25_with_county, hex_grid_sf, file = file_path)
+
 # ------------------------------------------------------------------------------
 # VISUALIZATION
 # ------------------------------------------------------------------------------
@@ -208,7 +212,7 @@ tmap_mode("plot")
 point_map <- tm_shape(pm25_with_county) +
   tm_dots(
     col = "PM25", 
-    palette = "viridis", 
+    palette = "inferno", 
     style = "cont", 
     size = 0.05, 
     title = "PM2.5 (μg/m³)"
@@ -227,7 +231,7 @@ hex_map <- tm_basemap("CartoDB.Positron", alpha = 1) +
     col = "PM25",
     title = "PM2.5 (μg/m³)",
     style = "cont",
-    palette = "viridis",
+    palette = "inferno",
     fill_alpha = 0.9,
     colorNA = "transparent",
     textNA = "",
