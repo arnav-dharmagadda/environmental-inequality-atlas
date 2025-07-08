@@ -312,6 +312,10 @@ Income deciles divide the national population into ten equal income bins. The fi
 \end{paracol}
 ```
 
+```{r sparkline table, out.width="100%"}
+knitr::include_graphics("/Users/jfischman/Library/CloudStorage/OneDrive-BowdoinCollege/Documents/GitHub/environmental-inequality-atlas/output/raceincome/income_table.png")
+```
+
 ```{=latex}
 \begin{tcolorbox}[
   colback=white,
@@ -431,3 +435,10 @@ print(final_with_legend)
 \end{minipage}
 \end{tcolorbox}
 ```
+
+
+
+  
+
+
+
