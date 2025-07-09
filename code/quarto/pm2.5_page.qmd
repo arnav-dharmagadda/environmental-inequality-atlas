@@ -52,7 +52,7 @@ knitr::opts_chunk$set(
 
 # Set file paths (use relative paths instead of setwd)
 data_path <- "/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/gridded_eif_data/"
-git_path <- "/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/"
+git_path <- "/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/"
 
 # Load packages
 
@@ -82,7 +82,7 @@ showtext_auto()
 
 <!-- LEFT COLUMN -->
 
-\lato\textcolor{black}{\large\textbf{Population Over Space}}
+\lato\textcolor{black}{\large\textbf{PM2.5 Exposure Over Space}}
 
 ```{r, pm25_map}
 file_path <- paste0('/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/map_data/pm25_with_county.rda')
@@ -128,8 +128,6 @@ hex_map <- tm_basemap("CartoDB.Positron", alpha = 1) +
 # Display the hexagonal map
 print(hex_map)
 
-
-
 ```
 
 ```{=latex}
@@ -137,8 +135,8 @@ print(hex_map)
 ```
 ```{=latex}
 \begin{tcolorbox}[
-  colback=white,
-  colframe=white,
+  colback=custommaroon,
+  colframe=custommaroon,
   boxrule=1pt,
   arc=0pt,
   left=12pt, right=12pt, top=10pt, bottom=10pt
@@ -146,22 +144,16 @@ print(hex_map)
 
 \vspace{0em}
 
-\color{black}
-\lato{\textcolor{custommaroon}{\large\textbf{Where People Live}}}
+\color{white}
+\lato{\textcolor{white}{\large\textbf{PM2.5}}}
 
 \vspace{1em}
 
-\begin{itemize}
+PM2.5 refers to fine particulate matter that is 2.5 micrometers or smaller in diameter. These tiny particles are a type of air pollution that can come from sources like vehicle emissions, industrial processes, wildfires, and chemical reactions in the atmosphere. Because of their small size, PM2.5 particles can penetrate deep into the lungs and even enter the bloodstream, posing health risks such as respiratory problems, heart disease, and premature death. 
 
-\item Charlottesville and Albemarle County are home to 147,428 people. 
+\vspace{0.5em}
 
-\item The most populous county is Albemarle. 
-
-\item The most populous localities are Charlottesville City, Crozet, and Hollymead.
-
-\item The region has a population density of 78 people per square kilometer, which is more dense than the national average of 37 per square kilometer.
-
-\end{itemize}
+The map on the left shows where PM2.5 is highest (darker) and lowest (lighter) in the county.
 
 \vspace{1em}
 
@@ -174,252 +166,195 @@ print(hex_map)
 \end{paracol}
 ```
 
-\vspace{0.5em}
+```{=latex}
+
+\vspace{1em}
+
+\lato Overall, the average resident in Charlottesville was exposed to 8.53 micrograms per cubic meter of PM2.5 in 2023, which is 1.7\% lower than the national average of 8.68 micrograms per cubic meter. This has decreased by 44.8\% since 2000. The National Ambient Air Quality Standards (NAAQ) sets the public health standard for PM2.5 exposure at 9 micrograms per cubic meter. About 4.6\% of Charlottesville residents live in areas exceeding the standard, which is 88.6\% lower than the national average of 40.5\%.
+
+\color{black}
+\lato{\textcolor{custommaroon}{\large\textbf{Exposure By Race/Ethnicity}}}
+
+In Charlottesville, Black residents experience the highest levels of PM2.5 exposure, and Black residents experience PM 2.5 levels above the national standard at the highest rate relative to other racial groups. PM2.5 exposure for White, Asian, and AIAN residents is higher than the national average, but lower than the national average for Black and Hispanic residents.
+
+\vspace{1em}
+
+
+```
+
+```{r sparkline_race, out.width="100%"}
+
+include_graphics("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/code/quarto/images/race_exposure.png")
+
+```
+
+```{=latex}
+
+\color{black}
+\lato{\textcolor{custommaroon}{\large\textbf{Exposure By Income Decile}}}
+
+Residents in the lowest income deciles in Charlottesville have the highest exposure to PM2.5 and have the highest rate of experiencing levels of PM2.5 that exceed the national standard. The tenth income decile has the lowest PM2.5 exposure and percent exposed to levels of PM2.5 exceeding the national standard. The second income decile has the highest average level of PM2.5 exposure, and the fifth income decile has the highest rate of areas exceeding the national standard.
+
+\vspace{1em}
+
+```
+
+```{r sparkline_inc, out.width="100%"}
+
+include_graphics("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/code/quarto/images/income_exposure.png")
+
+```
+
+\vspace{2em}
 
 ```{=latex}
 \setlength{\columnsep}{20pt}
-\columnratio{0.55}
+\columnratio{0.35}
 \begin{paracol}{2}
 ```
 
-<!-- LEFT COLUMN -->
-
-\lato\textcolor{custommaroon}{\large\textbf{Population Trends}}
-
-\lato 
-
-* The population has grown since 2000 by 47,506 people at an average growth rate of 1.63%. This is faster than the national average growth rate of 0.8%.
+```{=latex}
 
 
-* Albemarle County has the highest growth rate relative to other counties in the region.
+
+\begin{tcolorbox}[
+  colback=custommaroon,
+  colframe=custommaroon,
+  boxrule=1pt,
+  arc=0pt,
+  left=12pt, right=12pt, top=10pt, bottom=10pt
+]
+
+\vspace{0em}
+
+\color{white}
+\lato{\textcolor{white}{\large\textbf{Race/Ethnicity \& Income}}}
+
+\vspace{1.75em}
+
+Disparate exposure to PM2.5 exists across both income and racial dimensions. PM2.5 exposure tends to decline across all racial/ethnic categories, but level differences between groups remain. In the lowest income decile, Black, Asian, and Hispanic residents have the highest exposure, while White and Native American residents have the lowest exposure. This pattern persists in the highest income decile. 
+
+\vspace{1.75em}
+
+\end{tcolorbox}
+```
 
 
 ```{=latex}
 \switchcolumn
 ```
+\lato\textcolor{black}{\large\textbf{PM2.5 Exposure By Income Decile \& Race/Ethnicity}}
 
-\lato\textcolor{black}{\large\textbf{Population Over Time}}
+```{r, inc_plot}
+file_path <- paste0(git_path, "data/processed/pollutants_rda/pollutants_long.rda")
+load(file_path) 
 
-```{r, pop_over_time}
-
-file_path <- paste0('/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/raceincome_rda/raceincome_long.rda')
+file_path <- paste0(git_path, "data/processed/raceincome_rda/raceincome_long.rda")
 load(file_path)
 
-raceincome_by_county <- raceincome_combined %>%
-  group_by(year, COUNTYFP, NAME) %>%
-  summarise(n_noise_postprocessed = sum(n_noise_postprocessed, na.rm = TRUE), .groups = "drop") %>%
-  filter(year != 1999)
+raceincome_pollute <- pollutants_combined %>%
+  left_join(raceincome_combined, by = c("grid_lon", "grid_lat", "year", "STATEFP", "COUNTYFP", "COUNTYNS", "GEOID", "GEOIDFQ", "NAME", "NAMELSAD", "STUSPS", "STATE_NAME", "LSAD", "ALAND", "AWATER"))
 
-raceincome_combined <- raceincome_combined %>%
-  group_by(year) %>%
-  summarise(n_noise_postprocessed = sum(n_noise_postprocessed, na.rm = TRUE)) %>%
-  filter(year != 1999)
+line_plot_race <- raceincome_pollute %>%
+    mutate(pm25_gt_9 = pm25_ACAG_gwr > 9) %>%
+    filter(year == 2023) %>%
+    filter(income_decile != 0) %>%
+    filter(race_ethnicity != "Other/Unknown") %>%
+    group_by(race_ethnicity, income_decile) %>%
+    summarize(
+      pm25_avg = weighted.mean(pm25_ACAG_gwr, n_noise_postprocessed, na.rm = TRUE),
+      exceed_standard = weighted.mean(pm25_gt_9, n_noise_postprocessed, na.rm = TRUE),
+      .groups = "drop"
+    )
 
-plot_data <- bind_rows(
-  raceincome_by_county,
-  raceincome_combined %>% mutate(NAME = "Total", COUNTYFP = "Total")
-)
-
-ggplot(plot_data, aes(x = year, y = n_noise_postprocessed, color = NAME)) +
-  geom_line(size = 1.2, alpha = 0.9) +
-  geom_point(size = 2.5, alpha = 0.9) +
+ggplot(line_plot_race, aes(x = income_decile, y = pm25_avg, color = race_ethnicity)) +
+  geom_point(size = 1.5, shape = 2, alpha = 0.9) +
+  geom_line(size = 1, alpha = 0.9) +
   scale_color_manual(
     values = c(
-      "Total" = "#601215",
-      "Albemarle" = "#A6CEE3",
-      "Charlottesville" = "#003F5C"
-    )
-  ) +
-  labs(
-    #title = "Population Over Time",
-    x = "Year",
-    y = "Population"
+      "White" = "#2E8B57",
+      "Black" = "#003F5C",
+      "Hispanic" = "#FF6B35",
+      "Asian" = "#A6CEE3", 
+      "AIAN" = "#601215"
+    ),
+    breaks = c("White", "Black", "Hispanic", "Asian", "AIAN")
   ) +
   scale_x_continuous(
-    breaks = seq(2000, 2020, by = 5),
+    breaks = 1:10, 
+    labels = 1:10,
     minor_breaks = NULL,  # Remove minor grid lines
     expand = c(0.02, 0)
   ) +
   scale_y_continuous(
-    labels = scales::comma_format(scale = 1e-3, suffix = "K"),
     expand = c(0.02, 0),
-    limits = c(0, NA)  # Ensure y-axis starts at zero
+    limits = c(8.2, 9)
   ) +
-  theme_minimal(base_size = 12, base_family = "Lato") +
+  labs(
+    x = "Income Decile",
+    y = "Average PM2.5 (µg/m³)",
+    color = "Race/Ethnicity"
+  ) +
+  theme_minimal(base_size = 6, base_family = "Lato") +
   theme(
     # Plot titles
     plot.title = element_text(
       face = "bold", 
-      size = 16, 
+      size = 8, 
       hjust = 0,
-      margin = margin(b = 5),
+      margin = margin(b = 2.5),
       color = "black"
     ),
     plot.subtitle = element_text(
-      size = 14,
+      size = 7,
       hjust = 0,
-      margin = margin(b = 20),
+      margin = margin(b = 10),
       color = "gray30"
     ),
     plot.caption = element_text(
-      size = 9,
+      size = 4.5,
       hjust = 0,
-      margin = margin(t = 15),
+      margin = margin(t = 7.5),
       color = "gray50",
       lineheight = 1.1
     ),
     # Axes
-    axis.title = element_text(size = 12, color = "gray20"),
-    axis.text = element_text(size = 10, color = "gray30"),
-    axis.title.x = element_text(margin = margin(t = 10), size = 12),
-    axis.title.y = element_text(margin = margin(r = 10), size = 12),
-    axis.text.x = element_text(size = 10),
-    axis.text.y = element_text(size = 10),
+    axis.title = element_text(size = 10.5, color = "gray20"),
+    axis.text = element_text(size = 8.75, color = "gray30"),
+    axis.title.x = element_text(margin = margin(t = 5), size = 10.5),
+    axis.title.y = element_text(margin = margin(r = 5), size = 10.5),
+    axis.text.x = element_text(size = 8.75),
+    axis.text.y = element_text(size = 8.75),
     # Grid
     panel.grid.major.x = element_blank(),  # Remove vertical major grid lines
     panel.grid.minor.x = element_blank(),  # Remove vertical minor grid lines
-    panel.grid.major = element_line(color = "gray90", size = 0.5),
-    panel.grid.minor = element_line(color = "gray95", size = 0.25),
+    panel.grid.major = element_line(color = "gray90", size = 0.25),
+    panel.grid.minor = element_line(color = "gray95", size = 0.125),
     panel.background = element_rect(fill = "white", color = NA),
     # Add solid x-axis line
-    axis.line.x = element_line(color = "black", size = 0.5),
+    axis.line.x = element_line(color = "black", size = 0.25),
     # Legend
     legend.position = "top",
     legend.title = element_blank(),
-    legend.text = element_text(size = 11, color = "gray20"),
-    legend.key.width = unit(1.5, "cm"),
-    legend.margin = margin(b = 15),
+    legend.text = element_text(size = 5.5, color = "gray20"),
+    legend.key.width = unit(0.75, "cm"),
+    legend.margin = margin(b = 7.5),
     legend.box.spacing = unit(0, "pt"),
+    legend.direction = "horizontal",
+    legend.box = "horizontal",
+    legend.justification = "center",
     # Plot margins
-    plot.margin = margin(20, 25, 15, 20),
+    plot.margin = margin(10, 12.5, 7.5, 10),
     # Remove plot background
     plot.background = element_rect(fill = "white", color = NA)
-  )
+  ) + 
+  guides(color = guide_legend(nrow = 1, ncol = 5))
+
 
 ```
 
-```{=latex}
-\end{paracol}
-```
+\lato \textit{Notes:} Each line represents a different racial group. For each income decile, the average PM2.5 exposure is shown. 
 
-\vspace{0.5em}
-
-```{=latex}
-\setlength{\columnsep}{20pt}
-\columnratio{0.45}
-\begin{paracol}{2}
-```
-
-\lato\textcolor{black}{\large\textbf{Age Over Time}}
-
-```{r, age_share}
-
-file_path <- '/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/ageracesex_rda/ageracesex_year_long.rda'
-load(file_path)
-data_all <- ageracesex_year_long
-
-data_all <- data_all %>%
-  rowwise() %>%
-  mutate(total = sum(c(M, F, NA_sex, na_sex), na.rm = TRUE)) %>%
-  ungroup() %>%
-  mutate(
-    black_share = Black / total,
-    white_share = White / total,
-    hispanic_share = Hispanic / total,
-    asian_share = Asian / total,
-    male_share = M / total,
-    female_share = F / total,
-    under_18_share = under_18 / total,
-    bet_19_65_share = bet_19_65 / total,
-    over_65_share = over_65 / total,
-  )
-
-data_collapsed <- data_all %>%
-  group_by(year) %>%
-  summarise(across(
-    c(AIAN, Asian, Black, Hispanic, NA_race, White, other_race, under_18, bet_19_65, over_65, total),
-    ~ sum(.x, na.rm = TRUE)
-  )) %>%
-  mutate(
-    under_18_share = under_18 / total,
-    bet_19_65_share = bet_19_65 / total,
-    over_65_share = over_65 / total
-  ) %>%
-  filter(year != 1999) %>%
-  ungroup()
-
-age_data_long <- data_collapsed %>%
-  pivot_longer(cols = c(under_18_share, bet_19_65_share, over_65_share),
-               names_to = "type",
-               values_to = "value")
-
-ggplot(age_data_long, aes(x = year, y = value, color = type)) +
-  geom_line(size = 1.2) +
-  geom_point(size = 2.5, alpha = 0.9) +
-  scale_color_manual(
-    values = c(
-      "under_18_share" = "#A6CEE3",
-      "bet_19_65_share" = "#601215",
-      "over_65_share" = "#003F5C"
-    ),
-    labels = c(
-      "under_18_share" = "Under 18",
-      "bet_19_65_share" = "Ages 19-65",
-      "over_65_share" = "Over 65"
-    )
-  ) +
-  labs(
-    #title = "Age Over Time",
-    x = "Year",
-    y = "Share of Population"
-  ) +
-  scale_y_continuous(
-    labels = scales::percent_format(),
-    expand = c(0.02, 0),
-    limits = c(0, 0.8),  # Ensure y-axis starts at zero and goes to 80%
-    breaks = seq(0, 0.8, by = 0.2)  # Labels at 0%, 20%, 40%, 60%, 80%
-  ) +
-  scale_x_continuous(
-    breaks = seq(2000, 2020, by = 5),
-    minor_breaks = NULL,  # Remove minor grid lines
-    expand = c(0.02, 0)
-  ) +
-  theme_minimal(base_family = "Lato") +
-  theme(
-    # Axes
-    axis.title = element_text(size = 12, color = "gray20"),
-    axis.text = element_text(size = 10, color = "gray30"),
-    axis.title.x = element_text(margin = margin(t = 10), size = 12),
-    axis.title.y = element_text(margin = margin(r = 10), size = 12),
-    axis.text.x = element_text(size = 10),
-    axis.text.y = element_text(size = 10),
-    legend.position = "top",
-    legend.title = element_blank(),
-    legend.text = element_text(size = 11, color = "gray20"),
-    legend.key.width = unit(1.5, "cm"),
-    legend.margin = margin(b = 15),
-    legend.box.spacing = unit(0, "pt"),
-    plot.title = element_text(size = 16, face = "bold"),
-    panel.grid.major.x = element_blank(),  # Remove vertical major grid lines
-    panel.grid.minor.x = element_blank(),   # Remove vertical minor grid lines
-    # Add solid x-axis line
-    axis.line.x = element_line(color = "black", size = 0.5)
-  )
-
-```
-
-```{=latex}
-\switchcolumn
-```
-\lato\textcolor{custommaroon}{\large\textbf{Age Dynamics}}
-
-\lato 
-
-* 18% of Charlottesville’s population is under 18, 60% of the population is 19-65, and 20% of the population is over 65.
-
-* Charlottesville has a lower share of people under 18, and a similar share of people between 19 and 65 relative to the US. Charlottesville has a higher share of people over 65 than the US. 
-
-* The over 65 population in Charlottesville is growing, while the under 18 and 19-65 population is declining.
 
 ```{=latex}
 \end{paracol}

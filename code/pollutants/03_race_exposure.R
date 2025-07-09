@@ -35,40 +35,93 @@ raceincome_pollute_avg <- raceincome_pollute_avg %>%
     national_avg
   )
 
+# Calculate total (all races combined) statistics
+total_stats <- raceincome_pollute %>%
+  mutate(pm25_gt_9 = pm25_ACAG_gwr > 9) %>%
+  filter(year != 1999) %>%
+  filter(race_ethnicity != "Other/Unknown") %>%
+  group_by(year) %>%
+  summarize(
+    pm25_avg = weighted.mean(pm25_ACAG_gwr, n_noise_postprocessed, na.rm = TRUE),
+    exceed_standard = weighted.mean(pm25_gt_9, n_noise_postprocessed, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Calculate national totals (all races combined)
+national_total_stats <- national %>%
+  mutate(pm25_gt_9 = pm25_ACAG_gwr > 9) %>%
+  filter(race_ethnicity != "Other/Unknown") %>%
+  select(pm25_ACAG_gwr, n_noise_postprocessed, pm25_gt_9) %>%
+  summarize(
+    nat_pm25_avg = weighted.mean(pm25_ACAG_gwr, n_noise_postprocessed, na.rm = TRUE),
+    nat_exceed_standard = weighted.mean(pm25_gt_9, n_noise_postprocessed, na.rm = TRUE),
+    year = 2023,
+    .groups = "drop"
+  )
+
+# Combine total stats with national totals
+total_stats <- total_stats %>%
+  left_join(national_total_stats, by = "year") %>%
+  summarise(
+    race_ethnicity = "Total",
+    PM25_2023 = pm25_avg[year == 2023],
+    Trend = list(pm25_avg),
+    NatTrend = nat_pm25_avg[year == 2023],
+    Exceed_2023 = exceed_standard[year == 2023],
+    ExceedTrend = list(exceed_standard),
+    NatExceedTrend = nat_exceed_standard[year == 2023],
+    .groups = "drop"
+  )
+
 # Prepare sparkline-friendly format with nat avg
 pm25_spark_data <- raceincome_pollute_avg %>%
   filter(!is.na(pm25_avg)) %>%
   filter(year != 1999) %>%
+  filter(race_ethnicity != "Other/Unknown") %>%
   arrange(race_ethnicity, year) %>%
   group_by(race_ethnicity) %>%
   summarise(
     PM25_2023 = pm25_avg[year == 2023],
-    Exceed_2023 = exceed_standard[year == 2023],
     Trend = list(pm25_avg),
-    ExceedTrend = list(exceed_standard),
     NatTrend = nat_pm25_avg[year == 2023],
+    Exceed_2023 = exceed_standard[year == 2023],
+    ExceedTrend = list(exceed_standard),
     NatExceedTrend = nat_exceed_standard[year == 2023],
     .groups = "drop"
-  ) 
+  ) %>%
+  # Add the total row
+  bind_rows(total_stats) %>%
+  # Reorder rows to match desired race order with Total at top
+  mutate(race_ethnicity = factor(race_ethnicity, levels = c("White", "Black", "Hispanic", "Asian", "AIAN", "Total"))) %>%
+  arrange(race_ethnicity) 
 
 htmltools::save_html(
   reactable(
     pm25_spark_data,
     columns = list(
-      race_ethnicity = colDef(name = "Race", align = "center"),
-      PM25_2023 = colDef(
-        name = "PM2.5 in 2023",
-        format = colFormat(digits = 2),
-        align = "center"
+      race_ethnicity = colDef(
+        name = "Race or Ethnicity", 
+        align = "center",
+        style = function(value) {
+          if (value == "Total") {
+            list(fontWeight = "bold", backgroundColor = "#f5f5f5")
+          }
+        }
       ),
-      Exceed_2023 = colDef(
-        name = "% Exceeding 9 µg/m³ in 2023",
-        format = colFormat(percent = TRUE, digits = 1),
-        align = "center"
+      PM25_2023 = colDef(
+        name = "PM2.5<br><span style='font-size: 16px; font-weight: normal;'>(2023)</span>",
+        format = colFormat(digits = 2),
+        align = "center",
+        html = TRUE,
+        style = function(value, index) {
+          if (pm25_spark_data$race_ethnicity[index] == "Total") {
+            list(fontWeight = "bold", backgroundColor = "#f5f5f5")
+          }
+        }
       ),
       Trend = colDef(
-        name = "PM2.5 Trend (2000–2023)",
-        cell = function(values) {
+        name = "PM2.5 <br><span style='font-size: 16px; font-weight: normal;'>(2000–2023)</span>",
+        cell = function(values, index) {
           n <- length(values)
           left_label <- formatC(values[1], format = "f", digits = 1)
           right_label <- formatC(values[n], format = "f", digits = 1)
@@ -89,19 +142,47 @@ htmltools::save_html(
             width = 100,
             height = 40
           )
+          div_style <- "display: flex; align-items: center; justify-content: center;"
           div(
-            style = "display: flex; align-items: center; justify-content: center;",
+            style = div_style,
             tags$span(left_label, style = "font-size: 10px; color: black;"),
             tags$div(spark, style = "padding-left: 5px; padding-right: 5px;"),
             tags$span(right_label, style = "font-size: 10px; color: black;")
           )
         },
         html = TRUE,
-        align = "center"
+        align = "center",
+        style = function(value, index) {
+          if (pm25_spark_data$race_ethnicity[index] == "Total") {
+            list(fontWeight = "bold", backgroundColor = "#f5f5f5")
+          }
+        }
+      ),
+      NatTrend = colDef(
+        name = "National PM2.5<br><span style='font-size: 16px; font-weight: normal;'>(2023)</span>",
+        format = colFormat(digits = 2),
+        align = "center",
+        html = TRUE,
+        style = function(value, index) {
+          if (pm25_spark_data$race_ethnicity[index] == "Total") {
+            list(fontWeight = "bold", backgroundColor = "#f5f5f5")
+          }
+        }
+      ),
+      Exceed_2023 = colDef(
+        name = "% Exceeding Standard<br><span style='font-size: 16px; font-weight: normal;'>(2023)</span>",
+        format = colFormat(percent = TRUE, digits = 1),
+        align = "center",
+        html = TRUE,
+        style = function(value, index) {
+          if (pm25_spark_data$race_ethnicity[index] == "Total") {
+            list(fontWeight = "bold", backgroundColor = "#f5f5f5")
+          }
+        }
       ),
       ExceedTrend = colDef(
-        name = "% Exceeding 9 µg/m³ Trend",
-        cell = function(values) {
+        name = "% Exceeding Standard<br><span style='font-size: 16px; font-weight: normal;'>(2000–2023)</span>",
+        cell = function(values, index) {
           n <- length(values)
           left_label <- paste0(round(100 * values[1], 1), "%")
           right_label <- paste0(round(100 * values[n], 1), "%")
@@ -122,32 +203,43 @@ htmltools::save_html(
             width = 100,
             height = 40
           )
+          div_style <- "display: flex; align-items: center; justify-content: center;"
           div(
-            style = "display: flex; align-items: center; justify-content: center;",
+            style = div_style,
             tags$span(left_label, style = "font-size: 10px; color: black;"),
             tags$div(spark, style = "padding-left: 5px; padding-right: 5px;"),
             tags$span(right_label, style = "font-size: 10px; color: black;")
           )
         },
         html = TRUE,
-        align = "center"
-      ),
-      NatTrend = colDef(
-        name = "National PM2.5 in 2023",
-        format = colFormat(digits = 2),
-        align = "center"
+        align = "center",
+        style = function(value, index) {
+          if (pm25_spark_data$race_ethnicity[index] == "Total") {
+            list(fontWeight = "bold", backgroundColor = "#f5f5f5")
+          }
+        }
       ),
       NatExceedTrend = colDef(
-        name = "National % Exceeding 9 µg/m³ in 2023",
+        name = "National % Exceeding Standard<br><span style='font-size: 16px; font-weight: normal;'>(2023)</span>",
         format = colFormat(percent = TRUE, digits = 1),
-        align = "center"
+        align = "center",
+        html = TRUE,
+        style = function(value, index) {
+          if (pm25_spark_data$race_ethnicity[index] == "Total") {
+            list(fontWeight = "bold", backgroundColor = "#f5f5f5")
+          }
+        }
       )
     ),
     theme = reactableTheme(
       headerStyle = list(
         fontSize = "25px",
         fontWeight = "bold",
-        color = "black"
+        color = "black",
+        fontFamily = "Lato"
+      ),
+      cellStyle = list(
+        fontFamily = "Lato"
       )
     ),
     bordered = TRUE,
@@ -156,6 +248,15 @@ htmltools::save_html(
     compact = TRUE
   ),
   file = "GitHub/environmental-inequality-atlas/output/pollutants/race_exposure.html"
+)
+
+webshot2::webshot(
+  "GitHub/environmental-inequality-atlas/output/pollutants/race_exposure.html",
+  "GitHub/environmental-inequality-atlas/code/quarto/images/race_exposure.png",
+  vwidth = 1200,
+  vheight = 800,
+  zoom = 3,
+  delay = 2
 )
 
 #### Changes in Exposure Over Time ####

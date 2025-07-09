@@ -26,7 +26,7 @@ if (!requireNamespace("pacman", quietly = TRUE)) {
   install.packages("pacman")
 }
 
-pacman::p_load(sf, terra, dplyr, ggplot2, tmap, arrow, dplyr, tidyr, scales, haven, reactable, sparkline, htmltools, purrr, webshot2, ncdf4, stars)
+pacman::p_load(sf, terra, dplyr, ggplot2, tmap, arrow, dplyr, tidyr, scales, haven, reactable, sparkline, htmltools, purrr, webshot2, ncdf4, stars, webshot2)
 
 #### Load Data ####
 

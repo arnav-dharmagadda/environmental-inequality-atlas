@@ -44,10 +44,10 @@ pm25_spark_data <- raceincome_pollute_avg %>%
   group_by(income_decile) %>%
   summarise(
     PM25_2023 = pm25_avg[year == 2023],
-    Exceed_2023 = exceed_standard[year == 2023],
     Trend = list(pm25_avg),
-    ExceedTrend = list(exceed_standard),
     NatTrend = nat_pm25_avg[year == 2023],
+    Exceed_2023 = exceed_standard[year == 2023],
+    ExceedTrend = list(exceed_standard),
     NatExceedTrend = nat_exceed_standard[year == 2023],
     .groups = "drop"
   ) %>%
@@ -59,17 +59,19 @@ htmltools::save_html(
     columns = list(
       income_decile = colDef(name = "Income Decile", align = "center"),
       PM25_2023 = colDef(
-        name = "PM2.5 in 2023",
+        name = "PM2.5<br><span style='font-size: 16px; font-weight: normal;'>(2023)</span>",
         format = colFormat(digits = 2),
-        align = "center"
+        align = "center",
+        html = TRUE
       ),
       Exceed_2023 = colDef(
-        name = "% Exceeding 9 µg/m³ in 2023",
+        name = "% Exceeding Standard<br><span style='font-size: 16px; font-weight: normal;'>(2023)</span>",
         format = colFormat(percent = TRUE, digits = 1),
-        align = "center"
+        align = "center",
+        html = TRUE
       ),
       Trend = colDef(
-        name = "PM2.5 Trend (2000–2023)",
+        name = "PM2.5<br><span style='font-size: 16px; font-weight: normal;'>(2000–2023)</span>",
         cell = function(values) {
           n <- length(values)
           left_label <- formatC(values[1], format = "f", digits = 1)
@@ -102,7 +104,7 @@ htmltools::save_html(
         align = "center"
       ),
       ExceedTrend = colDef(
-        name = "% Exceeding 9 µg/m³ Trend",
+        name = "% Exceeding Standard<br><span style='font-size: 16px; font-weight: normal;'>(2000–2023)</span>",
         cell = function(values) {
           n <- length(values)
           left_label <- paste0(round(100 * values[1], 1), "%")
@@ -135,21 +137,27 @@ htmltools::save_html(
         align = "center"
       ),
       NatTrend = colDef(
-        name = "National PM2.5 in 2023",
+        name = "National PM2.5<br><span style='font-size: 16px; font-weight: normal;'>(2023)</span>",
         format = colFormat(digits = 2),
-        align = "center"
+        align = "center",
+        html = TRUE
       ),
       NatExceedTrend = colDef(
-        name = "National % Exceeding 9 µg/m³ in 2023",
+        name = "National % Exceeding Standard<br><span style='font-size: 16px; font-weight: normal;'>(2023)</span>",
         format = colFormat(percent = TRUE, digits = 1),
-        align = "center"
+        align = "center",
+        html = TRUE
       )
     ),
     theme = reactableTheme(
       headerStyle = list(
         fontSize = "25px",
         fontWeight = "bold",
-        color = "black"
+        color = "black",
+        fontFamily = "Lato"
+      ),
+      cellStyle = list(
+        fontFamily = "Lato"
       )
     ),
     bordered = TRUE,
@@ -160,6 +168,14 @@ htmltools::save_html(
   file = "GitHub/environmental-inequality-atlas/output/pollutants/income_exposure.html"
 )
 
+webshot2::webshot(
+  "GitHub/environmental-inequality-atlas/output/pollutants/income_exposure.html",
+  "GitHub/environmental-inequality-atlas/code/quarto/images/income_exposure.png",
+  vwidth = 1200,
+  vheight = 800,
+  zoom = 3,
+  delay = 2
+)
 #### CREATING LINE PLOT ####
 
 line_plot <- raceincome_pollute %>%
