@@ -510,3 +510,104 @@ ggplot(income_trend_thirds, aes(x = year, y = avg_income, color = Group)) +
     panel.background = element_rect(fill = "white", color = NA),
     plot.background = element_rect(fill = "white", color = NA)
   )
+
+# Filter for Charlottesville/Albemarle 1999–2024 data
+cville_deciles <- raceincome_combined %>%
+  filter(
+    !is.na(income_decile),
+    income_decile %in% 1:10,
+    !is.na(income_dollar_2024),
+    !is.na(n_noise_postprocessed),
+    STATEFP == "51", COUNTYFP %in% c("540", "003")
+  ) %>%
+  mutate(
+    income_dollar_2024 = ifelse(income_dollar_2024 < 0, 0, income_dollar_2024)
+  )
+
+# Summarize: avg income per decile per year
+cville_decile_yearly <- cville_deciles %>%
+  group_by(year, income_decile) %>%
+  summarise(
+    avg_income = weighted.mean(income_dollar_2024, n_noise_postprocessed, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Sparkline prep: Trend + income in 2024
+cville_trend_table <- cville_decile_yearly %>%
+  arrange(year) %>%
+  group_by(income_decile) %>%
+  summarise(
+    Trend = list(avg_income),
+    Income_2024 = avg_income[year == 2024],
+    Start_Income = first(avg_income),
+    Years = 2024 - first(year),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    Annual_Growth = (Income_2024 / Start_Income)^(1 / Years) - 1
+  )
+
+# Add population count and share from 2024
+decile_pop_2024 <- cville_deciles %>%
+  filter(year == 2024) %>%
+  group_by(income_decile) %>%
+  summarise(
+    Population = sum(n_noise_postprocessed, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    Share = Population / sum(Population)
+  )
+
+# Merge together
+
+cville_decile_table_simple <- cville_trend_table %>%
+  select(income_decile, Income_2024, Annual_Growth) %>%
+  left_join(decile_pop_2024, by = "income_decile") %>%
+  rename(
+    `Income Decile` = income_decile,
+    `Avg Income (2024 $)` = Income_2024,
+    `Annual Growth` = Annual_Growth,
+    `Population (2024)` = Population,
+    `Share of Pop.` = Share
+  )
+
+# Render table with reactable
+tup <- reactable(
+  cville_decile_table_simple,
+  columns = list(
+    `Income Decile` = colDef(name = "Decile", width = 70),
+    `Population (2024)` = colDef(
+      format = colFormat(separators = TRUE, digits = 0),
+      width = 120
+    ),
+    `Share of Pop.` = colDef(
+      format = colFormat(percent = TRUE, digits = 1),
+      width = 100
+    ),
+    `Avg Income (2024 $)` = colDef(
+      format = colFormat(prefix = "$", separators = TRUE, digits = 0),
+      width = 160
+    ),
+    `Annual Growth` = colDef(
+      format = colFormat(percent = TRUE, digits = 1),
+      width = 120
+    )
+  ),
+  bordered = TRUE,
+  striped = TRUE,
+  highlight = TRUE,
+  compact = TRUE
+)
+
+saveWidget(tup, "income_table.html", selfcontained = TRUE)
+
+# Save as PNG
+webshot(
+  "income_table.html",
+  "output/raceincome/income_table.png",
+  vwidth = 650,    # viewport width in pixels
+  vheight = 800,    # viewport height in pixels
+  zoom = 3
+)
+
