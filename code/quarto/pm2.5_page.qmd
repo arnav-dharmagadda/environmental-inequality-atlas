@@ -76,7 +76,7 @@ showtext_auto()
 
 ```{=latex}
 \setlength{\columnsep}{20pt}
-\columnratio{0.60}
+\columnratio{0.525}
 \begin{paracol}{2}
 ```
 
@@ -130,6 +130,8 @@ print(hex_map)
 
 ```
 
+\lato\scriptsize\textit{Notes}: Map with hexagonal grid shows PM2.5 concentrations.
+
 ```{=latex}
 \switchcolumn
 ```
@@ -146,6 +148,8 @@ print(hex_map)
 
 \color{white}
 \lato{\textcolor{white}{\large\textbf{PM2.5}}}
+
+\normalsize
 
 \vspace{1em}
 
@@ -168,7 +172,7 @@ The map on the left shows where PM2.5 is highest (darker) and lowest (lighter) i
 
 ```{=latex}
 
-\vspace{1em}
+\vspace{0.5em}
 
 \lato Overall, the average resident in Charlottesville was exposed to 8.53 micrograms per cubic meter of PM2.5 in 2023, which is 1.7\% lower than the national average of 8.68 micrograms per cubic meter. This has decreased by 44.8\% since 2000. The National Ambient Air Quality Standards (NAAQ) sets the public health standard for PM2.5 exposure at 9 micrograms per cubic meter. About 4.6\% of Charlottesville residents live in areas exceeding the standard, which is 88.6\% lower than the national average of 40.5\%.
 
@@ -177,33 +181,40 @@ The map on the left shows where PM2.5 is highest (darker) and lowest (lighter) i
 
 In Charlottesville, Black residents experience the highest levels of PM2.5 exposure, and Black residents experience PM 2.5 levels above the national standard at the highest rate relative to other racial groups. PM2.5 exposure for White, Asian, and AIAN residents is higher than the national average, but lower than the national average for Black and Hispanic residents.
 
-\vspace{1em}
+\vspace{0.5em}
 
 
 ```
-
+\lato\textcolor{black}{\large\textbf{Average PM2.5 Exposure and Exceeding Standard Rate by Race/Ethnicity}}
 ```{r sparkline_race, out.width="100%"}
 
 include_graphics("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/code/quarto/images/race_exposure.png")
 
 ```
 
+\lato\scriptsize\textit{Notes}: By race/ethnicity, this table shows the local and national average PM2.5 exposure in 2023 and local trend 2000-2023. Additionally, it shows local and national rate of people living in areas exceeding the national standard in 2023 and local trend 2000-2023.
+
 ```{=latex}
 
 \color{black}
 \lato{\textcolor{custommaroon}{\large\textbf{Exposure By Income Decile}}}
+
+\normalsize
 
 Residents in the lowest income deciles in Charlottesville have the highest exposure to PM2.5 and have the highest rate of experiencing levels of PM2.5 that exceed the national standard. The tenth income decile has the lowest PM2.5 exposure and percent exposed to levels of PM2.5 exceeding the national standard. The second income decile has the highest average level of PM2.5 exposure, and the fifth income decile has the highest rate of areas exceeding the national standard.
 
 \vspace{1em}
 
 ```
+\lato\textcolor{black}{\large\textbf{Average PM2.5 Exposure and Exceeding Standard Rate by Income Decile}}
 
 ```{r sparkline_inc, out.width="100%"}
 
 include_graphics("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/code/quarto/images/income_exposure.png")
 
 ```
+
+\lato \scriptsize \textit{Notes:} By income decile, this table shows the local and national average PM2.5 exposure in 2023 and local trend 2000-2023. Additionally, it shows local and national rate of people living in areas exceeding the national standard in 2023 and local trend 2000-2023.
 
 \vspace{2em}
 
@@ -230,11 +241,13 @@ include_graphics("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitH
 \color{white}
 \lato{\textcolor{white}{\large\textbf{Race/Ethnicity \& Income}}}
 
-\vspace{1.75em}
+\vspace{1em}
+
+\normalsize
 
 Disparate exposure to PM2.5 exists across both income and racial dimensions. PM2.5 exposure tends to decline across all racial/ethnic categories, but level differences between groups remain. In the lowest income decile, Black, Asian, and Hispanic residents have the highest exposure, while White and Native American residents have the lowest exposure. This pattern persists in the highest income decile. 
 
-\vspace{1.75em}
+\vspace{1em}
 
 \end{tcolorbox}
 ```
@@ -353,7 +366,7 @@ ggplot(line_plot_race, aes(x = income_decile, y = pm25_avg, color = race_ethnici
 
 ```
 
-\lato \textit{Notes:} Each line represents a different racial group. For each income decile, the average PM2.5 exposure is shown. 
+\lato \scriptsize \textit{Notes:} Each line represents a different racial group. For each income decile, the average PM2.5 exposure is shown. 
 
 
 ```{=latex}
