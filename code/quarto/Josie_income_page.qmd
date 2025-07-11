@@ -11,7 +11,7 @@ format:
     fontsize: 11pt
     colorlinks: true
     fig-pos: 'H'
-    mainfont: "Lato"  # Main body text font
+   
     include-in-header:
       text: |
         \newcommand{\districtname}{Charlottesville}
@@ -25,6 +25,8 @@ format:
         \usepackage{fontspec}
         \newfontfamily\leaguegothic{League Gothic}
         \newfontfamily\lato{Lato}
+        \pagestyle{empty}
+    mainfont: "Lato"  # Main body text font
 execute:
   echo: false
   warning: false
@@ -180,23 +182,31 @@ showtext_auto()
 
 
 ```{=latex}
-\begin{tcolorbox}[
-  colback=white,
-  colframe=white,
-  width=\textwidth,
-  arc=0mm,
-  boxrule=2pt,
-  left=10pt,
-  right=10pt,
-  top=2pt,
-  bottom=2pt
-]
+
 
 {\leaguegothic\textcolor{maroon}{{\Huge Income}}}
-\end{tcolorbox}
-```
-\vspace{0.05cm}
 
+```
+
+
+
+
+```{=latex}
+
+
+{\lato\textcolor{maroon}{\textbf{\large \districtname~and Albemarle County Trends and Shares}}}
+
+```
+30\% of the \districtname{} population is in the top 2 deciles. The average income in 2024 was \$197,636. The average annual growth is 1.4\%.
+
+
+```{=latex}
+
+
+
+{\lato\textcolor{black}{\textbf{\large \districtname~and Albemarle County Income Decile Distribution}}}
+\vspace{6pt}
+```
 
 ```{=latex}
 \setlength{\columnsep}{20pt}
@@ -205,22 +215,6 @@ showtext_auto()
 ```
 
 <!-- LEFT COLUMN -->
-```{=latex}
-\begin{tcolorbox}[
-  colback=white,
-  colframe=white,
-  width=\textwidth,
-  arc=0mm,
-  boxrule=2pt,
-  left=10pt,
-  right=10pt,
-  top=2pt,
-  bottom=2pt
-]
-
-{\lato\textcolor{maroon}{\textbf{\large \districtname~and Albemarle County Decile Distribution}}}
-\end{tcolorbox}
-```
 
 ```{r income}
 
@@ -255,11 +249,35 @@ ggplot(decile_prop %>% filter(region == "Charlottesville"),
     legend.position = "none",
     panel.grid.major.x = element_blank(),  # removes vertical gridlines
     panel.grid.minor.x = element_blank(),
+    axis.title.x = element_text(size = 12),
+    axis.title.y = element_text(size = 12),
+    axis.text = element_text(size = 12),
     
   )
 
 ```
 
+```{=latex}
+\begin{tcolorbox}[
+  colback=white,
+  colframe=white,
+  boxrule=1pt,
+  arc=0pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt,
+  width=\linewidth
+]
+\color{black}
+\scriptsize
+\begin{minipage}{\dimexpr\linewidth-16pt}
+\textit{Notes:} The figure shows the share of the \districtname~population within each decile of the national income distribution.
+  
+\end{minipage}
+
+
+\end{tcolorbox}
+
+
+```
 
 
 
@@ -270,67 +288,120 @@ ggplot(decile_prop %>% filter(region == "Charlottesville"),
 <!-- RIGHT COLUMN -->
 
 ```{=latex}
-\vspace*{\fill}
 
-\begin{minipage}[t]{\linewidth}
-
-\begin{tcolorbox}[
-  colback=white,
-  colframe=maroon,
-  boxrule=1pt,
-  arc=0pt,
-  left=8pt, right=8pt, top=6pt, bottom=6pt,
-  width=\linewidth
-]
-\color{black}
-\begin{minipage}{\dimexpr\linewidth-16pt}
-Income deciles divide the national population into ten equal income bins. The first decile reflects the 10\% of the U.S. population with the lowest income, while the 10th decile reflects the 10\% of the population with the highest income. The figure shows the share of the Charlottesville City and Albemarle County population within each decile of the national income distribution.
-\end{minipage}
-\end{tcolorbox}
 
 
 
 \begin{tcolorbox}[
   colback=maroon,
   colframe=maroon,
-  boxrule=0pt,
+  boxrule=1pt,
   arc=0pt,
   left=8pt, right=8pt, top=6pt, bottom=6pt,
   width=\linewidth
 ]
 \color{white}
-\begin{minipage}{\dimexpr\linewidth-16pt}
-30\% of the \districtname~population is in the top 2 deciles.
-\end{minipage}
+\begin{center}
+\textbf{Income Deciles:}\\[12pt]
+
+Income deciles divide the national population into ten equal income bins. The first decile reflects the 10\% of the U.S. population with the lowest income, while the 10th decile reflects the 10\% of the population with the highest income. The figure shows how the \districtname~income distribution differs from the U.S. A positive slope indicates a higher share of residents in the higher deciles while a negative slope indicates a higher share of residents in the lower deciles.  
+
+
+\end{center}
 \end{tcolorbox}
 
-\end{minipage}
+
+
+
 
 ```
 
 ```{=latex}
 \end{paracol}
-```
 
-```{r sparkline table, out.width="100%"}
-knitr::include_graphics("/Users/jfischman/Library/CloudStorage/OneDrive-BowdoinCollege/Documents/GitHub/environmental-inequality-atlas/output/raceincome/income_table.png")
 ```
 
 ```{=latex}
+
+{\lato\textcolor{black}{\textbf{\large \districtname~Income Table}}}
+
+\vspace{-0.5em}
+```
+
+\includegraphics[width=1\linewidth, trim=0.5cm 2cm 2cm 0.5cm, clip]{/Users/jfischman/Library/CloudStorage/Dropbox-TheLab/Josie Fischman/Github/environmental-inequality-atlas/output/raceincome/income_table.png}
+
+
+```{=latex}
+\vspace{-1em}
 \begin{tcolorbox}[
   colback=white,
   colframe=white,
-  width=\textwidth,
-  arc=0mm,
-  boxrule=2pt,
-  left=10pt,
-  right=10pt,
-  top=2pt,
-  bottom=2pt
+  boxrule=1pt,
+  width=\textwidth,  % full width
+  arc=0pt,
+  left=6pt, right=6pt, top=4pt, bottom=4pt
 ]
-
-{\lato\textcolor{maroon}{\textbf{\large Race Specific Income Distributions: \districtname~and Albemarle vs. U.S.}}}
+\color{black}
+\scriptsize
+\begin{minipage}{\dimexpr\linewidth-16pt}
+\textit{Notes:} The table shows the average income level for each decile group in 2024.The annual growth represents the average annual change in income from 1999 to 2024. Positive values represent an increase in average income while negative values represent a decrease in average income.
+\end{minipage}
 \end{tcolorbox}
+```
+
+```{=latex}
+\newpage
+
+
+{\leaguegothic\textcolor{maroon}{{\Huge Race and Income}}}
+
+
+```
+
+```{=latex}
+\vspace{1pt}
+
+
+{\lato\textcolor{maroon}{\textbf{\large \districtname~Race-Income Trends and Shares}}}
+
+```
+The population with the highest average income is the White population and the population with the lowest average income is the Black population. The population with the highest average annual income growth rate from 1999-2024 is the Asian population and the population with the lowest average annual growth rate is the Black population.
+```{=latex}
+
+
+{\lato\textcolor{black}{\textbf{\large \districtname~Race-Income Table}}}
+
+\vspace{-0.5em}
+```
+
+\includegraphics[width=1\linewidth, trim=0.5cm 2cm 2cm 0.5cm, clip]{/Users/jfischman/Library/CloudStorage/Dropbox-TheLab/Josie Fischman/Github/environmental-inequality-atlas/output/raceincome/cville_growth_table.png}
+
+
+```{=latex}
+\vspace{-1em}
+\begin{tcolorbox}[
+  colback=white,
+  colframe=white,
+  boxrule=1pt,
+  width=\textwidth,  % full width
+  arc=0pt,
+  left=6pt, right=6pt, top=6pt, bottom=6pt
+]
+\color{black}
+\scriptsize
+\begin{minipage}{\dimexpr\linewidth-16pt}
+\textit{Notes:} The table shows that average income and the average growth rate over the last 25 years by race. Higher growth rates indicate faster growth over time. 
+
+\end{minipage}
+\end{tcolorbox}
+```
+
+
+```{=latex}
+
+
+{\lato\textcolor{black}{\textbf{\large Race Specific Income Distributions: \districtname~and Albemarle vs. U.S.}}}
+
 ```
 
 ```{r income by race}
@@ -416,28 +487,19 @@ print(final_with_legend)
 ```{=latex}
 \begin{tcolorbox}[
   colback=white,
-  colframe=maroon,
+  colframe=white,
   boxrule=1pt,
   width=\textwidth,  % full width
   arc=0pt,
   left=6pt, right=6pt, top=4pt, bottom=4pt
 ]
 \color{black}
-\footnotesize
+\scriptsize
 \begin{minipage}{\dimexpr\linewidth-16pt}
-\begin{itemize}
-  \setlength\itemsep{0.25em}
-  \item The dark blue bars show the share of the population within each decile of the national income distribution for each race in \districtname~while the light blue bars show the income decile distributions for every race in the U.S.
-  \item The set of figures shows how race specific income distributions in \districtname~differ from U.S. race specific income distributions
-  \item A positive slope indicates a higher proportion of individuals in the upper deciles while a negative slope indicates a higher proportion of individuals in the lower deciles. 
-  \item Differences between the dark and light blue lines indicate a difference in income distribution for the given decile.
-\end{itemize}
+\textit{Notes:} The dark blue bars show the share of the population within each decile of the national income distribution for each race in \districtname~while the light blue bars show the income decile distributions for every race in the U.S. The set of figures shows how race specific income distributions in \districtname~differ from U.S. race specific income distributions. A positive slope indicates a higher proportion of individuals in the upper deciles while a negative slope indicates a higher proportion of individuals in the lower deciles. Differences between the dark and light blue lines indicate a difference in income distribution for the given decile.
+
 \end{minipage}
 \end{tcolorbox}
-```
-
-```{r race table, out.width="100%"}
-knitr::include_graphics("/Users/jfischman/Library/CloudStorage/Dropbox-TheLab/Josie Fischman/Github/environmental-inequality-atlas/output/raceincome/cville_growth_table.png")
 ```
 
 

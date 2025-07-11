@@ -29,7 +29,11 @@ library(sf)
 library(webshot2)
 raceincome_2023 <- load("/Users/jfischman/Library/CloudStorage/Dropbox-TheLab/Josie Fischman/Github/environmental-inequality-atlas/data/processed/raceincome_rda/nat_raceincome_2024.rda")
 raceincome2023 <- get(raceincome_2023)
-View(raceincome2023)
+
+raceincome_long <- load("/Users/jfischman/Library/CloudStorage/Dropbox-TheLab/Josie Fischman/Github/environmental-inequality-atlas/data/processed/raceincome_rda/raceincome_long.rda")
+raceincomelong <- get(raceincome_long)
+View(raceincomelong)
+
 # separate into race income deciles
 raceincome2023 <- raceincome2023 %>%
   filter(
@@ -512,7 +516,7 @@ ggplot(income_trend_thirds, aes(x = year, y = avg_income, color = Group)) +
   )
 
 # Filter for Charlottesville/Albemarle 1999–2024 data
-cville_deciles <- raceincome_combined %>%
+cville_deciles <- raceincomelong %>%
   filter(
     !is.na(income_decile),
     income_decile %in% 1:10,
@@ -572,42 +576,183 @@ cville_decile_table_simple <- cville_trend_table %>%
     `Share of Pop.` = Share
   )
 
+
 # Render table with reactable
 tup <- reactable(
   cville_decile_table_simple,
   columns = list(
-    `Income Decile` = colDef(name = "Decile", width = 70),
+    `Income Decile` = colDef(
+      name = "Decile", 
+      width = 100,
+      align = "center"
+    ),
     `Population (2024)` = colDef(
       format = colFormat(separators = TRUE, digits = 0),
-      width = 120
+      width = 140,
+      align = "center"
     ),
     `Share of Pop.` = colDef(
       format = colFormat(percent = TRUE, digits = 1),
-      width = 100
+      width = 100,
+      align = "center"
     ),
     `Avg Income (2024 $)` = colDef(
       format = colFormat(prefix = "$", separators = TRUE, digits = 0),
-      width = 160
+      width = 160,
+      align = "center"
     ),
     `Annual Growth` = colDef(
-      format = colFormat(percent = TRUE, digits = 1),
-      width = 120
+      name = "Annual Growth",
+      width = 120,
+      align = "center",
+      cell = function(value, index) {
+        decile <- cville_decile_table_simple[["Income Decile"]][index]
+        if (decile == 1) {
+          "\u2013"  # en-dash
+        } else {
+          scales::percent(value, accuracy = 0.1)
+        }
+      }
     )
   ),
   bordered = TRUE,
   striped = TRUE,
   highlight = TRUE,
-  compact = TRUE
+  compact = TRUE,
+  theme = reactableTheme(
+    headerStyle = list(
+      fontSize = "14px",        # smaller header font
+      fontWeight = "bold",
+      color = "black",
+      fontFamily = "Lato"
+    ),
+    cellStyle = list(
+      fontSize = "12px",        # smaller cell font
+      fontFamily = "Lato"
+    )
+  )
 )
 
+
 saveWidget(tup, "income_table.html", selfcontained = TRUE)
+
 
 # Save as PNG
 webshot(
   "income_table.html",
   "output/raceincome/income_table.png",
-  vwidth = 650,    # viewport width in pixels
-  vheight = 800,    # viewport height in pixels
-  zoom = 3
+  vwidth = 700,    # viewport width in pixels
+  vheight = 350,    # viewport height in pixels
+  zoom = 3,
 )
 
+
+#RACE TABLE
+cville_income_by_race <- raceincomelong %>%
+  filter(
+    STATEFP == "51",
+    COUNTYFP %in% c("540", "003"),
+    !is.na(race_ethnicity),
+    !race_ethnicity %in% c("NA", "Unknown", "Other/Unknown", "Other"),
+    !is.na(income_dollar_2024),
+    !is.na(n_noise_postprocessed)
+  ) %>%
+  mutate(
+    income_dollar_2024 = ifelse(income_dollar_2024 < 0, 0, income_dollar_2024),
+    race_ethnicity = tolower(trimws(race_ethnicity))
+  )
+cville_growth_table <- cville_income_by_race %>%
+  filter(race_ethnicity != "other_race") %>%
+  group_by(year, race_ethnicity) %>%
+  summarise(
+    avg_income = weighted.mean(income_dollar_2024, n_noise_postprocessed, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  arrange(race_ethnicity, year) %>%
+  group_by(race_ethnicity) %>%
+  summarise(
+    Income_2024 = avg_income[year == 2024],
+    Start_Income = first(avg_income),
+    Years = 2024 - first(year),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    Annual_Growth = (Income_2024 / Start_Income)^(1 / Years) - 1,
+    Race = recode(race_ethnicity,
+                  "white" = "White",
+                  "black" = "Black",
+                  "hispanic" = "Hispanic",
+                  "asian" = "Asian",
+                  "aian" = "AIAN")
+  ) %>%
+  filter(!is.na(Race)) %>%
+  select(Race, Income_2024, Annual_Growth)
+
+cville_growth_table <- cville_growth_table %>%
+  mutate(Race = factor(Race, levels = c("White", "Black", "Hispanic", "Asian", "AIAN"))) %>%
+  arrange(Race)
+
+cville_summary_table <- reactable(
+  cville_growth_table,
+  columns = list(
+    Race = colDef(
+      name = "Race/Ethnicity",
+      align = "center"
+      ),
+    Income_2024 = colDef(
+      name = "2024 Avg Income",
+      format = colFormat(prefix = "$", separators = TRUE, digits = 0),
+      align = "center"
+    ),
+    Annual_Growth = colDef(
+      name = "Annual Growth Rate",
+      format = colFormat(percent = TRUE, digits = 1),
+      align = "center"
+    )
+  ),
+  bordered = TRUE,
+  striped = TRUE,
+  highlight = TRUE,
+  compact = TRUE,
+  theme = reactableTheme(
+    headerStyle = list(
+      fontSize = "14px",        # smaller header font
+      fontWeight = "bold",
+      color = "black",
+      fontFamily = "Lato"
+    ),
+    cellStyle = list(
+      fontSize = "12px",        # smaller cell font
+      fontFamily = "Lato"
+    )
+  )
+)
+saveWidget(cville_summary_table, "output/raceincome/cville_growth_table.html", selfcontained = TRUE)
+webshot("output/raceincome/cville_growth_table.html", "output/raceincome/cville_growth_table.png", vwidth = 650,    # viewport width in pixels
+        vheight = 800, zoom = 2)
+
+cville_income_overall <- raceincomelong %>%
+  filter(
+    STATEFP == "51",
+    COUNTYFP %in% c("540", "003"),
+    !is.na(income_dollar_2024),
+    !is.na(n_noise_postprocessed)
+  ) %>%
+  mutate(income_dollar_2024 = ifelse(income_dollar_2024 < 0, 0, income_dollar_2024)) %>%
+  group_by(year) %>%
+  summarise(
+    avg_income = weighted.mean(income_dollar_2024, n_noise_postprocessed, na.rm = TRUE),
+    .groups = "drop"
+  )
+View(cville_income_overall)
+
+cville_income_summary <- cville_income_overall %>%
+  arrange(year) %>%
+  summarise(
+    Start_Year = first(year),
+    Start_Income = first(avg_income),
+    Income_2024 = avg_income[year == 2024],
+    Years = 2024 - first(year),
+    Annual_Growth = (Income_2024 / Start_Income)^(1 / Years) - 1
+  )
+View(cville_income_summary)
