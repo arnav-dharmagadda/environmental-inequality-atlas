@@ -91,7 +91,7 @@ process_rda_file <- function(file_path, lon_col = "grid_lon", lat_col = "grid_la
 all_rda_files <- list.files(processed_path, pattern = "\\.rda$", full.names = TRUE, recursive = TRUE)
 
 # Filter to exclude files ending in "_hex.rda"
-file_paths <- all_rda_files[!grepl("_hex\\.rda$", all_rda_files) & !grepl("^nat_", basename(all_rda_files)) & !grepl("_point\\.rda$", all_rda_files) & !grepl("_point_with_hex_id\\.rda$", all_rda_files)]
+file_paths <- all_rda_files[!grepl("_hex\\.rda$", all_rda_files) & !grepl("^nat_", basename(all_rda_files)) & !grepl("_point\\.rda$", all_rda_files) & !grepl("_point_with_hex_id\\.rda$", all_rda_files) & !grepl("^pol_", basename(all_rda_files))]
 
 #file_paths <- '/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/raceincome_rda/raceincome_2024.rda'
 #file_paths <- '/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/ageracesex_rda/ageracesex_2024.rda'

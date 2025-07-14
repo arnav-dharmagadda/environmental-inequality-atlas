@@ -29,6 +29,7 @@ format:
         % Suppress page numbers
         \pagestyle{empty}
         \definecolor{custommaroon}{HTML}{601215}
+        \definecolor{eilblue}{HTML}{003f5c}
         \usepackage[none]{hyphenat}
 execute:
   echo: false
@@ -76,7 +77,7 @@ showtext_auto()
 
 ```{=latex}
 \setlength{\columnsep}{20pt}
-\columnratio{0.60}
+\columnratio{0.55}
 \begin{paracol}{2}
 ```
 
@@ -150,17 +151,13 @@ tm_basemap("CartoDB.Positron", alpha = 1) +
   )
 ```
 
+\lato\scriptsize\textit{Notes}: Map with hexagonal grid shows population concentrations, with darker regions indicating more people.
+
+\normalsize
+
 ```{=latex}
 \switchcolumn
 ```
-```{=latex}
-\begin{tcolorbox}[
-  colback=white,
-  colframe=white,
-  boxrule=1pt,
-  arc=0pt,
-  left=12pt, right=12pt, top=10pt, bottom=10pt
-]
 
 \vspace{0em}
 
@@ -169,34 +166,25 @@ tm_basemap("CartoDB.Positron", alpha = 1) +
 
 \vspace{1em}
 
-\begin{itemize}
-
-\item Charlottesville and Albemarle County are home to 147,428 people. 
-
-\item The most populous county is Albemarle. 
-
-\item The most populous localities are Charlottesville City, Crozet, and Hollymead.
-
-\item The region has a population density of 78 people per square kilometer, which is more dense than the national average of 37 per square kilometer.
-
-\end{itemize}
+Urban and rural environments sometimes face distinct environmental risks. Understanding local population patterns can inform policymaking decisions.
 
 \vspace{1em}
 
-\end{tcolorbox}
-```
+Charlottesville and Albemarle County are home to 147,428 people. People are not distributed uniformly across land area. In the map to the left, darker blue areas indicate more dense, urban regions. Lighter shades of blue indicate more rural, sparsely-populated areas.
 
+\vspace{1em}
 
+The region has a population density of 78 people per square kilometer, which is more dense than the national average of 37 per square kilometer.
 
 ```{=latex}
 \end{paracol}
 ```
 
-\vspace{0.5em}
+\vspace{1.5em}
 
 ```{=latex}
 \setlength{\columnsep}{20pt}
-\columnratio{0.55}
+\columnratio{0.5}
 \begin{paracol}{2}
 ```
 
@@ -206,11 +194,14 @@ tm_basemap("CartoDB.Positron", alpha = 1) +
 
 \lato 
 
-* The population has grown since 2000 by 47,506 people at an average growth rate of 1.63%. This is faster than the national average growth rate of 0.8%.
+\vspace{1em}
+
+Changes in population over time can affect how communities plan for infrastructure, public services, and environmental management.
 
 
-* Albemarle County has the highest growth rate relative to other counties in the region.
+\vspace{1em}
 
+The population has grown since 2000 by 47,506 people at an average growth rate of 1.63%. This is faster than the national average growth rate of 0.8%.
 
 ```{=latex}
 \switchcolumn
@@ -219,6 +210,8 @@ tm_basemap("CartoDB.Positron", alpha = 1) +
 \lato\textcolor{black}{\large\textbf{Population Over Time}}
 
 ```{r, pop_over_time}
+#| fig.width: 8
+#| fig.height: 4.25
 
 file_path <- paste0('/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/raceincome_rda/raceincome_long.rda')
 load(file_path)
@@ -254,7 +247,7 @@ ggplot(plot_data, aes(x = year, y = n_noise_postprocessed, color = NAME)) +
     y = "Population"
   ) +
   scale_x_continuous(
-    breaks = seq(2000, 2020, by = 5),
+    breaks = seq(2000, 2025, by = 5),
     minor_breaks = NULL,  # Remove minor grid lines
     expand = c(0.02, 0)
   ) +
@@ -316,21 +309,25 @@ ggplot(plot_data, aes(x = year, y = n_noise_postprocessed, color = NAME)) +
 
 ```
 
+\lato\scriptsize\textit{Notes}: Line plot shows population in every year, 2000-2024.
+
 ```{=latex}
 \end{paracol}
 ```
 
-\vspace{0.5em}
+\vspace{1.5em}
 
 ```{=latex}
 \setlength{\columnsep}{20pt}
-\columnratio{0.45}
+\columnratio{0.5}
 \begin{paracol}{2}
 ```
 
 \lato\textcolor{black}{\large\textbf{Age Over Time}}
 
 ```{r, age_share}
+#| fig.width: 8
+#| fig.height: 4.125
 
 file_path <- '/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/processed/ageracesex_rda/ageracesex_year_long.rda'
 load(file_path)
@@ -426,6 +423,8 @@ ggplot(age_data_long, aes(x = year, y = value, color = type)) +
 
 ```
 
+\lato\scriptsize\textit{Notes}: Line plot shows population share by age group (under 18, 19-65, over 65) in every year, 2000-2024.
+
 ```{=latex}
 \switchcolumn
 ```
@@ -433,11 +432,21 @@ ggplot(age_data_long, aes(x = year, y = value, color = type)) +
 
 \lato 
 
-* 18% of Charlottesville’s population is under 18, 60% of the population is 19-65, and 20% of the population is over 65.
+\normalsize
 
-* Charlottesville has a lower share of people under 18, and a similar share of people between 19 and 65 relative to the US. Charlottesville has a higher share of people over 65 than the US. 
+\vspace{1em}
 
-* The over 65 population in Charlottesville is growing, while the under 18 and 19-65 population is declining.
+18% of Charlottesville’s population is under 18, 60% of the population is 19-65, and 20% of the population is over 65.
+
+\vspace{1em}
+
+Charlottesville has a lower share of people under 18, and a similar share of people between 19 and 65 relative to the US. Charlottesville has a higher share of people over 65 than the US. 
+
+\vspace{1em}
+
+The over 65 population in Charlottesville is growing, while the under 18 and 19-65 population is declining.
+
+\vspace{1em}
 
 ```{=latex}
 \end{paracol}

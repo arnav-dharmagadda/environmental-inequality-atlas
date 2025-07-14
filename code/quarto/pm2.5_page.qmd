@@ -1,0 +1,374 @@
+---
+format:
+  pdf:
+    documentclass: article
+    pdf-engine: xelatex  # Required for system fonts
+    geometry:
+      - top=0.5in
+      - bottom=0.5in
+      - left=0.5in
+      - right=0.5in
+    fontsize: 11pt
+    colorlinks: true
+    fig-pos: 'H'
+    mainfont: "Lato"  # Main body text font
+    include-in-header:
+      text: |
+        \newcommand{\districtname}{District 5}
+        \usepackage{multicol}
+        \usepackage{paracol}
+        \usepackage{xcolor}
+        \usepackage{tcolorbox}
+        \usepackage{graphicx}
+        \usepackage{float}
+        \definecolor{maroon}{RGB}{128,0,0}
+        \usepackage{fontspec}
+        \usepackage{datetime}
+        \newfontfamily\leaguegothic{League Gothic}
+        \newfontfamily\lato{Lato}
+        % Suppress page numbers
+        \pagestyle{empty}
+        \definecolor{custommaroon}{HTML}{601215}
+        \usepackage[none]{hyphenat}
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+#| include: false
+library(knitr)
+library(ggplot2)
+library(dplyr)
+
+# Set figure defaults
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.height = 4,
+  dpi = 300,
+  out.width = "100%"
+)
+
+# Set file paths (use relative paths instead of setwd)
+data_path <- "/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/gridded_eif_data/"
+git_path <- "/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/"
+
+# Load packages
+
+if (!requireNamespace("pacman", quietly = TRUE)) {
+  install.packages("pacman")
+}
+
+pacman::p_load(ncdf4, sf, terra, dplyr, ggplot2, tmap, arrow, dplyr, tidyr, scales, haven, stringr, purrr, tigris, systemfonts, showtext)
+
+# Set default ggplot2 font to Lato (system font)
+theme_set(theme_minimal(base_family = "Lato"))
+
+font_add(family = "Lato", regular = "/Users/arnavdharmagadda/Library/Group Containers/UBF8T346G9.Office/FontCache/4/CloudFonts/Lato/25090817022.ttf")  # optional, if not auto-detected
+showtext_auto()
+
+```
+
+\leaguegothic\textcolor{custommaroon}{\Huge\textbf{Air Quality: PM2.5 Exposure}}
+
+\vspace{0.5em}
+
+```{=latex}
+\setlength{\columnsep}{20pt}
+\columnratio{0.525}
+\begin{paracol}{2}
+```
+
+<!-- LEFT COLUMN -->
+
+\lato\textcolor{black}{\large\textbf{PM2.5 Exposure Over Space}}
+
+```{r, pm25_map}
+file_path <- paste0('/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/data/map_data/pm25_with_county.rda')
+load(file_path)
+
+# Create hexagonal map with publication styling
+hex_map <- tm_basemap("CartoDB.Positron", alpha = 1) +
+  tm_shape(hex_grid_sf) +
+  tm_fill(
+    col = "PM25",
+    title = "PM2.5 (μg/m³)",
+    style = "cont",
+    palette = "-inferno",
+    fill_alpha = 0.9,
+    colorNA = "transparent",
+    textNA = "",
+    lwd = 0
+  ) +
+  tm_borders(
+    col = "white",
+    lwd = 0.3
+  ) +
+  tm_graticules(
+    n.x = 5,
+    n.y = 5,
+    col = "gray70",
+    lwd = 0.3,
+    labels.size = 0.3
+  ) +
+  tm_layout(
+    main.title.size = 0.8,
+    main.title.fontfamily = "Lato",
+    legend.outside = TRUE,
+    legend.text.size = 0.6,
+    legend.title.size = 0.7,
+    legend.text.fontfamily = "Lato",
+    legend.title.fontfamily = "Lato",
+    fontfamily = "Lato",
+    bg.color = "transparent",
+    outer.bg.color = "transparent"
+  )
+
+# Display the hexagonal map
+print(hex_map)
+
+```
+
+\lato\scriptsize\textit{Notes}: Map with hexagonal grid shows PM2.5 concentrations.
+
+```{=latex}
+\switchcolumn
+```
+```{=latex}
+\begin{tcolorbox}[
+  colback=custommaroon,
+  colframe=custommaroon,
+  boxrule=1pt,
+  arc=0pt,
+  left=12pt, right=12pt, top=10pt, bottom=10pt
+]
+
+\vspace{0em}
+
+\color{white}
+\lato{\textcolor{white}{\large\textbf{PM2.5}}}
+
+\normalsize
+
+\vspace{1em}
+
+PM2.5 refers to fine particulate matter that is 2.5 micrometers or smaller in diameter. These tiny particles are a type of air pollution that can come from sources like vehicle emissions, industrial processes, wildfires, and chemical reactions in the atmosphere. Because of their small size, PM2.5 particles can penetrate deep into the lungs and even enter the bloodstream, posing health risks such as respiratory problems, heart disease, and premature death. 
+
+\vspace{0.5em}
+
+The map on the left shows where PM2.5 is highest (darker) and lowest (lighter) in the county.
+
+\vspace{1em}
+
+\end{tcolorbox}
+```
+
+
+
+```{=latex}
+\end{paracol}
+```
+
+```{=latex}
+
+\vspace{0.5em}
+
+\lato Overall, the average resident in Charlottesville was exposed to 8.53 micrograms per cubic meter of PM2.5 in 2023, which is 1.7\% lower than the national average of 8.68 micrograms per cubic meter. This has decreased by 44.8\% since 2000. The National Ambient Air Quality Standards (NAAQ) sets the public health standard for PM2.5 exposure at 9 micrograms per cubic meter. About 4.6\% of Charlottesville residents live in areas exceeding the standard, which is 88.6\% lower than the national average of 40.5\%.
+
+\color{black}
+\lato{\textcolor{custommaroon}{\large\textbf{Exposure By Race/Ethnicity}}}
+
+In Charlottesville, Black residents experience the highest levels of PM2.5 exposure, and Black residents experience PM 2.5 levels above the national standard at the highest rate relative to other racial groups. PM2.5 exposure for White, Asian, and AIAN residents is higher than the national average, but lower than the national average for Black and Hispanic residents.
+
+\vspace{0.5em}
+
+
+```
+\lato\textcolor{black}{\large\textbf{Average PM2.5 Exposure and Exceeding Standard Rate by Race/Ethnicity}}
+```{r sparkline_race, out.width="100%"}
+
+include_graphics("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/code/quarto/images/race_exposure.png")
+
+```
+
+\lato\scriptsize\textit{Notes}: By race/ethnicity, this table shows the local and national average PM2.5 exposure in 2023 and local trend 2000-2023. Additionally, it shows local and national rate of people living in areas exceeding the national standard in 2023 and local trend 2000-2023.
+
+```{=latex}
+
+\color{black}
+\lato{\textcolor{custommaroon}{\large\textbf{Exposure By Income Decile}}}
+
+\normalsize
+
+Residents in the lowest income deciles in Charlottesville have the highest exposure to PM2.5 and have the highest rate of experiencing levels of PM2.5 that exceed the national standard. The tenth income decile has the lowest PM2.5 exposure and percent exposed to levels of PM2.5 exceeding the national standard. The second income decile has the highest average level of PM2.5 exposure, and the fifth income decile has the highest rate of areas exceeding the national standard.
+
+\vspace{1em}
+
+```
+\lato\textcolor{black}{\large\textbf{Average PM2.5 Exposure and Exceeding Standard Rate by Income Decile}}
+
+```{r sparkline_inc, out.width="100%"}
+
+include_graphics("/Users/arnavdharmagadda/The Lab Dropbox/Arnav Dharmagadda/GitHub/environmental-inequality-atlas/code/quarto/images/income_exposure.png")
+
+```
+
+\lato \scriptsize \textit{Notes:} By income decile, this table shows the local and national average PM2.5 exposure in 2023 and local trend 2000-2023. Additionally, it shows local and national rate of people living in areas exceeding the national standard in 2023 and local trend 2000-2023.
+
+\vspace{2em}
+
+```{=latex}
+\setlength{\columnsep}{20pt}
+\columnratio{0.35}
+\begin{paracol}{2}
+```
+
+```{=latex}
+
+
+
+\begin{tcolorbox}[
+  colback=custommaroon,
+  colframe=custommaroon,
+  boxrule=1pt,
+  arc=0pt,
+  left=12pt, right=12pt, top=10pt, bottom=10pt
+]
+
+\vspace{0em}
+
+\color{white}
+\lato{\textcolor{white}{\large\textbf{Race/Ethnicity \& Income}}}
+
+\vspace{1em}
+
+\normalsize
+
+Disparate exposure to PM2.5 exists across both income and racial dimensions. PM2.5 exposure tends to decline across all racial/ethnic categories, but level differences between groups remain. In the lowest income decile, Black, Asian, and Hispanic residents have the highest exposure, while White and Native American residents have the lowest exposure. This pattern persists in the highest income decile. 
+
+\vspace{1em}
+
+\end{tcolorbox}
+```
+
+
+```{=latex}
+\switchcolumn
+```
+\lato\textcolor{black}{\large\textbf{PM2.5 Exposure By Income Decile \& Race/Ethnicity}}
+
+```{r, inc_plot}
+file_path <- paste0(git_path, "data/processed/pollutants_rda/pollutants_long.rda")
+load(file_path) 
+
+file_path <- paste0(git_path, "data/processed/raceincome_rda/raceincome_long.rda")
+load(file_path)
+
+raceincome_pollute <- pollutants_combined %>%
+  left_join(raceincome_combined, by = c("grid_lon", "grid_lat", "year", "STATEFP", "COUNTYFP", "COUNTYNS", "GEOID", "GEOIDFQ", "NAME", "NAMELSAD", "STUSPS", "STATE_NAME", "LSAD", "ALAND", "AWATER"))
+
+line_plot_race <- raceincome_pollute %>%
+    mutate(pm25_gt_9 = pm25_ACAG_gwr > 9) %>%
+    filter(year == 2023) %>%
+    filter(income_decile != 0) %>%
+    filter(race_ethnicity != "Other/Unknown") %>%
+    group_by(race_ethnicity, income_decile) %>%
+    summarize(
+      pm25_avg = weighted.mean(pm25_ACAG_gwr, n_noise_postprocessed, na.rm = TRUE),
+      exceed_standard = weighted.mean(pm25_gt_9, n_noise_postprocessed, na.rm = TRUE),
+      .groups = "drop"
+    )
+
+ggplot(line_plot_race, aes(x = income_decile, y = pm25_avg, color = race_ethnicity)) +
+  geom_point(size = 1.5, shape = 2, alpha = 0.9) +
+  geom_line(size = 1, alpha = 0.9) +
+  scale_color_manual(
+    values = c(
+      "White" = "#2E8B57",
+      "Black" = "#003F5C",
+      "Hispanic" = "#FF6B35",
+      "Asian" = "#A6CEE3", 
+      "AIAN" = "#601215"
+    ),
+    breaks = c("White", "Black", "Hispanic", "Asian", "AIAN")
+  ) +
+  scale_x_continuous(
+    breaks = 1:10, 
+    labels = 1:10,
+    minor_breaks = NULL,  # Remove minor grid lines
+    expand = c(0.02, 0)
+  ) +
+  scale_y_continuous(
+    expand = c(0.02, 0),
+    limits = c(8.2, 9)
+  ) +
+  labs(
+    x = "Income Decile",
+    y = "Average PM2.5 (µg/m³)",
+    color = "Race/Ethnicity"
+  ) +
+  theme_minimal(base_size = 6, base_family = "Lato") +
+  theme(
+    # Plot titles
+    plot.title = element_text(
+      face = "bold", 
+      size = 8, 
+      hjust = 0,
+      margin = margin(b = 2.5),
+      color = "black"
+    ),
+    plot.subtitle = element_text(
+      size = 7,
+      hjust = 0,
+      margin = margin(b = 10),
+      color = "gray30"
+    ),
+    plot.caption = element_text(
+      size = 4.5,
+      hjust = 0,
+      margin = margin(t = 7.5),
+      color = "gray50",
+      lineheight = 1.1
+    ),
+    # Axes
+    axis.title = element_text(size = 10.5, color = "gray20"),
+    axis.text = element_text(size = 8.75, color = "gray30"),
+    axis.title.x = element_text(margin = margin(t = 5), size = 10.5),
+    axis.title.y = element_text(margin = margin(r = 5), size = 10.5),
+    axis.text.x = element_text(size = 8.75),
+    axis.text.y = element_text(size = 8.75),
+    # Grid
+    panel.grid.major.x = element_blank(),  # Remove vertical major grid lines
+    panel.grid.minor.x = element_blank(),  # Remove vertical minor grid lines
+    panel.grid.major = element_line(color = "gray90", size = 0.25),
+    panel.grid.minor = element_line(color = "gray95", size = 0.125),
+    panel.background = element_rect(fill = "white", color = NA),
+    # Add solid x-axis line
+    axis.line.x = element_line(color = "black", size = 0.25),
+    # Legend
+    legend.position = "top",
+    legend.title = element_blank(),
+    legend.text = element_text(size = 5.5, color = "gray20"),
+    legend.key.width = unit(0.75, "cm"),
+    legend.margin = margin(b = 7.5),
+    legend.box.spacing = unit(0, "pt"),
+    legend.direction = "horizontal",
+    legend.box = "horizontal",
+    legend.justification = "center",
+    # Plot margins
+    plot.margin = margin(10, 12.5, 7.5, 10),
+    # Remove plot background
+    plot.background = element_rect(fill = "white", color = NA)
+  ) + 
+  guides(color = guide_legend(nrow = 1, ncol = 5))
+
+
+```
+
+\lato \scriptsize \textit{Notes:} Each line represents a different racial group. For each income decile, the average PM2.5 exposure is shown. 
+
+
+```{=latex}
+\end{paracol}
+```
